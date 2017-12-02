@@ -18,7 +18,7 @@ class App extends Component {
                         exact
                         path="/"
                         component={LoginContainer}/>
-                    <PrivateRoute
+                    <PublicRoute
                         exact
                         path="/Home"
                         component={DashboardContainer}/>

@@ -10,20 +10,23 @@ export function* requestLoginBack() {
 
         yield take(LOGIN_REQUEST);
 
-        let server = "http://localhost:3002/";
+        let server = "http://localhost:3001/fblogin";
+
         console.log("Helllo");
-        store.dispatch(push('/Home'));
-        /*axios.get(server)
+
+        axios.get(server)
             .then(function (response) {
-                if (!!response.data.status && response.data.status === "success") {
+                console.log(response);
+                if (!!response.status && response.status === 200) {
                     //store.dispatch()
+                    window.location.href = response.data.redirectURI+'client_id='+response.data.client_id+'&redirect_uri='+response.data.redirect_uri;
                 } else {
                     alert('Erreur lors du Login');
                 }
             })
             .catch(function (error) {
                 console.log(error);
-            });*/
+            });
     }
 }
 

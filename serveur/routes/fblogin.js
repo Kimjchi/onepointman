@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const SUCCESS_STATUS = 200;
+const REDIRECT_STATUS = 304;
 const NOT_FOUND_STATUS = 404;
 
 const _sendRepsonse = (status, message, res) => {
@@ -14,9 +15,9 @@ router.get('/', function(req, res, next) {
     console.log("GET /fblogin");
 
     let facebookURI = {
-        redirectURI:'https://www.facebook.com/v2.11/dialog/oauth?\n' +
-        '  client_id=onepointman\n' +
-        '  &redirect_uri=/fblogin/handleauth'
+        redirectURI: 'https://www.facebook.com/v2.11/dialog/oauth?',
+        client_id: '137357800216709',
+        redirect_uri: 'http://localhost:3000/Home'
     };
 
     //TODO: Send response to client

@@ -1396,6 +1396,10 @@ article, aside, details, figcaption, figure, footer, header, hgroup, main, menu,
     box-sizing: border-box;
 }
 
+/*body {
+    background: #2ab8ac;
+}*/
+
 header {
     width: 100%;
     background-color: #ffab52;

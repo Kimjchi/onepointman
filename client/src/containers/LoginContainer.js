@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import LoginComponent from "../components/LoginComponent";
+import {loginRequest} from "../actions/opLogin";
 
 
 class LoginContainer extends Component {
@@ -8,7 +9,7 @@ class LoginContainer extends Component {
 
     render() {
         return (
-            <LoginComponent/>
+            <LoginComponent login={this.props.loginRequest}/>
         )
     }
 }
@@ -23,7 +24,9 @@ function mapStateToProps (state) {
 //fonctions
 const  mapDispatchToProps = (dispatch) => {
     return{
-
+        loginRequest: () => {
+            dispatch(loginRequest())
+        }
     }
 };
 

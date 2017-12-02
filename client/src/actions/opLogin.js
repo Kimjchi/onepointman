@@ -10,8 +10,8 @@ export function changeForm (newFormState){
     return {type: CHANGE_FORM, newFormState}
 }
 
-export function loginRequest (data){
-    return {type: LOGIN_REQUEST, data}
+export function loginRequest (){
+    return {type: LOGIN_REQUEST}
 }
 
 export function sendingRequest (sending){

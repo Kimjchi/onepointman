@@ -2,6 +2,7 @@ import {combineReducers} from 'redux';
 import {routerReducer} from 'react-router-redux';
 import opLogin from './opLogin';
 import opGroups from './opGroups';
+import opMap from './opMap';
 
 // TODO les autres reducers a rajouter ici
 
@@ -9,7 +10,8 @@ import opGroups from './opGroups';
 const appReducer = combineReducers({
     routerReducer,
     opLogin,
-    opGroups
+    opGroups,
+    opMap,
 });
 
 const rootReducer = (state, action) => {

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import GroupsContainer from "./GroupsContainer";
+import MapContainer from "./MapContainer";
 
 
 class DashboardContainer extends Component {
@@ -10,6 +11,7 @@ class DashboardContainer extends Component {
         return (
             <div>
                 <GroupsContainer/>
+                <MapContainer/>
             </div>
         )
     }

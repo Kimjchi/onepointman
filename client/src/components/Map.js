@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {  withGoogleMap, GoogleMap, Marker } from "react-google-maps"
 import GoogleMapsWrapper from "../util/GoogleMapsWrapper";
+import '../style/Map.css';
 
 class Map extends Component {
 
@@ -11,11 +12,11 @@ class Map extends Component {
     render()
     {
         return (
-            <div>
+            <div class="center">
                 <GoogleMapsWrapper
                     googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places"
                     loadingElement={<div style={{ height: '100%' }} />}
-                    containerElement={<div style={{ height: '600px', width: '1200px' }} />}
+                    containerElement={<div style={{ height: '600px'}} />}
                     mapElement={<div style={{ height: '100%' }} />}
                     defaultZoom={3}
                         defaultCenter={{ lat: -34.397, lng: 150.644 }}>

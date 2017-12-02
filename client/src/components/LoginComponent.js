@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Button, Grid, PageHeader, Row} from 'react-bootstrap';
 import '../style/Login.css';
+import '../style/Shake.css';
 
 class LoginComponent extends Component {
     constructor(props) {
@@ -19,7 +20,7 @@ class LoginComponent extends Component {
                     <PageHeader className="text-center">OnePointMan</PageHeader>
                 </Row>
                 <Row className="show-grid text-center">
-                        <Button bsSize="large" onClick={this._handleLogin}>Login</Button>
+                        <Button bsSize="large" onClick={this._handleLogin} className="shake shake-slow">Login</Button>
                 </Row>
             </Grid>
         )

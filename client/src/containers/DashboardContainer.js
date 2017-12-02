@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import GroupsContainer from "./GroupsContainer";
 import MapContainer from "./MapContainer";
+import {Grid, PageHeader, Row} from "react-bootstrap";
+import UsersContainer from "./UsersContainer";
 
 
 class DashboardContainer extends Component {
@@ -9,10 +11,20 @@ class DashboardContainer extends Component {
 
     render() {
         return (
-            <div>
+            <Grid>
+                <Row className="show-grid">
+                    <PageHeader className="text-center">OnePointMan</PageHeader>
+                </Row>
                 <GroupsContainer/>
-                <MapContainer/>
-            </div>
+                <Row className="show-grid">
+                    <UsersContainer/>
+                </Row>
+                <Row className="show-grid">
+                    {
+                        <MapContainer/>
+                    }
+                </Row>
+            </Grid>
         )
     }
 }

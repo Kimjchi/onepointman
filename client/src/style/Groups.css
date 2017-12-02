@@ -163,3 +163,17 @@ a:hover
     transform: scale(1.0, 1.0);
     opacity: 1;
 }
+
+.moddal {
+    color: #232323;
+    font-family: "Avenir Next", "Avenir", sans-serif;
+
+}
+
+.modal .btn {
+    font-family: "Avenir Next", cursive;
+    font-size: 30px;
+    padding: 10px 20px;
+    margin: 10px auto;
+    transition: background-color, .3s;
+}

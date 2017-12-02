@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './App.css';
 import {Provider} from 'react-redux';
 import {Switch} from 'react-router-dom'
 import {PrivateRoute, PublicRoute} from "./components/CustomRoute";

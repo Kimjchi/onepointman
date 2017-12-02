@@ -1,13 +1,15 @@
 import {combineReducers} from 'redux';
 import {routerReducer} from 'react-router-redux';
 import opLogin from './opLogin';
+import opGroups from './opGroups';
 
 // TODO les autres reducers a rajouter ici
 
 
 const appReducer = combineReducers({
     routerReducer,
-    opLogin
+    opLogin,
+    opGroups
 });
 
 const rootReducer = (state, action) => {

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
+import GroupsContainer from "./GroupsContainer";
 
 
 class DashboardContainer extends Component {
@@ -8,7 +9,7 @@ class DashboardContainer extends Component {
     render() {
         return (
             <div>
-
+                <GroupsContainer/>
             </div>
         )
     }

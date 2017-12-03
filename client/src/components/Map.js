@@ -12,15 +12,17 @@ class Map extends Component {
     render()
     {
         return (
-            <div class="center">
+            <div className="center">
                 <GoogleMapsWrapper
-                    googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places"
+                    googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyAz09vuKBf8P3_7nXx_DNSKwzY0toXGxYw&v=3.exp&libraries=geometry,drawing,places"
                     loadingElement={<div style={{ height: '100%' }} />}
-                    containerElement={<div style={{ height: '600px'}} />}
+                    containerElement={<div style={{ height: '100%'}} />}
                     mapElement={<div style={{ height: '100%' }} />}
-                    defaultZoom={3}
-                        defaultCenter={{ lat: -34.397, lng: 150.644 }}>
+                    zoom={this.props.zoom}
+                    center={this.props.mapCenter}>
+
                         {this.props.isMarkerShown && <Marker position={{lat: -34.397, lng: 150.644}}/>}
+
                     </GoogleMapsWrapper>
             </div>
         )

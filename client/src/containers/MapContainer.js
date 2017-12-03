@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import Map from "../components/Map";
 import {loginRequest} from "../actions/opLogin";
-import {recenterMap} from "../actions/opMap";
+import {recenterMap, updateMarkers} from "../actions/opMap";
 
 
 class MapContainer extends Component {
@@ -14,8 +14,11 @@ class MapContainer extends Component {
         let {isMarkerShown} = this.props.opMap;
         let {mapCenter} = this.props.opMap;
         let {zoom} = this.props.opMap;
+        let {markers} = this.props.opMap;
+        let updateMarkers = this.props.updateMarkers;
         return (
-            <Map isMarkerShown = {isMarkerShown} mapCenter = {mapCenter} zoom = {zoom} />
+            <Map isMarkerShown = {isMarkerShown} mapCenter = {mapCenter}
+                 zoom = {zoom} updateMarkers = {updateMarkers}  markers = {markers}/>
     )
     }
 }
@@ -30,6 +33,9 @@ function mapStateToProps (state) {
 //fonctions
 const  mapDispatchToProps = (dispatch) => {
     return{
+        updateMarkers: (markers) => {
+            dispatch(updateMarkers(markers))
+        }
     }
 };
 

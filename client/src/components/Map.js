@@ -20,8 +20,12 @@ class Map extends Component {
                     mapElement={<div style={{ height: '100%' }} />}
                     zoom={this.props.zoom}
                     center={this.props.mapCenter}>
-
-                        {this.props.isMarkerShown && <Marker position={{lat: -34.397, lng: 150.644}}/>}
+                        {this.props.isMarkerShown && this.props.markers.map(marker => (
+                            <Marker
+                                key={marker.id}
+                                position={{ lat: marker.lat, lng: marker.lng }}
+                            />
+                        ))}
 
                     </GoogleMapsWrapper>
             </div>

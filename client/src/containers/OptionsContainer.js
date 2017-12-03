@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import ReactDOM from 'react-dom';
 import '../style/Options.css';
-import {recenterMap} from "../actions/opMap";
+import {recenterMap, updateMarkers} from "../actions/opMap";
 import {changeAddress, changeAddressEntry, changeAddressFormatted} from "../actions/opOptions";
 import GoogleMaps from '@google/maps';
 
@@ -26,8 +26,7 @@ class OptionsContainer extends Component {
 
     _handleAddressSearch(event) {
         if (event.key === 'Enter') {
-            this._geocodeAddress(event);
-            //this.props.recenterMap({ lat: -36.397, lng: 150.644 });
+            this._geocodeAddress();
         }
     }
 
@@ -35,35 +34,38 @@ class OptionsContainer extends Component {
         this.props.changeAddress(event.target.value);
     }
 
-    _geocodeAddress (event) {
+    _geocodeAddress () {
         let {address} = this.props.opOptions;
         googleMapsClient.geocode({
             address: address
         }, function(err, response) {
+            console.log(response);
+            console.log(err);
             if (!err) {
-                console.log(JSON.stringify(response.json.results[0].formatted_address));
-                //foundAddress: results[0].formatted_address,
-                //isGeocodingError: false
-                this.props.changeAddress(response.json.results[0].formatted_address);
-                this.props.recenterMap(response.json.results[0].geometry.location, 15);
-                //this.marker.setPosition(results[0].geometry.location);
-
+                let position = response.json.results[0].geometry.location;
+                let address = response.json.results[0].formatted_address;
+                console.log(JSON.stringify(address));
+                this.props.changeAddress(address, true);
+                this.props.recenterMap(position, 15);
+                position.id = "perso-01";
+                let markersArray = [position];
+                this.props.updateMarkers(markersArray);
                 return;
             }
-            /*this.setState({
-            foundAddress: null,
-            isGeocodingError: true
-            });*/
 
+            this.props.changeAddress(address, false);
             this.props.recenterMap({
                 lat: ATLANTIC_OCEAN.latitude,
                 lng: ATLANTIC_OCEAN.longitude
             }, 3);
 
-            /*this.marker.setPosition({
+            let markersArray = [{
+                id: "perso-01",
                 lat: ATLANTIC_OCEAN.latitude,
                 lng: ATLANTIC_OCEAN.longitude
-            });*/
+            }];
+
+            this.props.updateMarkers(markersArray);
         }.bind(this));
     }
 
@@ -159,8 +161,11 @@ const  mapDispatchToProps = (dispatch) => {
         recenterMap: (mapCenter, zoom) => {
             dispatch(recenterMap(mapCenter, zoom))
         },
-        changeAddress: (newAddress) => {
-            dispatch(changeAddress(newAddress))
+        changeAddress: (newAddress, validAddress) => {
+            dispatch(changeAddress(newAddress, validAddress))
+        },
+        updateMarkers: (newMarkers) => {
+            dispatch(updateMarkers(newMarkers))
         }
     }
 };

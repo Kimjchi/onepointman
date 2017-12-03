@@ -10,14 +10,15 @@ import {CHANGE_ADDRESS_ENTRY} from "../actions/opOptions";
 
 //pour le register e mail
 let initialState = {
-    address : ""
+    address : "",
+    validAddress : false
 };
 
 export default function reducer (state = initialState, action ){
 
     switch (action.type){
         case CHANGE_ADDRESS:
-            return {...state , address : action.newAddress};
+            return {...state , address : action.newAddress, validAddress : action.validAddress};
 
         default:
             return state

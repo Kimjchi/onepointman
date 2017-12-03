@@ -12,8 +12,6 @@ export function* requestLoginBack() {
 
         let server = "http://localhost:3001/fblogin";
 
-        console.log("Helllo");
-
         axios.get(server)
             .then(function (response) {
                 console.log(response);

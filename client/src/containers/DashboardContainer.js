@@ -3,6 +3,8 @@ import {connect} from "react-redux";
 import GroupsContainer from "./GroupsContainer";
 import MapContainer from "./MapContainer";
 import OptionsContainer from "./OptionsContainer";
+import {Grid, PageHeader, Row} from "react-bootstrap";
+import UsersContainer from "./UsersContainer";
 
 
 class DashboardContainer extends Component {
@@ -11,9 +13,10 @@ class DashboardContainer extends Component {
     render() {
         return (
             <div>
-                <OptionsContainer/>
-                <GroupsContainer/>
-                <MapContainer/>
+            <OptionsContainer/>
+                <UsersContainer/>
+            <MapContainer/>
+            <GroupsContainer/>
             </div>
         )
     }

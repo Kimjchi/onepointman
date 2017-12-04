@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
         loginButton = (LoginButton)findViewById(R.id.login_button);
         if(isLogged())
         {
-            System.out.println("Lancer l'appli googlemap");
+            goToMap();
         }
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -52,6 +52,7 @@ public class MainActivity extends Activity {
                                 "Auth Token: "
                                 + loginResult.getAccessToken().getToken()
                 );
+                goToMap();
             }
 
             @Override
@@ -88,4 +89,10 @@ public class MainActivity extends Activity {
     {
         return  AccessToken.getCurrentAccessToken() != null;
     }
+
+    private void goToMap() {
+        Intent intent = new Intent(this, map.class);
+        startActivity(intent);
+    }
+
 }

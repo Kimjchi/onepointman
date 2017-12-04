@@ -2,12 +2,13 @@
 //ajouter le reste dans l'import
 
 //pour le register e mail
-import {ADD_USER, CHANGE_GROUP_DISPLAY, CHANGE_SEARCH} from "../actions/opUsers";
+import {ADD_USER, CHANGE_SEARCH, DELETE_USER} from "../actions/opUsers";
 
 let initialState = {
     users: [],
     groupToDisplay: '',
     search: '',
+    usersToDelete: [],
     groupesUsers: [
         {
             id: 1,
@@ -46,6 +47,8 @@ export default function reducer (state = initialState, action ){
 
         case ADD_USER:
             return {...state ,users: action.arrayUsers , error:'', groupToDisplay: action.idGroup};
+        case DELETE_USER:
+            return {...state ,usersToDelete: action.arrayUsers , error:''};
         case CHANGE_SEARCH:
             return {...state ,search: action.newSearch , error:''};
         default:

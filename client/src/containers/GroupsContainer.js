@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {addGroup, changeNomGroupe} from "../actions/opGroups";
 import GroupsComponent from "../components/GroupsComponent";
-import {addUser, changeGroupDisplay} from "../actions/opUsers";
+import {addUser} from "../actions/opUsers";
 
 
 class GroupsContainer extends Component {

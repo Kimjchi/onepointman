@@ -35,16 +35,16 @@ public class MainActivity extends Activity {
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.main_activity);
         loginButton = (LoginButton)findViewById(R.id.login_button);
-
         if(isLogged())
         {
-            System.out.println("Lancer l'appli googlemap");
+            goToMap();
         }
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 System.out.println("Succès login");
+                goToMap();
             }
 
             @Override
@@ -75,8 +75,14 @@ public class MainActivity extends Activity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    private boolean isLogged()
+    public boolean isLogged()
     {
-        return AccessToken.getCurrentAccessToken() != null;
+        return  AccessToken.getCurrentAccessToken() != null;
     }
+
+    private void goToMap() {
+        Intent intent = new Intent(this, map.class);
+        startActivity(intent);
+    }
+
 }

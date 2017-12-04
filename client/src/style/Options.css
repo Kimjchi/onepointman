@@ -129,7 +129,7 @@ body .wrapper input[type="checkbox"]:not(:checked) + label {
     display: none;
 }
 
-input[type="text"] {
+.wrapper input[type="text"] {
     width: 95%;
     padding: 12px 20px;
     margin: 0.5em 0;

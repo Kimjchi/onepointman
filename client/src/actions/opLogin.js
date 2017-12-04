@@ -6,10 +6,6 @@ export const LOGOUT = 'LOGOUT';
 export const SET_AUTH = 'SET_AUTH';
 export const LOGIN = 'LOGIN';
 
-export function changeForm (newFormState){
-    return {type: CHANGE_FORM, newFormState}
-}
-
 export function loginRequest (){
     return {type: LOGIN_REQUEST}
 }

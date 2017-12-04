@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import Map from "../components/Map";
-import {loginRequest} from "../actions/opLogin";
 import {recenterMap, updateMarkers} from "../actions/opMap";
 
 

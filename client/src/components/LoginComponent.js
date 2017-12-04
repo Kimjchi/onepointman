@@ -17,7 +17,7 @@ class LoginComponent extends Component {
         return (
             <Grid className="loginPage">
                 <Row className="show-grid">
-                    <PageHeader className="text-center">OnePointMan</PageHeader>
+                    <PageHeader className="text-center">OnePointMan <i className="material-icons marker" style={{fontSize:"48px;color:red"}}>place</i></PageHeader>
                 </Row>
                 <Row className="show-grid text-center">
                         <Button bsSize="large" onClick={this._handleLogin} className="shake shake-slow">Login</Button>

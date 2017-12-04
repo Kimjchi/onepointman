@@ -48,7 +48,7 @@
             android:value="AIzaSyC_xDop_6Hz8Ko-T80DrMTurvba0UNtQw8" />
 
         <activity
-            android:name=".map"
+            android:name=".Map"
             android:label="@string/title_activity_map"></activity>
     </application>
 

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.widget.TextView;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -81,7 +80,7 @@ public class MainActivity extends Activity {
     }
 
     private void goToMap() {
-        Intent intent = new Intent(this, map.class);
+        Intent intent = new Intent(this, Map.class);
         startActivity(intent);
     }
 

@@ -34,7 +34,7 @@ class UsersComponent extends Component {
 
     render() {
         return (
-            <div className="text-center">
+            <div className="text-centerUser">
                 <ul id="navlist">
                     {
                         this.props.users.map((user, index) => {

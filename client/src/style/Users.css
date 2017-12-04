@@ -30,7 +30,7 @@ li.last{
     border-radius: 15px;
 }
 
-.text-center {
+.text-centerUser {
     z-index: 10;
     position:absolute;
     margin-left: auto;

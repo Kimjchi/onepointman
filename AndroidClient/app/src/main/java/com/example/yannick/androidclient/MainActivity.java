@@ -19,7 +19,6 @@ import com.facebook.login.widget.LoginButton;
  */
 
 public class MainActivity extends Activity {
-    private TextView info;
     private LoginButton loginButton;
     private CallbackManager callbackManager;
 
@@ -32,41 +31,30 @@ public class MainActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+        setContentView(R.layout.main_activity);
+        loginButton = (LoginButton)findViewById(R.id.login_button);
+
         if(isLogged())
         {
             System.out.println("Lancer l'appli googlemap");
         }
 
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
-        setContentView(R.layout.main_activity);
-        info = (TextView)findViewById(R.id.info);
-        loginButton = (LoginButton)findViewById(R.id.login_button);
-
-
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 System.out.println("Succès login");
-                info.setText(
-                        "User ID: "
-                                + loginResult.getAccessToken().getUserId()
-                                + "\n" +
-                                "Auth Token: "
-                                + loginResult.getAccessToken().getToken()
-                );
             }
 
             @Override
             public void onCancel() {
                 System.out.println("Cancel login");
-                info.setText("Login attempt canceled.");
             }
 
             @Override
             public void onError(FacebookException e) {
                 System.out.println(e.toString());
-                info.setText("Login attempt failed.");
             }
         });
     }

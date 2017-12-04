@@ -3,7 +3,6 @@ import {connect} from "react-redux";
 import GroupsContainer from "./GroupsContainer";
 import MapContainer from "./MapContainer";
 import OptionsContainer from "./OptionsContainer";
-import {Grid, PageHeader, Row} from "react-bootstrap";
 import UsersContainer from "./UsersContainer";
 
 

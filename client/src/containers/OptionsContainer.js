@@ -81,8 +81,8 @@ class OptionsContainer extends Component {
                     </label>
                     <input id='jobs' type='checkbox'/>
                         <label htmlFor='jobs'>
-                            <p className ="accordion"><span className="ico"></span>Partage</p>
-                            <div className='lil_arrow'></div>
+                            <p className ="accordion"><span className="ico"/>Partage</p>
+                            <div className='lil_arrow'/>
                             <div className='content'>
                                 <ul>
                                     <li>
@@ -93,12 +93,12 @@ class OptionsContainer extends Component {
                                     </li>
                                 </ul>
                             </div>
-                            <span></span>
+                            <span/>
                         </label>
                         <input id='financial' type='checkbox'/>
                         <label htmlFor='financial'>
-                            <p className ="accordion"><span className="ico"></span>Rendez-vous</p>
-                            <div className='lil_arrow'></div>
+                            <p className ="accordion"><span className="ico"/>Rendez-vous</p>
+                            <div className='lil_arrow'/>
                             <div className='content'>
                                 <ul>
                                     <li>
@@ -109,12 +109,12 @@ class OptionsContainer extends Component {
                                     </li>
                                 </ul>
                             </div>
-                            <span></span>
+                            <span/>
                         </label>
                         <input id='events' type='checkbox'/>
                             <label htmlFor='events'>
-                                <p className ="accordion"> <span className="ico"></span>Filtres</p>
-                                <div className='lil_arrow'></div>
+                                <p className ="accordion"> <span className="ico"/>Filtres</p>
+                                <div className='lil_arrow'/>
                                 <div className='content'>
                                     <ul>
                                         <li>
@@ -128,12 +128,12 @@ class OptionsContainer extends Component {
                                         </li>
                                     </ul>
                                 </div>
-                                <span></span>
+                                <span/>
                             </label>
                                 <input id='settings' type='checkbox'/>
                                     <label htmlFor='settings'>
-                                        <p className ="accordion"><span className="ico"></span>Autre chose ?</p>
-                                        <div className='lil_arrow'></div>
+                                        <p className ="accordion"><span className="ico"/>Autre chose ?</p>
+                                        <div className='lil_arrow'/>
                                         <div className='content'>
                                             <ul>
                                                 <li>
@@ -141,7 +141,7 @@ class OptionsContainer extends Component {
                                                 </li>
                                             </ul>
                                         </div>
-                                        <span></span>
+                                        <span/>
                                     </label>
             </div>
         )

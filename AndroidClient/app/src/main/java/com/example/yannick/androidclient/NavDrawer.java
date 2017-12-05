@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.IntegerRes;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,12 +17,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONObject;
 
 public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private Menu menu;
     private Activity thisActivity;
+    private int selectedGroup = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +66,34 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                     .error(R.drawable.ic_menu_camera)
                     .into(profilePic);
         }
+
+        final Handler updateGroupInfos = new Handler();
+        final String url = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";
+        updateGroupInfos.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (selectedGroup != -1)
+                {
+                    System.out.println("Récupérer les infos du groupe courrant");
+                    JsonObjectRequest updateGroupRequest =
+                            new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response)
+                                {
+                                    System.out.println("Ici on attends la réponse");
+                                }
+                            }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error)
+                            {
+                                System.out.println("On a pas eu la réponse MORRAY");
+                            }
+                });
+                VolleyRequester.getInstance(getApplicationContext()).addToRequestQueue(updateGroupRequest);
+                }
+                updateGroupInfos.postDelayed(this, 1000);
+            }
+        }, 1000);
 
     }
 

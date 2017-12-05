@@ -1,25 +1,30 @@
 package com.example.yannick.androidclient;
 
+import android.app.Fragment;
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-
 import static com.example.yannick.androidclient.LocationService.getLocationService;
 
-public class Map extends FragmentActivity implements OnMapReadyCallback {
+public class Map extends Fragment implements OnMapReadyCallback {
+    //call this method in your onCreateMethod
 
     private GoogleMap mMap;
     private LocationManager locationManager;
@@ -27,24 +32,28 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     private final int REQUEST_PERMISSION_PHONE_LOCATION = 1;
     private boolean canDisplayMarker = false;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
-        // Obtain the SupportMapFragment and get notified when the Map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
             Log.v("LOCATION", "Permission précedement refusée");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
-        } else {
             Log.v("LOCATION", "Demande de permission");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
         }
+        return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+
+        MapFragment fragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
+        fragment.getMapAsync(this);
+
+    }
     @Override
     public void onRequestPermissionsResult(
             int requestCode,
@@ -52,12 +61,12 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             int[] grantResults) {
         switch (requestCode) {
             case REQUEST_PERMISSION_PHONE_LOCATION:
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    locationService = getLocationService(getApplicationContext());
+                if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    locationService = getLocationService(getActivity().getApplicationContext());
                     Log.v("PERMISSION", "ACCEPT!");
                     if (locationService != null) {
                         Log.v("LOCALISATION", "Condition remplie");
-                        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationService);
                         canDisplayMarker = true;
                         Log.v("LOCALISATION", "J'affiche ma position!");
@@ -72,7 +81,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
     }
 
     public boolean isLocationPermissionGranted() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.v("PERMISSION", "ACCEPT!");
             return true;
         } else {
@@ -100,7 +109,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
 
     public void displayMyPosition() {
         if (canDisplayMarker && (mMap != null)) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Location newLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 mMap.addMarker(new MarkerOptions()
                         .position(new LatLng(newLocation.getLatitude(), newLocation.getLongitude()))
@@ -108,4 +117,5 @@ public class Map extends FragmentActivity implements OnMapReadyCallback {
             }
         }
     }
+
 }

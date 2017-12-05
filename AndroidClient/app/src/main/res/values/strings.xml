@@ -16,4 +16,10 @@
     <string name="title_activity_map">Map</string>
     <string name="facebook_app_id">137357800216709</string>
     <string name="descriptionApp">Il est temps de retrouver vos amis, en avant (Guingamp)!</string>
+    <string name="title_activity_nav_drawer">NavDrawer</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>

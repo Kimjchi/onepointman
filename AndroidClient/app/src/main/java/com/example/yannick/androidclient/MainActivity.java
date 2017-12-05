@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
     }
 
     private void goToMap() {
-        Intent intent = new Intent(this, Map.class);
+        Intent intent = new Intent(this, NavDrawer.class);
         startActivity(intent);
     }
 

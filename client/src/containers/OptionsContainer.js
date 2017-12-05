@@ -47,7 +47,6 @@ class OptionsContainer extends Component {
                 console.log(JSON.stringify(address));
                 this.props.changeAddress(address, true);
                 this.props.recenterMap(position, 15);
-                position.id = "perso-01";
                 let markersArray = [position];
                 this.props.updateMarkers(markersArray);
                 return;
@@ -60,7 +59,6 @@ class OptionsContainer extends Component {
             }, 3);
 
             let markersArray = [{
-                id: "perso-01",
                 lat: ATLANTIC_OCEAN.latitude,
                 lng: ATLANTIC_OCEAN.longitude
             }];

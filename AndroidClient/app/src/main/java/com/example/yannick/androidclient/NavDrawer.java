@@ -1,6 +1,7 @@
 package com.example.yannick.androidclient;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.FragmentManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -66,6 +67,27 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                     .error(R.drawable.ic_menu_camera)
                     .into(profilePic);
         }
+
+        String urlGetGroup = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";
+        JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET, urlGetGroup, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        int limit = 5;
+                        for(int i=0; i < 5; i++)
+                        {
+                            MenuItem mi = menu.findItem(R.id.groups).getSubMenu().add(0, i, i, "Groupe" + i + " maggle");
+                            mi.setIcon(R.drawable.group);
+                        }
+                    }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        VolleyRequester.getInstance(getApplicationContext()).addToRequestQueue(setGroups);
 
         final Handler updateGroupInfos = new Handler();
         final String url = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";
@@ -136,10 +158,29 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-
+        switch(id)
+        {
+            case 0:
+                System.out.println("Groupe 1");
+                break;
+            case 1:
+                System.out.println("Groupe 2");
+                break;
+            case 2:
+                System.out.println("Groupe 3");
+                break;
+            case 3:
+                System.out.println("Groupe 4");
+                break;
+            case R.id.nav_settings:
+                System.out.println("Settings");
+                break;
+            case R.id.nav_logout:
+                System.out.println("Logout");
+                break;
+            default:
+                break;
         }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

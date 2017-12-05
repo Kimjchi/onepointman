@@ -125,9 +125,9 @@ public class Map extends Fragment implements OnMapReadyCallback {
             public void run() {
                 Log.v("Location", "Updating position...");
                 myLocation = locationService.getLocation();
-                getActivity().runOnUiThread(displayMyPosition);
+//                getActivity().runOnUiThread(displayMyPosition);
                 Log.v("Location", "Display update!");
-                Log.v("POSITION","Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
+//                Log.v("POSITION","Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
                 handler.postDelayed(this, MY_POSITION_UPDATE_TIME);
             }
         });

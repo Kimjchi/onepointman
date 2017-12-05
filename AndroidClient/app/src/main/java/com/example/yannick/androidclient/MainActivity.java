@@ -2,6 +2,9 @@ package com.example.yannick.androidclient;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.hardware.camera2.params.Face;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
@@ -10,8 +13,13 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
 
 /**
  * Created by yannick on 04/12/17.
@@ -21,11 +29,6 @@ public class MainActivity extends Activity {
     private LoginButton loginButton;
     private CallbackManager callbackManager;
 
-    public MainActivity()
-    {
-
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,14 +37,12 @@ public class MainActivity extends Activity {
         callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.main_activity);
         loginButton = (LoginButton)findViewById(R.id.login_button);
-        if(isLogged())
-        {
-            goToMap();
-        }
+        loginButton.setReadPermissions(Arrays.asList("public_profile"));
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+                retreiveInfos();
                 System.out.println("Succès login");
                 goToMap();
             }
@@ -56,6 +57,12 @@ public class MainActivity extends Activity {
                 System.out.println(e.toString());
             }
         });
+
+        if(isLogged())
+        {
+            //retreiveInfos();
+            //goToMap();
+        }
     }
 
     @Override
@@ -84,4 +91,10 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    private void retreiveInfos()
+    {
+        Profile profile = Profile.getCurrentProfile();
+        FacebookInfosRetrieval.user_id = profile.getId();
+        FacebookInfosRetrieval.user_name = profile.getFirstName() + " " + profile.getLastName();
+    }
 }

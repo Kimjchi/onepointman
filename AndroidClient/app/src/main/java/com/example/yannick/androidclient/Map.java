@@ -2,11 +2,11 @@ package com.example.yannick.androidclient;
 
 import android.app.Fragment;
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -18,10 +18,13 @@ import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import static com.example.yannick.androidclient.LocationService.getLocationService;
 
 public class Map extends Fragment implements OnMapReadyCallback {
     //call this method in your onCreateMethod
-import static com.example.yannick.androidclient.LocationService.getLocationService;
 
     private GoogleMap mMap;
     private LocationManager locationManager;
@@ -32,20 +35,25 @@ import static com.example.yannick.androidclient.LocationService.getLocationServi
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_map, container, false);
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
             Log.v("LOCATION", "Permission précedement refusée");
             Log.v("LOCATION", "Demande de permission");
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
         }
+        return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+
+        MapFragment fragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
+        fragment.getMapAsync(this);
+
+    }
     @Override
     public void onRequestPermissionsResult(
             int requestCode,
@@ -53,12 +61,12 @@ import static com.example.yannick.androidclient.LocationService.getLocationServi
             int[] grantResults) {
         switch (requestCode) {
             case REQUEST_PERMISSION_PHONE_LOCATION:
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    locationService = getLocationService(getApplicationContext());
+                if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    locationService = getLocationService(getActivity().getApplicationContext());
                     Log.v("PERMISSION", "ACCEPT!");
                     if (locationService != null) {
                         Log.v("LOCALISATION", "Condition remplie");
-                        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationService);
                         canDisplayMarker = true;
                         Log.v("LOCALISATION", "J'affiche ma position!");
@@ -72,13 +80,8 @@ import static com.example.yannick.androidclient.LocationService.getLocationServi
         }
     }
 
-        MapFragment fragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
-        fragment.getMapAsync(this);
-
-    }
-
     public boolean isLocationPermissionGranted() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.v("PERMISSION", "ACCEPT!");
             return true;
         } else {
@@ -106,7 +109,7 @@ import static com.example.yannick.androidclient.LocationService.getLocationServi
 
     public void displayMyPosition() {
         if (canDisplayMarker && (mMap != null)) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Location newLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 mMap.addMarker(new MarkerOptions()
                         .position(new LatLng(newLocation.getLatitude(), newLocation.getLongitude()))

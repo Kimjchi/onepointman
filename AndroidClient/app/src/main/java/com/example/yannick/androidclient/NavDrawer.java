@@ -1,6 +1,8 @@
 package com.example.yannick.androidclient;
 
+import android.app.Activity;
 import android.app.FragmentManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -13,15 +15,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.squareup.picasso.Picasso;
 
-public class NavDrawer extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private Menu menu;
+    private Activity thisActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        thisActivity = this;
         setTitle("OnePointMan");
         setContentView(R.layout.activity_nav_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -37,6 +41,10 @@ public class NavDrawer extends AppCompatActivity
         fm.beginTransaction().replace(R.id.content_frame, new Map()).commit();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        menu = navigationView.getMenu();
+
         View hView =  navigationView.getHeaderView(0);
         ImageView profilePic = hView.findViewById(R.id.profilePicture);
         ((TextView) hView.findViewById(R.id.userName)).setText(FacebookInfosRetrieval.user_name);
@@ -74,6 +82,7 @@ public class NavDrawer extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        System.out.println("OptionsItemSelected");
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
@@ -90,18 +99,9 @@ public class NavDrawer extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

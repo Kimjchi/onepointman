@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 
 public class Map extends Fragment implements OnMapReadyCallback {
     //call this method in your onCreateMethod
@@ -20,7 +19,7 @@ public class Map extends Fragment implements OnMapReadyCallback {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_map, container, false);
+        return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
     @Override
@@ -28,7 +27,7 @@ public class Map extends Fragment implements OnMapReadyCallback {
     {
         super.onViewCreated(view, savedInstanceState);
 
-        MapFragment fragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        MapFragment fragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
         fragment.getMapAsync(this);
 
     }

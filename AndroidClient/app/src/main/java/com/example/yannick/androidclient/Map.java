@@ -107,6 +107,7 @@ public class Map extends Fragment implements OnMapReadyCallback {
         locationService = getLocationService(getActivity().getApplicationContext());
         if (locationService != null) {
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, locationService);
             Log.v("GPS Service", "Service STARTED!");
             updateMyPosition = newDisplayUpdateThread();
@@ -122,9 +123,6 @@ public class Map extends Fragment implements OnMapReadyCallback {
             private Handler handler = new Handler();
 
             public void run() {
-                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
                 Log.v("Location", "Updating position...");
                 myLocation = locationService.getLocation();
                 getActivity().runOnUiThread(displayMyPosition);

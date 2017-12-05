@@ -60,8 +60,9 @@ public class MainActivity extends Activity {
 
         if(isLogged())
         {
-            //retreiveInfos();
-            //goToMap();
+            retreiveInfos();
+            retreiveInfos();
+            goToMap();
         }
     }
 
@@ -93,6 +94,7 @@ public class MainActivity extends Activity {
 
     private void retreiveInfos()
     {
+        Profile.fetchProfileForCurrentAccessToken();
         Profile profile = Profile.getCurrentProfile();
         FacebookInfosRetrieval.user_id = profile.getId();
         FacebookInfosRetrieval.user_name = profile.getFirstName() + " " + profile.getLastName();

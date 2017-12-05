@@ -1,9 +1,11 @@
 package com.example.yannick.androidclient;
 
+import android.app.Activity;
 import android.app.FragmentManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.os.Handler;
+import android.support.annotation.IntegerRes;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,25 +15,31 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-public class NavDrawer extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONObject;
+
+public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private Menu menu;
+    private Activity thisActivity;
+    private int selectedGroup = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        thisActivity = this;
+        setTitle("OnePointMan");
         setContentView(R.layout.activity_nav_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -42,6 +50,50 @@ public class NavDrawer extends AppCompatActivity
         FragmentManager fm = getFragmentManager();
         fm.beginTransaction().replace(R.id.content_frame, new Map()).commit();
 
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        menu = navigationView.getMenu();
+
+        View hView =  navigationView.getHeaderView(0);
+        ImageView profilePic = hView.findViewById(R.id.profilePicture);
+        ((TextView) hView.findViewById(R.id.userName)).setText(FacebookInfosRetrieval.user_name);
+
+        if(profilePic != null)
+        {
+            Picasso.with(this).load("https://graph.facebook.com/"+FacebookInfosRetrieval.user_id+"/picture?type=large")
+                    .placeholder(R.drawable.hamburger)
+                    .error(R.drawable.ic_menu_camera)
+                    .into(profilePic);
+        }
+
+        final Handler updateGroupInfos = new Handler();
+        final String url = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";
+        updateGroupInfos.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (selectedGroup != -1)
+                {
+                    System.out.println("Récupérer les infos du groupe courrant");
+                    JsonObjectRequest updateGroupRequest =
+                            new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response)
+                                {
+                                    System.out.println("Ici on attends la réponse");
+                                }
+                            }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error)
+                            {
+                                System.out.println("On a pas eu la réponse MORRAY");
+                            }
+                });
+                VolleyRequester.getInstance(getApplicationContext()).addToRequestQueue(updateGroupRequest);
+                }
+                updateGroupInfos.postDelayed(this, 1000);
+            }
+        }, 1000);
 
     }
 
@@ -58,7 +110,7 @@ public class NavDrawer extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.nav_drawer, menu);
+        getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
     }
 
@@ -68,6 +120,7 @@ public class NavDrawer extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        System.out.println("OptionsItemSelected");
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
@@ -84,18 +137,9 @@ public class NavDrawer extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

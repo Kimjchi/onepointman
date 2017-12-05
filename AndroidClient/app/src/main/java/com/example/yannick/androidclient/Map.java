@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -43,6 +44,7 @@ public class Map extends Fragment implements OnMapReadyCallback {
                         .position(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()))
                         .title("Here I am!"));
             }
+            Toast.makeText(getActivity().getApplicationContext(), "Longitude(" + myLocation.getLongitude() + ")\nLatitude(" + myLocation.getLatitude()+")", Toast.LENGTH_LONG).show();
         }
     });
 
@@ -128,7 +130,6 @@ public class Map extends Fragment implements OnMapReadyCallback {
                 getActivity().runOnUiThread(displayMyPosition);
                 Log.v("Location", "Display update!");
                 Log.v("POSITION","Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
-
                 handler.postDelayed(this, MY_POSITION_UPDATE_TIME);
             }
         });

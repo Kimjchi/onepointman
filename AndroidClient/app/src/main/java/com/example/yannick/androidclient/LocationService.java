@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Created by Arnaud Ricaud on 04/12/2017.
@@ -67,6 +68,7 @@ public class LocationService implements LocationListener{
     public void onLocationChanged(Location newLocation) {
         location = newLocation;
         Log.v("Location Service","NEW POSITION: Longitude(" + newLocation.getLongitude() + ") Latitude(" + newLocation.getLatitude()+")");
+
     }
 
     @Override

@@ -1,11 +1,14 @@
 package com.example.yannick.androidclient;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,97 +28,111 @@ import static com.example.yannick.androidclient.LocationService.getLocationServi
 
 public class Map extends Fragment implements OnMapReadyCallback {
     //call this method in your onCreateMethod
-
     private GoogleMap mMap;
+    private final int REQUEST_PERMISSION_PHONE_LOCATION = 1;
+    private final int MY_POSITION_UPDATE_TIME = 10000;
     private LocationManager locationManager;
     private LocationService locationService;
-    private final int REQUEST_PERMISSION_PHONE_LOCATION = 1;
-    private boolean canDisplayMarker = false;
+    private Location myLocation;
+    private Handler handler = new Handler();
+
+    private Thread displayMyPosition = new Thread(new Runnable() {
+        public void run() {
+            if ((myLocation != null) && (mMap != null)) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()))
+                        .title("Here I am!"));
+            }
+        }
+    });
+
+    private Thread updateMyPosition;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_map, container, false);
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        //On regarde si on a la permission d'utiliser la localisation de l'utilisateur et on lui demande si ce n'est pas le cas.
         if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
             Log.v("LOCATION", "Permission précedement refusée");
-            Log.v("LOCATION", "Demande de permission");
         } else {
+            Log.v("LOCATION", "Demande de permission");
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_PHONE_LOCATION);
         }
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        startGpsService();
+    }
+
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        updateMyPosition.interrupt();
+        Log.v("GPS Service", "Display position STOPPED");
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-
         MapFragment fragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
         fragment.getMapAsync(this);
-
-    }
-    @Override
-    public void onRequestPermissionsResult(
-            int requestCode,
-            String permissions[],
-            int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_PERMISSION_PHONE_LOCATION:
-                if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    locationService = getLocationService(getActivity().getApplicationContext());
-                    Log.v("PERMISSION", "ACCEPT!");
-                    if (locationService != null) {
-                        Log.v("LOCALISATION", "Condition remplie");
-                        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationService);
-                        canDisplayMarker = true;
-                        Log.v("LOCALISATION", "J'affiche ma position!");
-                        displayMyPosition();
-                    } else {
-                        Log.v("LOCALISATION", "Condition NON remplie");
-                    }
-                } else {
-                    Log.v("PERMISSION", "DENIED!");
-                }
-        }
     }
 
-    public boolean isLocationPermissionGranted() {
-        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.v("PERMISSION", "ACCEPT!");
-            return true;
+    public void startGpsService() {
+        //On start le service gps si l'instance n'est pas créée et qu'on a les droits:
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            Log.v("Location", "Permission granted!");
+            startLocationService();
         } else {
-            Log.v("PERMISSION", "DENIED!");
-            return false;
+            Log.v("Location", "Permission denied!");
         }
-
     }
 
-
-    /**
-     * Manipulates the Map once available.
-     * This callback is triggered when the Map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+    @SuppressLint("MissingPermission") //Permission déjà vérifiée!
+    public void startLocationService() {
+        Log.v("GPS Service", "Starting service...");
+        locationService = getLocationService(getActivity().getApplicationContext());
+        if (locationService != null) {
+            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, locationService);
+            Log.v("GPS Service", "Service STARTED!");
+            updateMyPosition = newDisplayUpdateThread();
+            updateMyPosition.start();
+            Log.v("GPS Service", "Display position every " + MY_POSITION_UPDATE_TIME + "ms");
+        } else {
+            Log.v("GPS Service", "ERROR: Impossible to get instance...");
+        }
     }
 
+    public Thread newDisplayUpdateThread(){
+        return new Thread(new Runnable() {
+            private Handler handler = new Handler();
 
-    public void displayMyPosition() {
-        if (canDisplayMarker && (mMap != null)) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                Location newLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(newLocation.getLatitude(), newLocation.getLongitude()))
-                        .title("Hello world"));
+            public void run() {
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                Log.v("Location", "Updating position...");
+                myLocation = locationService.getLocation();
+                getActivity().runOnUiThread(displayMyPosition);
+                Log.v("Location", "Display update!");
+                Log.v("POSITION","Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
+
+                handler.postDelayed(this, MY_POSITION_UPDATE_TIME);
             }
-        }
+        });
     }
+
 
 }

@@ -22,6 +22,7 @@ public class LocationService implements LocationListener{
     private LocationManager locationManager;
     private Location location;
 
+
     //Méthode pour récupérer l'instance de la classe
     public static LocationService getLocationService(Context context){
         if (instance == null) {
@@ -34,7 +35,6 @@ public class LocationService implements LocationListener{
     private LocationService( Context context )     {
 
         this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
         if ( ContextCompat.checkSelfPermission( context, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED){
                 Log.v("ERREUR", "Impossible de créer l'instance de localisation: permission refusée");
                 return ;
@@ -43,20 +43,16 @@ public class LocationService implements LocationListener{
         try {
             // Status des connections Wi-Fi et GPS
             boolean isGPSEnabled = locationManager.isProviderEnabled("gps");
-
             if (!isGPSEnabled){
-                //TODO: Pop-up d'avertissement
                 Log.v("ERROR","Service de localisation indisponible!");
             } else {
                 if (isGPSEnabled)  {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000, 1, this);
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
                     if (locationManager != null)  {
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     }
                 }
             }
-
-
         } catch (Exception ex)  {
             Log.v("ERROR", "Error creating location service: " + ex.getMessage() );
         }
@@ -70,7 +66,7 @@ public class LocationService implements LocationListener{
     @Override
     public void onLocationChanged(Location newLocation) {
         location = newLocation;
-        Log.v("POSITION","Longitude: " + newLocation.getLongitude() + "Latitude: " + newLocation.getLatitude());
+        Log.v("Location Service","NEW POSITION: Longitude(" + newLocation.getLongitude() + ") Latitude(" + newLocation.getLatitude()+")");
     }
 
     @Override

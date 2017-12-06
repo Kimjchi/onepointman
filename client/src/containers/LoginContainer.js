@@ -6,7 +6,6 @@ import {loginRequest} from "../actions/opLogin";
 
 class LoginContainer extends Component {
 
-
     render() {
         return (
             <LoginComponent login={this.props.loginRequest}/>
@@ -14,20 +13,20 @@ class LoginContainer extends Component {
     }
 }
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
 
-    return{
+    return {
         opLogin: state.opLogin,
     }
 }
 
 //fonctions
-const  mapDispatchToProps = (dispatch) => {
-    return{
+const mapDispatchToProps = (dispatch) => {
+    return {
         loginRequest: () => {
             dispatch(loginRequest())
         }
     }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps) (LoginContainer)
+export default connect(mapStateToProps, mapDispatchToProps)(LoginContainer)

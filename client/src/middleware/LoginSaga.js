@@ -12,14 +12,12 @@ export function* requestLoginBack() {
 
         let server = "http://localhost:3001/fblogin";
 
-        console.log("Helllo");
-
         axios.get(server)
             .then(function (response) {
                 console.log(response);
                 if (!!response.status && response.status === 200) {
                     //store.dispatch()
-                    window.location.href = response.data.redirectURI+'client_id='+response.data.client_id+'&redirect_uri='+response.data.redirect_uri;
+                    window.location.href = response.data.redirectURI + 'client_id=' + response.data.client_id + '&redirect_uri=' + response.data.redirect_uri;
                 } else {
                     alert('Erreur lors du Login');
                 }
@@ -29,7 +27,6 @@ export function* requestLoginBack() {
             });
     }
 }
-
 
 export function* LoginFlow() {
     yield fork(requestLoginBack);

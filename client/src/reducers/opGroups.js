@@ -1,31 +1,25 @@
-import {
-    CHANGE_FORM,
-    SET_AUTH,
-    SENDING_REQUEST,
-    LOGIN
-}  from '../actions/opLogin';
-import {ADD_GROUP} from "../actions/opGroups";
+import {ADD_GROUP, CHANGE_NOM_GROUPE} from "../actions/opGroups";
 
 //ajouter le reste dans l'import
 
 //pour le register e mail
 let initialState = {
-    formState:{
-        username:'',
-        password: '',
-        email:''
-    },
+    nomGroupe: '',
     groupes: [
         {
-            nom: 'Groupe 1'
+            id: 1,
+            nom: 'Heya'
         },
         {
-            nom: 'Groupe 2'
+            id: 2,
+            nom: 'BROOOS'
         },
         {
-            nom: 'Groupe 3'
+            id: 3,
+            nom: 'Yeee'
         },
         {
+            id: 4,
             nom: 'Groupe 4'
         }
     ],
@@ -37,10 +31,10 @@ export default function reducer (state = initialState, action ){
 
     switch (action.type){
 
-        case CHANGE_FORM:
-            return {...state ,formState: action.newFormState , error:''};
+        case CHANGE_NOM_GROUPE:
+            return {...state ,nomGroupe: action.nomGroupe , error:''};
         case ADD_GROUP:
-            return {...state ,groupes: action.arrayGroups , error:''};
+            return {...state ,groupes: action.arrayGroups , error:'', nomGroupe: ''};
         default:
             return state
 

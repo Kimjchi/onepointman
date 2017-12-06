@@ -11,9 +11,11 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var fblogin = require('./routes/fblogin');
 var connection = require('./connection');
+var groups = require('./routes/groups');
 
 var app = express();
 
+//app.set('views', path.join(__dirname, 'views'));
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -33,6 +35,7 @@ app.use(function (req, res, next) {
 app.use('/', index);
 app.use('/users', users);
 app.use('/fblogin', fblogin);
+app.use('/groups', groups);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -17,7 +17,7 @@ export function* HandleAuth() {
             .then(function (response) {
                 console.log(response);
                 if (!!response.status && response.status === 200) {
-                    alert('Auth successed');
+                    alert('liste d\'amis : ' + JSON.stringify(response.data));
                     window.location.href = 'http://localhost:3000/Home';
                 } else {
                     alert('auth error');

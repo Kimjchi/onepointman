@@ -19,7 +19,9 @@ import android.util.Log;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.yannick.androidclient.LocationService.getLocationService;
@@ -33,7 +35,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private LocationService locationService;
     private DisplayThread updateMyPosition;
     public static MapFragment instance = null;
-    private Map<String, Marker> markers;
+    private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>() {
+    };
     Location myLocation;
 
     @Nullable
@@ -117,6 +120,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return false;
         }
     }
+
     public void startDisplayThread() {
         updateMyPosition = new DisplayThread();
         updateMyPosition.run();
@@ -127,6 +131,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (updateMyPosition.getdisplayThreadRunning()) {
             updateMyPosition.stopDisplay();
             Log.v("GPS Service", "Display thread stopped");
+        }
+    }
+    public void addMarker(String name, MarkerOptions marker){
+        markers.put(name, marker);
+    }
+
+    public void updateDisplayMarkers(){
+        mMap.clear();
+        for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
+            mMap.addMarker(marker.getValue());
         }
     }
 }

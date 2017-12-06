@@ -10,6 +10,8 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -40,11 +42,14 @@ public class DisplayThread implements Runnable {
                     activity.getActivity().runOnUiThread(new Thread(new Runnable() {
                         public void run(){
                         if ((myLocation != null) && (activity.mMap != null)) {
-                            activity.mMap.addMarker(new MarkerOptions()
+                            MarkerOptions marker = new MarkerOptions()
                                     .position(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()))
-                                    .title("Here I am!"));
-                            Toast.makeText(activity.getActivity().getApplicationContext(), "Longitude(" + myLocation.getLongitude() + ")\nLatitude(" + myLocation.getLatitude()+")", Toast.LENGTH_LONG).show();
-                        }
+                                    .title("Here I am!")
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                            activity.addMarker("_MY_SELF_", marker);
+                            activity.updateDisplayMarkers();
+                            }
+                        Toast.makeText(activity.getActivity().getApplicationContext(), "Longitude(" + myLocation.getLongitude() + ")\nLatitude(" + myLocation.getLatitude()+")", Toast.LENGTH_LONG).show();
                         Log.v("LOCATION", "Update displayed!");
                         Log.v("POSITION", "Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
 

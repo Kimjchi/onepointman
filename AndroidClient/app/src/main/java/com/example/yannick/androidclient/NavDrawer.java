@@ -77,10 +77,11 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                         for(int i=0; i < limit; i++)
                         {
                             MenuItem mi = menu.findItem(R.id.groups)
-                                    .getSubMenu().add(0, i, i, "Groupe" + i + " maggle");
+                                    .getSubMenu().add(0, i, i, "Groupe" + i + " maggle n ique ta mere je mange des sauterelles par exemple hein");
                             mi.setIcon(R.drawable.group);
                             ImageButton settingsButton = new ImageButton(getApplicationContext());
-                            settingsButton.setBackgroundResource(R.drawable.reglage);
+                            settingsButton.setImageResource(R.drawable.reglage);
+                            settingsButton.setBackgroundResource(0);
                             settingsButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {

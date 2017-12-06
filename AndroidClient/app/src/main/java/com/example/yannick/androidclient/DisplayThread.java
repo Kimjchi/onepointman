@@ -20,7 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 
 public class DisplayThread implements Runnable {
-    private final int MY_POSITION_UPDATE_TIME = 10000;
+    private final int MY_POSITION_UPDATE_TIME = 3000;
     private Handler handler = new Handler();
     private boolean displayThreadRunning = true;
     private Location myLocation;

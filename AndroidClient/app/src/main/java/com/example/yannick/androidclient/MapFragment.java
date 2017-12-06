@@ -93,7 +93,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         if (locationService != null) {
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             String provider = bestProvider();
-            locationManager.requestLocationUpdates(provider, 5000, 1, locationService);
+            locationManager.requestLocationUpdates(provider, 3000, 1, locationService);
             //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationService);
             //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationService);
             locationManager.getLastKnownLocation(provider);
@@ -126,29 +126,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void startDisplayThread() {
-        updateMyPosition = new DisplayThread();
-        updateMyPosition.run();
-        Log.v("GPS Service", "Display thread started");
-    }
-
-    public void stopDisplayThread() {
-        if (updateMyPosition.getdisplayThreadRunning()) {
-            updateMyPosition.stopDisplay();
-            Log.v("GPS Service", "Display thread stopped");
-        }
-    }
-    public void addMarker(String name, MarkerOptions marker){
-        markers.put(name, marker);
-    }
-
-    public void updateDisplayMarkers(){
-        mMap.clear();
-        for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
-            mMap.addMarker(marker.getValue());
-        }
-    }
-
     public String bestProvider(){
         critere.setAccuracy(Criteria.ACCURACY_LOW);
         critere.setPowerRequirement(Criteria.POWER_LOW);
@@ -164,9 +141,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Log.v("PROVIDER", "Best provider: " + provider);
             return provider;
         }
-
-
+    }
+    
+    public void startDisplayThread() {
+        updateMyPosition = new DisplayThread();
+        updateMyPosition.run();
+        Log.v("GPS Service", "Display thread started");
     }
 
+    public void stopDisplayThread() {
+        if (updateMyPosition.getdisplayThreadRunning()) {
+            updateMyPosition.stopDisplay();
+            Log.v("GPS Service", "Display thread stopped");
+        }
+    }
 
+    public void addMarker(String name, MarkerOptions marker){
+        markers.put(name, marker);
+    }
+
+    public void updateDisplayMarkers(){
+        mMap.clear();
+        for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
+            mMap.addMarker(marker.getValue());
+        }
+    }
 }

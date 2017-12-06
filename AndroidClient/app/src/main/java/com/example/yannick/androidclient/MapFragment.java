@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
@@ -30,7 +31,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     //call this method in your onCreateMethod
     public GoogleMap mMap;
     private final int REQUEST_PERMISSION_PHONE_LOCATION = 1;
-
+    private Criteria critere = new Criteria();
     private LocationManager locationManager;
     private LocationService locationService;
     private DisplayThread updateMyPosition;
@@ -91,7 +92,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationService = getLocationService(getActivity().getApplicationContext());
         if (locationService != null) {
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, locationService);
+            String provider = bestProvider();
+            locationManager.requestLocationUpdates(provider, 5000, 1, locationService);
+            //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationService);
+            //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationService);
+            locationManager.getLastKnownLocation(provider);
             Log.v("GPS Service", "Service STARTED!");
             return true;
         } else {
@@ -143,4 +148,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mMap.addMarker(marker.getValue());
         }
     }
+
+    public String bestProvider(){
+        critere.setAccuracy(Criteria.ACCURACY_LOW);
+        critere.setPowerRequirement(Criteria.POWER_LOW);
+        critere.setAltitudeRequired(false);
+        critere.setBearingRequired(false);
+
+        String provider = locationManager.getBestProvider(critere, true);
+        // Cant get a hold of provider
+        if (provider == null) {
+            Log.v("PROVIDER", "Provider is null");
+            return "None";
+        } else {
+            Log.v("PROVIDER", "Best provider: " + provider);
+            return provider;
+        }
+
+
+    }
+
+
 }

@@ -48,7 +48,6 @@ public class LocationService implements LocationListener{
                 Log.v("ERROR","Service de localisation indisponible!");
             } else {
                 if (isGPSEnabled)  {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
                     if (locationManager != null)  {
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     }

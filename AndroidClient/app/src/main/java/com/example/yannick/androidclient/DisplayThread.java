@@ -23,12 +23,12 @@ public class DisplayThread implements Runnable {
     private boolean displayThreadRunning = true;
     private Location myLocation;
 
-    private Map activity;
+    private MapFragment activity;
 
     @Override
     public void run() {
         if (displayThreadRunning) {
-            activity = Map.instance;
+            activity = MapFragment.instance;
             LocationService locationService = LocationService.getLocationService(activity.getActivity().getApplicationContext());
             LocationManager locationManager;
             locationManager = (LocationManager) activity.getActivity().getSystemService(Context.LOCATION_SERVICE);

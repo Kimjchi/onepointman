@@ -15,17 +15,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
+
+import java.util.Map;
 
 import static com.example.yannick.androidclient.LocationService.getLocationService;
 
-public class Map extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
     //call this method in your onCreateMethod
     public GoogleMap mMap;
     private final int REQUEST_PERMISSION_PHONE_LOCATION = 1;
@@ -33,7 +32,8 @@ public class Map extends Fragment implements OnMapReadyCallback {
     private LocationManager locationManager;
     private LocationService locationService;
     private DisplayThread updateMyPosition;
-    public static Map instance = null;
+    public static MapFragment instance = null;
+    private Map<String, Marker> markers;
     Location myLocation;
 
     @Nullable
@@ -64,7 +64,7 @@ public class Map extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        MapFragment fragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
+        com.google.android.gms.maps.MapFragment fragment = (com.google.android.gms.maps.MapFragment) getChildFragmentManager().findFragmentById(R.id.mapFragment);
         fragment.getMapAsync(this);
     }
 

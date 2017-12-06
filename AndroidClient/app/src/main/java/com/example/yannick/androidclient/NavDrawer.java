@@ -1,12 +1,9 @@
 package com.example.yannick.androidclient;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.FragmentManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.IntegerRes;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -49,7 +46,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         toggle.syncState();
 
         FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().replace(R.id.content_frame, new Map()).commit();
+        fm.beginTransaction().replace(R.id.content_frame, new MapFragment()).commit();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);

@@ -1,26 +1,26 @@
-import {ADD_GROUP, CHANGE_NOM_GROUPE} from "../actions/opGroups";
+import {ADD_GROUP, CHANGE_GROUP_NAME, CHANGE_GROUPS} from "../actions/opGroups";
 
 //ajouter le reste dans l'import
 
 //pour le register e mail
 let initialState = {
-    nomGroupe: '',
-    groupes: [
+    groupName: '',
+    groups: [
         {
-            id: 1,
-            nom: 'Heya'
+            idgroup: 1,
+            nomgroup: 'Heya'
         },
         {
             id: 2,
-            nom: 'BROOOS'
+            nomgroup: 'BROOOS'
         },
         {
             id: 3,
-            nom: 'Yeee'
+            nomgroup: 'Yeee'
         },
         {
             id: 4,
-            nom: 'Groupe 4'
+            nomgroup: 'Groupe 4'
         }
     ],
     errors: '',
@@ -31,10 +31,12 @@ export default function reducer (state = initialState, action ){
 
     switch (action.type){
 
-        case CHANGE_NOM_GROUPE:
-            return {...state ,nomGroupe: action.nomGroupe , error:''};
+        case CHANGE_GROUP_NAME:
+            return {...state ,groupName: action.groupName , error:''};
         case ADD_GROUP:
-            return {...state ,groupes: action.arrayGroups , error:'', nomGroupe: ''};
+            return {...state ,groups: action.arrayGroups , error:'', groupName: ''};
+        case CHANGE_GROUPS:
+            return {...state, groups: action.groups, error:''};
         default:
             return state
 

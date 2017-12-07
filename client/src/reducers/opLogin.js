@@ -2,15 +2,14 @@ import {
     CHANGE_FORM,
     SET_AUTH,
     SENDING_REQUEST,
-    LOGIN
-}  from '../actions/opLogin';
+    LOGIN, IDUSER
+} from '../actions/opLogin';
 
 //ajouter le reste dans l'import
 
 //pour le register e mail
 let initialState = {
     errors: '',
-    sending:'',
     isLoading: false,
     loggedIn: false,
     idUser: '',
@@ -24,11 +23,10 @@ export default function reducer (state = initialState, action ){
             return {...state , isAdmin: action.isAdminState._auth.isAdmin ,cookie: action.isAdminState._auth.cookie, error:''};
         case SET_AUTH:
             return {...state, loggedIn: action.newAuthState, error:''};
-        case SENDING_REQUEST:
-            return {...state, loggedIn: action.sending, error:''};
+        case IDUSER:
+            return {...state, idUser: action.id, error:''};
         default:
             return state
-
     }
 
 }

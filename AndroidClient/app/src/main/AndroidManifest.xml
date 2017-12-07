@@ -46,6 +46,11 @@
             android:label="@string/title_activity_nav_drawer"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".SettingsGroup"
+            android:label="@string/title_activity_settings_group"
+            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

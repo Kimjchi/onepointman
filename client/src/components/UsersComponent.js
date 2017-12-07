@@ -38,7 +38,7 @@ class UsersComponent extends Component {
                 <ul id="navlist">
                     {
                         this.props.users.map((user, index) => {
-                            return <li key={index}><a href="#">{user.nom}</a></li>
+                            return <li key={index}><a href="#">{user.prenom} {user.nomuser}</a></li>
                         })
                     }
                     {

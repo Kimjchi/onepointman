@@ -22,7 +22,7 @@ public class LocationService implements LocationListener{
 
     private LocationManager locationManager;
     private Location location;
-
+    private Context thisContext;
 
     //Méthode pour récupérer l'instance de la classe
     public static LocationService getLocationService(Context context){
@@ -34,7 +34,7 @@ public class LocationService implements LocationListener{
 
     //Constructeur:
     private LocationService( Context context )     {
-
+        thisContext = context;
         this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         if ( ContextCompat.checkSelfPermission( context, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED){
                 Log.v("ERREUR", "Impossible de créer l'instance de localisation: permission refusée");
@@ -43,13 +43,21 @@ public class LocationService implements LocationListener{
 
         try {
             // Status des connections Wi-Fi et GPS
-            boolean isGPSEnabled = locationManager.isProviderEnabled("gps");
+            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (!isGPSEnabled){
                 Log.v("ERROR","Service de localisation indisponible!");
             } else {
                 if (isGPSEnabled)  {
                     if (locationManager != null)  {
                         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (location == null){
+                            if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+                                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                Log.v("Location Service","NETWORK LAST POSITION: Longitude(" + location.getLongitude() + ") Latitude(" + location.getLatitude()+")");
+                            }
+                        } else {
+                            Log.v("Location Service","GPS LAST POSITION: Longitude(" + location.getLongitude() + ") Latitude(" + location.getLatitude()+")");
+                        }
                     }
                 }
             }
@@ -66,8 +74,9 @@ public class LocationService implements LocationListener{
     @Override
     public void onLocationChanged(Location newLocation) {
         location = newLocation;
-        Log.v("Location Service","NEW POSITION: Longitude(" + newLocation.getLongitude() + ") Latitude(" + newLocation.getLatitude()+")");
-
+        VolleyRequester restRequester = VolleyRequester.getInstance(thisContext);
+        restRequester.sendMyPosition(location);
+        Log.v("Location Service","NEW POSITION: Longitude(" + location.getLongitude() + ") Latitude(" + location.getLatitude()+")");
     }
 
     @Override

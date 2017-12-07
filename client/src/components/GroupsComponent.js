@@ -17,8 +17,8 @@ class GroupsComponent extends Component {
     }
 
     _addGroup() {
-        let array = this.props.groupes;
-        array.push({nom: this.props.nomGroupe});
+        let array = this.props.groups;
+        array.push({nom: this.props.groupName});
         this.props.addGroup(array);
     }
 
@@ -32,7 +32,7 @@ class GroupsComponent extends Component {
 
     _getValidation(event) {
         event.preventDefault();
-        const length = this.props.nomGroupe.length;
+        const length = this.props.groupName.length;
         if (length > 0) {
             this._addGroup();
             this._close();
@@ -43,19 +43,19 @@ class GroupsComponent extends Component {
     }
 
     _handleChange(event) {
-        this.props.changeNomGroupe(event.target.value);
+        this.props.changeGroupName(event.target.value);
     }
 
     _displayUsers(event) {
-        let users = this.props.groupesUsers;
-        let usersToDisplay = users.filter(groupe => {
-            return groupe.id === parseInt(event.target.id, 10);
+        let users = this.props.groups;
+        let usersToDisplay = users.filter(group => {
+            return group.idgroup === parseInt(event.target.id, 10);
         });
         if(usersToDisplay.length === 0) {
             this.props.addUser([], event.target.id);
         }
         else {
-            this.props.addUser(usersToDisplay[0].users, event.target.id);
+            this.props.addUser(usersToDisplay[0].membres, event.target.id);
         }
     }
 
@@ -72,8 +72,8 @@ class GroupsComponent extends Component {
 
                 <ul id="menu">
                     {
-                        this.props.groupes.map((groupe, index) => {
-                            return <a key={index}><li onClick={this._displayUsers} id={groupe.id}>{groupe.nom}</li></a>
+                        this.props.groups.map((group, index) => {
+                            return <a key={index}><li onClick={this._displayUsers} id={group.idgroup}>{group.nomgroup}</li></a>
                         })
                     }
                     <i className="fa fa-plus fa-lg" style={{color: '#232323'}} onClick={this._open}/>
@@ -90,7 +90,7 @@ class GroupsComponent extends Component {
                                 <ControlLabel>Nom du groupe</ControlLabel>
                                 <FormControl
                                     type="text"
-                                    value={this.props.nomGroupe}
+                                    value={this.props.groupName}
                                     onChange={this._handleChange}
                                 />
                                 <FormControl.Feedback />

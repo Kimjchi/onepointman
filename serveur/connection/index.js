@@ -11,6 +11,12 @@ var pg = require("pg"); // require Postgres module
 
 
 // Setup connection
+/*var username = "postgres" ;// sandbox username
+var password = "root" ;// read only privileges on our table
+var host = "localhost";
+var database = "postgres" ;// database name
+var database_port = '5433';
+var conString = "postgres://"+username+":"+password+"@"+host+':' + database_port +"/"+database; // Your Database Connection*/
 var db = {};
 var username = "ibczdvtaadgadk" ;// sandbox username
 var password = "3cc134f31e9b48c561177588ca3ab639d9ae83ef1a06efd51fab3bdf3d790c9b" ;// read only privileges on our table

@@ -1,21 +1,24 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import {addGroup, changeNomGroupe} from "../actions/opGroups";
+import {addGroup, changeGroupName, getGroups} from "../actions/opGroups";
 import GroupsComponent from "../components/GroupsComponent";
 import {addUser} from "../actions/opUsers";
 
 
 class GroupsContainer extends Component {
-
+    constructor(props) {
+        super(props);
+        this.props.getGroups(5);
+    }
 
     render() {
-        let {groupes, nomGroupe} = this.props.opGroups;
-        let {groupesUsers} = this.props.opUsers;
+        let {groups, groupName} = this.props.opGroups;
+        let {groupsUsers} = this.props.opUsers;
         return (
-            <GroupsComponent groupes={groupes}
-                             nomGroupe={nomGroupe}
-                             groupesUsers={groupesUsers}
-                             changeNomGroupe={this.props.changeNomGroupe}
+            <GroupsComponent groups={groups}
+                             groupName={groupName}
+                             groupsUsers={groupsUsers}
+                             changeGroupName={this.props.changeGroupName}
                              addGroup={this.props.addGroup}
                              addUser={this.props.addUser}
             />
@@ -34,14 +37,17 @@ function mapStateToProps (state) {
 //fonctions
 const  mapDispatchToProps = (dispatch) => {
     return{
-        changeNomGroupe: (nomGroupe) => {
-            dispatch(changeNomGroupe(nomGroupe));
+        changeGroupName: (groupName) => {
+            dispatch(changeGroupName(groupName));
         },
         addGroup: (arrayGroups) => {
             dispatch(addGroup(arrayGroups));
         },
         addUser: (arrayUsers, idGroup) => {
             dispatch(addUser(arrayUsers, idGroup));
+        },
+        getGroups: (idUser) => {
+            dispatch(getGroups(idUser));
         }
     }
 };

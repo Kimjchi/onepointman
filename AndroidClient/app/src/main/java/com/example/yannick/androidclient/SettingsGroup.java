@@ -16,13 +16,6 @@ public class SettingsGroup extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.settingsToolbar);
         toolbar.setTitle(getIntent().getExtras().get("groupName").toString());
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("Ici");
-                onBackPressed();
-            }
-        });
 
         setSupportActionBar(toolbar);
 
@@ -41,6 +34,12 @@ public class SettingsGroup extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        System.out.println("Ici" + id);
+
+        if(id == android.R.id.home)
+        {
+            onBackPressed();
+        }
 
         return super.onOptionsItemSelected(item);
     }

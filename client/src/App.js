@@ -6,6 +6,7 @@ import {ConnectedRouter} from 'react-router-redux';
 import {history, store} from './store.js';
 import LoginContainer from "./containers/LoginContainer";
 import DashboardContainer from "./containers/DashboardContainer";
+import HandleAuthContainer from "./containers/HandleAuthContainer";
 
 
 class App extends Component {
@@ -18,6 +19,10 @@ class App extends Component {
                         exact
                         path="/"
                         component={LoginContainer}/>
+                    <PublicRoute
+                        exact
+                        path="/handleauth"
+                        component={HandleAuthContainer}/>
                     <PublicRoute
                         exact
                         path="/Home"

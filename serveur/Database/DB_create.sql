@@ -1,6 +1,16 @@
+DROP TABLE IF EXISTS "USER" CASCADE;
+DROP TABLE IF EXISTS "GROUP" CASCADE;
+DROP TABLE IF EXISTS "PINPOINT" CASCADE;
+DROP TABLE IF EXISTS "DRAWING" CASCADE;
+DROP TABLE IF EXISTS "FRIENDS" CASCADE;
+DROP TABLE IF EXISTS "USER_GROUP" CASCADE;
+
+
+
 CREATE TABLE "USER"(
     iduser serial PRIMARY KEY,
     isconnected boolean,
+    isloggedin boolean,
     position geometry(Point,4326),
     nom varchar(50),
     prenom varchar(50),
@@ -39,7 +49,7 @@ CREATE TABLE "FRIENDS"(
 );
 
 CREATE TABLE "USER_GROUP"(
-    shares boolean,
+    sharesposition boolean,
     iscreator boolean,
     iduser integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup),

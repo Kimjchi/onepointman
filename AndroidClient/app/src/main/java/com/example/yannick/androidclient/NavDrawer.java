@@ -80,7 +80,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                                     .getSubMenu().add(0, i, i, "Groupe" + i + " maggle n ique ta mere je mange des sauterelles par exemple hein");
                             mi.setIcon(R.drawable.group);
                             ImageButton settingsButton = new ImageButton(getApplicationContext());
-                            settingsButton.setImageResource(R.drawable.reglage);
+                            settingsButton.setImageResource(R.drawable.bouton_style);
                             settingsButton.setBackgroundResource(0);
                             settingsButton.setOnClickListener(new View.OnClickListener() {
                                 @Override

@@ -19,6 +19,7 @@ public class SettingsGroup extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.out.println("Ici");
                 onBackPressed();
             }
         });
@@ -40,7 +41,7 @@ public class SettingsGroup extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        
+
         return super.onOptionsItemSelected(item);
     }
 }

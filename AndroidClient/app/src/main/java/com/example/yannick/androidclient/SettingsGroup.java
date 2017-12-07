@@ -1,12 +1,17 @@
 package com.example.yannick.androidclient;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -15,6 +20,7 @@ public class SettingsGroup extends AppCompatActivity {
     private ArrayList<UserModel> userModels;
     private ListView userList;
     private static UserAdapter userAdapter;
+    private String newName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +62,52 @@ public class SettingsGroup extends AppCompatActivity {
 
         System.out.println("Ici" + id);
 
-        if(id == android.R.id.home)
+        switch (id)
         {
-            onBackPressed();
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.addMemberSettings:
+                //TODO Lancer l'activite d'ajoute de membre
+                System.out.println("Launch activity add member");
+                break;
+            case R.id.changeNameGroup:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Changer le nom du groupe");
+
+                final EditText input = new EditText(this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setMessage("Rentrer le nouveau nom du groupe");
+
+                builder.setPositiveButton("Changer", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        newName = input.getText().toString();
+                    }
+                });
+                builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+                break;
+            case R.id.deleteGroupSettings:
+                new AlertDialog.Builder(this)
+                        .setTitle("Supprimer le groupe ")
+                        .setMessage("Voulez-vous vraiment supprimer ce groupe?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(R.string.oui, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                Toast.makeText(getApplicationContext(), "Groupe delete", Toast.LENGTH_SHORT).show();
+                                onBackPressed();
+                            }})
+                        .setNegativeButton(R.string.non, null).show();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

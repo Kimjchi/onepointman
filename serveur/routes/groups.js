@@ -15,14 +15,15 @@ router.get('/:iduser/', function (req, res) {
                 status: 'success',
                 message: toReturn
             });
-
+            sender.sendResponse(sender.SUCCESS_STATUS, toReturn, res);
 
         })
         .catch(e => {
             res.send({
                 status: 'fail',
                 message: e.toString()
-             })
+            })
+            sender.sendResponse(sender.NOT_FOUND_STATUS, toReturn, res);
         });
 
 });
@@ -33,8 +34,8 @@ let getGroups = (iduser) =>
         .field('ugr.idgroup')
         .field('gr.nom')
         .where('ugr.iduser = ?', iduser)
-        .left_join('public."GROUP"','gr','ugr.idgroup = gr.idgroup')
-        ;
+        .left_join('public."GROUP"', 'gr', 'ugr.idgroup = gr.idgroup')
+;
 
 let getUsersInGroups = (iduser) =>
     squel.select()
@@ -48,7 +49,7 @@ let getUsersInGroups = (iduser) =>
         .field('ugr.idgroup')
         .toString();
 
-function buildGroupsObject(queryResult){
+function buildGroupsObject(queryResult) {
     var groups = [];
     queryResult.forEach((element, index) => {
         // le resultat de la requete donne un tableau de {prenom, nomuser, iduser, nomgroup, idgroup}
@@ -56,23 +57,27 @@ function buildGroupsObject(queryResult){
         let idPosition;
         // si l'id du groupe n'existe pas encore dans le tableau, on le push et on crée un ligne pour le groupe
         groups.forEach(grelement => {
-            if(element.idgroup === grelement.idgroup){
+            if (element.idgroup === grelement.idgroup) {
                 contains = true;
                 idPosition = index;
             }
         });
-        if(!contains){
-            groups.push({idgroup: element.idgroup, nomgroup: element.nomgroup, membres:[] })
+        if (!contains) {
+            groups.push({idgroup: element.idgroup, nomgroup: element.nomgroup, membres: []})
         }
     });
     //une fois le tableau des groupes créé, on push les membres dans groups[idGroupConcerné].membres
     queryResult.forEach((element) => {
         let idGroupeConcerne;
-       //on get la position dans groups du groupe concerné pour l'user (element)
+        //on get la position dans groups du groupe concerné pour l'user (element)
         groups.forEach((grelement, grindex) => {
-            if(grelement.idgroup === element.idgroup){
+            if (grelement.idgroup === element.idgroup) {
                 idGroupeConcerne = grindex;
-                groups[idGroupeConcerne].membres.push({iduser: element.iduser, prenom: element.prenom, nomuser:element.nomuser});
+                groups[idGroupeConcerne].membres.push({
+                    iduser: element.iduser,
+                    prenom: element.prenom,
+                    nomuser: element.nomuser
+                });
             }
             console.log(groups[grindex].membres);
         })
@@ -82,11 +87,11 @@ function buildGroupsObject(queryResult){
 }
 
 // les infos d'un groupe en particulier
-router.get('/:iduser/:idgroup', function(req,res){
-   let iduser = req.params.iduser;
-   let idgroup = req.params.idgroup;
+router.get('/:iduser/:idgroup', function (req, res) {
+    let iduser = req.params.iduser;
+    let idgroup = req.params.idgroup;
 
-    console.log(iduser+" " +idgroup);
+    console.log(iduser + " " + idgroup);
 });
 
 module.exports = router;

@@ -4,14 +4,12 @@ var axios = require('axios');
 var express = require('express');
 var router = express.Router();
 var querystring = require('querystring');
+var facebookdata = require("../facebookdata");
 
 var SUCCESS_STATUS = 200;
 var REDIRECT_STATUS = 304;
 var NOT_FOUND_STATUS = 404;
 
-var appAccessToken = void 0;
-var userAccessToken = void 0;
-var userFbId = void 0;
 var userFriendList = void 0;
 
 var _sendResponse = function _sendResponse(status, message, res) {
@@ -46,22 +44,14 @@ var _getAppAccessToken = function _getAppAccessToken() {
 var _inspectUserToken = function _inspectUserToken() {
     var inspectTokenRequest = {
         redirectURI: 'https://graph.facebook.com/debug_token?',
-        input_token: userAccessToken,
-        access_token: appAccessToken
+        input_token: facebookdata.userAccessToken,
+        access_token: facebookdata.appAccessToken
     };
 
     return axios.get(inspectTokenRequest.redirectURI + 'input_token=' + inspectTokenRequest.input_token + '&access_token=' + inspectTokenRequest.access_token);
 };
 
-var _getUserFriendList = function _getUserFriendList() {
-    var userFriendListRequest = {
-        redirectURI: 'https://graph.facebook.com/v2.11/',
-        userAccessToken: userAccessToken,
-        userID: userFbId
-    };
-
-    return axios.get(userFriendListRequest.redirectURI + userFriendListRequest.userID + '/friends?access_token=' + userFriendListRequest.userAccessToken);
-};
+var _checkIfUserExists = function _checkIfUserExists() {};
 
 router.get('/', function (req, res, next) {
     console.log("GET /fblogin");
@@ -86,25 +76,17 @@ router.get('/handleauth', function (req, res, next) {
 
     _getUserAccessToken(str).then(function (response) {
 
-        userAccessToken = response.data.access_token;
+        facebookdata.userAccessToken = response.data.access_token;
 
         _getAppAccessToken().then(function (response) {
 
-            appAccessToken = response.data.access_token;
+            facebookdata.appAccessToken = response.data.access_token;
 
             _inspectUserToken().then(function (response) {
-                userFbId = response.data.data.user_id;
+                facebookdata.userFbId = response.data.data.user_id;
 
-                _getUserFriendList().then(function (response) {
-                    userFriendList = response.data.data;
-
-                    console.log(userFriendList);
-
-                    //TODO: Send response to client
-                    _sendResponse(SUCCESS_STATUS, userFriendList, res);
-                }).catch(function (error) {
-                    console.log(error);
-                });
+                //TODO: Send response to client
+                _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res);
             }).catch(function (error) {
                 console.log(error);
             });

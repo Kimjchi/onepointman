@@ -16,11 +16,13 @@ router.get('/:iduser/', function (req, res) {
             status: 'success',
             message: toReturn
         });
+        sender.sendResponse(sender.SUCCESS_STATUS, toReturn, res);
     }).catch(function (e) {
         res.send({
             status: 'fail',
             message: e.toString()
         });
+        sender.sendResponse(sender.NOT_FOUND_STATUS, toReturn, res);
     });
 });
 
@@ -56,7 +58,11 @@ function buildGroupsObject(queryResult) {
         groups.forEach(function (grelement, grindex) {
             if (grelement.idgroup === element.idgroup) {
                 idGroupeConcerne = grindex;
-                groups[idGroupeConcerne].membres.push({ iduser: element.iduser, prenom: element.prenom, nomuser: element.nomuser });
+                groups[idGroupeConcerne].membres.push({
+                    iduser: element.iduser,
+                    prenom: element.prenom,
+                    nomuser: element.nomuser
+                });
             }
             console.log(groups[grindex].membres);
         });

@@ -5,6 +5,7 @@ export const SENDING_REQUEST = 'SENDING_REQUEST';
 export const LOGOUT = 'LOGOUT';
 export const SET_AUTH = 'SET_AUTH';
 export const LOGIN = 'LOGIN';
+export const IDUSER = 'IDUSER';
 
 export function loginRequest (){
     return {type: LOGIN_REQUEST}
@@ -24,4 +25,8 @@ export function login (isAdminState) {
 
 export function logout (){
     return {type: LOGOUT}
+}
+
+export function idUser(id) {
+    return {type: IDUSER, id}
 }

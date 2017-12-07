@@ -2,14 +2,12 @@ const axios = require('axios');
 const express = require('express');
 const router = express.Router();
 const querystring = require('querystring');
+const facebookdata = require("../facebookdata");
 
 const SUCCESS_STATUS = 200;
 const REDIRECT_STATUS = 304;
 const NOT_FOUND_STATUS = 404;
 
-let appAccessToken;
-let userAccessToken;
-let userFbId;
 let userFriendList;
 
 const _sendResponse = (status, message, res) => {
@@ -46,21 +44,15 @@ const _getAppAccessToken = () => {
 const _inspectUserToken = () => {
     let inspectTokenRequest = {
         redirectURI: 'https://graph.facebook.com/debug_token?',
-        input_token: userAccessToken,
-        access_token: appAccessToken
+        input_token: facebookdata.userAccessToken,
+        access_token: facebookdata.appAccessToken
     };
 
     return axios.get(inspectTokenRequest.redirectURI + 'input_token=' + inspectTokenRequest.input_token + '&access_token=' + inspectTokenRequest.access_token)
 };
 
-const _getUserFriendList = () => {
-    let userFriendListRequest = {
-        redirectURI: 'https://graph.facebook.com/v2.11/',
-        userAccessToken: userAccessToken,
-        userID: userFbId
-    }
-
-    return axios.get(userFriendListRequest.redirectURI + userFriendListRequest.userID + '/friends?access_token=' + userFriendListRequest.userAccessToken)
+const _checkIfUserExists = () => {
+    
 };
 
 router.get('/', function (req, res, next) {
@@ -87,32 +79,22 @@ router.get('/handleauth', function (req, res, next) {
     _getUserAccessToken(str)
         .then(response => {
 
-            userAccessToken = response.data.access_token;
+            facebookdata.userAccessToken = response.data.access_token;
 
             _getAppAccessToken()
                 .then(response => {
 
-                    appAccessToken = response.data.access_token;
+                    facebookdata.appAccessToken = response.data.access_token;
 
                     _inspectUserToken()
                         .then(response => {
-                            userFbId = response.data.data.user_id;
+                            facebookdata.userFbId = response.data.data.user_id;
 
-                            _getUserFriendList()
-                                .then(response => {
-                                    userFriendList = response.data.data;
-
-                                    console.log(userFriendList);
-
-                                    //TODO: Send response to client
-                                    _sendResponse(SUCCESS_STATUS, userFriendList, res)
-                                })
-                                .catch(error => {
-                                    console.log(error)
-                                })
+                            //TODO: Send response to client
+                            _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res)
                         })
                         .catch(error => {
-                            console.log(error)
+                            console.log(error);
                         });
                 })
                 .catch(error => {

@@ -2,17 +2,23 @@
   <library name="Generated files" type="javaScript">
     <properties>
       <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/dist/facebookdata.js" />
         <item url="file://$PROJECT_DIR$/dist/routes/groups.js" />
         <item url="file://$PROJECT_DIR$/dist/connection/index.js" />
+        <item url="file://$PROJECT_DIR$/dist/sender.js" />
         <item url="file://$PROJECT_DIR$/dist/routes/fblogin.js" />
         <item url="file://$PROJECT_DIR$/dist/app.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/users.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
+      <root url="file://$PROJECT_DIR$/dist/facebookdata.js" />
       <root url="file://$PROJECT_DIR$/dist/routes/groups.js" />
       <root url="file://$PROJECT_DIR$/dist/connection/index.js" />
+      <root url="file://$PROJECT_DIR$/dist/sender.js" />
       <root url="file://$PROJECT_DIR$/dist/routes/fblogin.js" />
       <root url="file://$PROJECT_DIR$/dist/app.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/users.js" />
     </CLASSES>
     <SOURCES />
   </library>

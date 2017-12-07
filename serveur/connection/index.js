@@ -11,7 +11,6 @@ var pg = require("pg"); // require Postgres module
 
 
 // Setup connection
-var db = {};
 var username = "postgres" ;// sandbox username
 var password = "root" ;// read only privileges on our table
 var host = "localhost";

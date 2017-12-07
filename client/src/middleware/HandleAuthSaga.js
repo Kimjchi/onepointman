@@ -1,7 +1,9 @@
 import {take, fork} from 'redux-saga/effects';
 import axios from 'axios';
 import {HANDLE_AUTH_REQ} from "../actions/opHandleAuth";
-
+import {store} from '../store';
+import {idUser, setAuthState} from "../actions/opLogin";
+import {push} from "react-router-redux";
 
 export function* HandleAuth() {
 
@@ -15,12 +17,10 @@ export function* HandleAuth() {
 
         axios.get(server + window.location.href.substring(window.location.href.indexOf("?") + 1, window.location.href.length))
             .then(function (response) {
-                console.log(response);
                 if (!!response.status && response.status === 200) {
                     alert('liste d\'amis : ' + JSON.stringify(response.data));
-                    window.location.href = 'http://localhost:3000/Home';
-
-                    response.data.status === 'success' && response.status ===  200
+                    store.dispatch(setAuthState(true));
+                    store.dispatch(push("/Home"));
                 } else {
                     alert('auth error');
                 }

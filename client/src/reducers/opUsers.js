@@ -9,35 +9,6 @@ let initialState = {
     groupToDisplay: '',
     search: '',
     usersToDelete: [],
-    groupsUsers: [
-        {
-            id: 1,
-            nom: 'Groupe 1',
-            users: [
-                {
-                    nom: 'Joe Lie'
-                },
-                {
-                    nom: 'Broo te'
-                }
-            ]
-        },
-        {
-            id: 2,
-            nom: 'Babes',
-            users: [
-                {
-                    nom: 'Devon Brunet'
-                },
-                {
-                    nom: 'Jérémy Kim'
-                },
-                {
-                    nom: 'Babe'
-                }
-            ]
-        }
-    ],
     friends: [],
     errors: '',
 };

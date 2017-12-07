@@ -7,20 +7,20 @@ let initialState = {
     groupName: '',
     groups: [
         {
-            id: 1,
-            nom: 'Heya'
+            idgroup: 1,
+            nomgroup: 'Heya'
         },
         {
             id: 2,
-            nom: 'BROOOS'
+            nomgroup: 'BROOOS'
         },
         {
             id: 3,
-            nom: 'Yeee'
+            nomgroup: 'Yeee'
         },
         {
             id: 4,
-            nom: 'Groupe 4'
+            nomgroup: 'Groupe 4'
         }
     ],
     errors: '',

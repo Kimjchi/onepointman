@@ -23,7 +23,7 @@ class App extends Component {
                         exact
                         path="/handleauth"
                         component={HandleAuthContainer}/>
-                    <PublicRoute
+                    <PrivateRoute
                         exact
                         path="/Home"
                         component={DashboardContainer}/>

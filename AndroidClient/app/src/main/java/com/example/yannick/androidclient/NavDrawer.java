@@ -2,6 +2,7 @@ package com.example.yannick.androidclient;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -16,7 +17,6 @@ import android.view.MenuItem;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -86,7 +86,10 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                                 @Override
                                 public void onClick(View view) {
                                     System.out.println("APPUI SUR LE BOUTON");
-                                    //Lancer l'activite réglages du groupe
+                                    Intent settings = new Intent(getApplicationContext(), SettingsGroup.class);
+                                    settings.putExtra("groupName", "Je suis le groupe");
+                                    settings.putExtra("groupdId", 289);
+                                    startActivity(settings);
                                 }
                             });
                             mi.setActionView(settingsButton);
@@ -150,7 +153,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        getMenuInflater().inflate(R.menu.nav_drawer_settings, menu);
         return true;
     }
 

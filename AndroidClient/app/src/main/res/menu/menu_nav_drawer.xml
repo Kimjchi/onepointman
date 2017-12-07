@@ -11,9 +11,9 @@
     <item android:title="Réglages">
         <menu>
             <item
-                android:id="@+id/nav_settings"
-                android:icon="@drawable/reglage"
-                android:title="Réglages" />
+                android:id="@+id/add_group"
+                android:icon="@drawable/add"
+                android:title="Ajouter un groupe" />
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/logout"

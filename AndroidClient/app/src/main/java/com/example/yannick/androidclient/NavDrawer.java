@@ -13,8 +13,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -71,11 +73,30 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                     @Override
                     public void onResponse(JSONObject response)
                     {
-                        int limit = 5;
-                        for(int i=0; i < 5; i++)
+                        int limit = 19;
+                        for(int i=0; i < limit; i++)
                         {
-                            MenuItem mi = menu.findItem(R.id.groups).getSubMenu().add(0, i, i, "Groupe" + i + " maggle");
+                            MenuItem mi = menu.findItem(R.id.groups)
+                                    .getSubMenu().add(0, i, i, "Groupe" + i + " maggle n ique ta mere je mange des sauterelles par exemple hein");
                             mi.setIcon(R.drawable.group);
+                            ImageButton settingsButton = new ImageButton(getApplicationContext());
+                            settingsButton.setImageResource(R.drawable.reglage);
+                            settingsButton.setBackgroundResource(0);
+                            settingsButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    System.out.println("APPUI SUR LE BOUTON");
+                                    //Lancer l'activite réglages du groupe
+                                }
+                            });
+                            mi.setActionView(settingsButton);
+                            mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                                @Override
+                                public boolean onMenuItemClick(MenuItem menuItem) {
+                                    System.out.println("Clicked on "+menuItem.getItemId());
+                                    return false;
+                                }
+                            });
                         }
                     }
         }, new Response.ErrorListener() {
@@ -169,7 +190,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             case 3:
                 System.out.println("Groupe 4");
                 break;
-            case R.id.nav_settings:
+            case R.id.add_group:
                 System.out.println("Settings");
                 break;
             case R.id.nav_logout:

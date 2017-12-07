@@ -52,7 +52,7 @@ const _inspectUserToken = () => {
 };
 
 const _checkIfUserExists = () => {
-    
+
 };
 
 router.get('/', function (req, res, next) {

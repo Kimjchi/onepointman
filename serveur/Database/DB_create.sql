@@ -11,7 +11,8 @@ CREATE TABLE "USER"(
     iduser serial PRIMARY KEY,
     isconnected boolean,
     isloggedin boolean,
-    position geometry(Point,4326),
+    userlg numeric(9,6),
+    userlt numeric(9,6),
     nom varchar(50),
     prenom varchar(50),
     lastconnexion date
@@ -26,7 +27,8 @@ CREATE TABLE "GROUP"(
 CREATE TABLE "PINPOINT"(
     idpinpoint serial PRIMARY KEY,
     description varchar(255),
-    position geometry(Point,4326),
+    pinlt numeric(9,6),
+    pinlg numeric(9,6),
     creationdate date,
     idcreator integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)
@@ -35,7 +37,8 @@ CREATE TABLE "PINPOINT"(
 CREATE TABLE "DRAWING"(
     iddrawing serial PRIMARY KEY,
     description varchar(255),
-    position geometry(Point,4326),
+    drawinglg numeric(9,6),
+    drawinglt numeric(9,6),
     actif boolean,
     img bytea,
     idcreator integer REFERENCES "USER" (iduser),

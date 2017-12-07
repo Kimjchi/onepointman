@@ -1,7 +1,7 @@
 SELECT setval('public."USER_iduser_seq"', 1, FALSE);
 SELECT setval('public."GROUP_idgroup_seq"',1,FALSE);
 
-INSERT INTO public."USER" (position, nom, prenom) VALUES (ST_GeomFromText('POINT(-71.060316 48.432044)', 4326), 'NIQUETA', 'Maman');
+INSERT INTO public."USER" (userlt, userlg, nom, prenom) VALUES (-71.060316,  48.432044, 'NIQUETA', 'Maman');
 INSERT INTO public."USER" (nom, prenom) VALUES ('Watson', 'Emma');
 INSERT INTO public."USER" (nom, prenom) VALUES ('Radcliffe', 'Daniel');
 INSERT INTO public."USER" (nom, prenom) VALUES ('QuifaitRonWeaslay', 'LacteurRoux');

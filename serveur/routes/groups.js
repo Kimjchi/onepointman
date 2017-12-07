@@ -19,6 +19,7 @@ router.get('/:iduser/', function (req, res) {
 
         })
         .catch(e => {
+            res.status(400);
             res.send({
                 status: 'fail',
                 message: e.toString()
@@ -74,7 +75,6 @@ function buildGroupsObject(queryResult){
                 idGroupeConcerne = grindex;
                 groups[idGroupeConcerne].membres.push({iduser: element.iduser, prenom: element.prenom, nomuser:element.nomuser});
             }
-            console.log(groups[grindex].membres);
         })
     });
     return groups;
@@ -83,10 +83,62 @@ function buildGroupsObject(queryResult){
 
 // les infos d'un groupe en particulier
 router.get('/:iduser/:idgroup', function(req,res){
+    //vérifier si l'utilisateur est bien dans le groupe avant de faire le traitement
+
    let iduser = req.params.iduser;
    let idgroup = req.params.idgroup;
+//pour le groupe : renvoyer son nom, les pinpoints qui lui sont associés, les dessins,
+// les positions des gens SSI ils décident de la partager avec ce groupe
+    let requete = addUsersInfosToTable(idgroup);
+    db.any(requete)
+        .then((result) =>{
+            res.send({
+                status: 'success',
+                message: result
+            });
+        })
+        .catch(e => {
+            res.status(400);
+            res.send({
+                status: 'fail',
+                message: e.toString()
+            })
+        });
+    console.log(requete);
 
-    console.log(iduser+" " +idgroup);
+
 });
+
+let getGroupInfos = (idgroup) =>
+    squel.select()
+        .from('public."GROUP"', 'gr')
+        .field('gr.nom', 'nomgroup')
+        .field('ugr.iduser')
+        .field('gr.idgroup')
+        .field('ugr.sharesposition')
+        .field('pin.idpinpoint')
+        .field('draw.iddrawing')
+        .left_join('public."DRAWING"', 'draw', 'draw.idgroup = gr.idgroup')
+        .left_join('public."PINPOINT"', 'pin', 'pin.idgroup = gr.idgroup')
+        .left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = gr.idgroup')
+        .where('gr.idgroup = ?', idgroup);
+
+let addUsersInfosToTable = (idgroup) =>
+    squel.select()
+        .from(getGroupInfos(idgroup), 'groupinfos')
+        .left_join('public."USER"', 'usr', 'usr.iduser = groupinfos.iduser')
+        .field('groupinfos.nomgroup')
+        .field('groupinfos.iduser')
+        .field('groupinfos.idgroup')
+        .field('groupinfos.sharesposition')
+        .field('groupinfos.idpinpoint')
+        .field('groupinfos.iddrawing')
+        .field('usr.nom', 'nomuser')
+        .field('usr.prenom')
+       // .field('usr.userlt')
+       // .field('usr.userlg')
+        .toString();
+
+
 
 module.exports = router;

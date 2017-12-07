@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ListView;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -21,6 +22,8 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Created by yannick on 05/12/17.
@@ -148,6 +151,41 @@ public class VolleyRequester
                                     }
                                 });
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("Erreur lors de la récupérations des groupes");
+            }
+        });
+        VolleyRequester.getInstance(context).addToRequestQueue(setGroups);
+    }
+
+    public void fillSettingsUserView(final ArrayList<UserModel> userModels, final ListView userList)
+    {
+        JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET,
+                URL_SERVEUR + "/groups/2", null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        System.out.println(response.toString());
+                        try {
+                            JSONArray array = (JSONArray) response.get("message");
+
+                            for(int i=0; i < array.length(); i++)
+                            {
+                                final JSONObject groupe = (JSONObject) array.get(i);
+                                final int id = groupe.getInt("idgroup");
+                                final String name = groupe.getString("nomgroup");
+                                userModels.add(new UserModel(name, id));
+                            }
+                            SettingsGroup.userAdapter = new UserAdapter(userModels, context);
+                            userList.setAdapter(SettingsGroup.userAdapter);
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

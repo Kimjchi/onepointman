@@ -6,7 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -39,7 +42,6 @@ public class UserAdapter extends ArrayAdapter<UserModel> {
     @Override
     public long getItemId(int pos) {
         return dataSet.get(pos).getId();
-        //just return 0 if your list items do not have an Id variable.
     }
 
     @Override
@@ -51,6 +53,13 @@ public class UserAdapter extends ArrayAdapter<UserModel> {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.row_item, null);
         }
+
+        ImageView pic = view.findViewById(R.id.userImageSettings);
+
+        Picasso.with(getContext()).load("https://graph.facebook.com/"+getItemId(position)+"/picture?type=large")
+                .placeholder(R.drawable.hamburger)
+                .error(R.drawable.ic_menu_camera)
+                .into(pic);
 
         TextView userName = view.findViewById(R.id.userNameSettings);
         userName.setText(dataSet.get(position).getName());

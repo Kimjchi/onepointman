@@ -18,7 +18,7 @@ public class SettingsGroup extends AppCompatActivity {
 
     private ArrayList<UserModel> userModels;
     private ListView userList;
-    private static UserAdapter userAdapter;
+    public static UserAdapter userAdapter;
     private String newName;
 
     @Override
@@ -38,14 +38,7 @@ public class SettingsGroup extends AppCompatActivity {
 
         userModels = new ArrayList<>();
 
-        for(int i=0; i<3; i++)
-        {
-            userModels.add(new UserModel("tmpUser", 57+i));
-        }
-
-        userAdapter = new UserAdapter(userModels, getApplicationContext());
-
-        userList.setAdapter(userAdapter);
+        VolleyRequester.getInstance(getApplicationContext()).fillSettingsUserView(userModels, userList);
     }
 
     @Override

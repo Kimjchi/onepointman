@@ -24,7 +24,6 @@ public class DisplayThread implements Runnable {
     private Handler handler = new Handler();
     private boolean displayThreadRunning = true;
     private Location myLocation;
-
     private MapFragment activity;
 
     @Override
@@ -52,9 +51,10 @@ public class DisplayThread implements Runnable {
                         Toast.makeText(activity.getActivity().getApplicationContext(), "Longitude(" + myLocation.getLongitude() + ")\nLatitude(" + myLocation.getLatitude()+")", Toast.LENGTH_LONG).show();
                         Log.v("LOCATION", "Update displayed!");
                         Log.v("POSITION", "Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
-
                         }
                     }));
+                    VolleyRequester requester = VolleyRequester.getInstance(activity.getActivity().getApplicationContext());
+                    requester.sendMyPosition(myLocation);
                 }
                 handler.postDelayed(this, MY_POSITION_UPDATE_TIME);
             }

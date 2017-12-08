@@ -64,6 +64,34 @@ public class VolleyRequester
         getRequestQueue().add(req);
     }
 
+    public void authServer(String idUser, String token)
+    {
+        String json = "{\"iduser\":"+ idUser + ",\"token\":"
+                + token + "}";
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/authAndroid", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            System.out.println("Connexion à TEAM BACKEND OK MAGGLE");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    System.out.println("Auth failed");
+                }
+            });
+            this.addToRequestQueue(authRequest);
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.toString());
+        }
+    }
+
     public void connectToFbFromServer()
     {
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
@@ -138,34 +166,6 @@ public class VolleyRequester
         this.addToRequestQueue(grpRequest);
     }
 
-    public void sendMyPosition(Location myPosition){
-
-        String idUser = FacebookInfosRetrieval.user_id;
-        JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
-                URL_SERVEUR + "/users/updateposition/" + idUser + "/"
-        + myPosition.getLatitude() + "/" + myPosition.getLongitude() +"/", null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            if((response.getString("status")) == "succes"){
-                                Log.v("SEND POSITION", "Position envoyée avec succès!");
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // TODO Auto-generated method stub
-                //MDR LÉ EREUR C POUR LÉ FèBLe
-                System.out.println("Erreur lors de la demande des groupes: " + error.toString());
-            }
-        });
-        this.addToRequestQueue(grpRequest);
-    }
-
     public void displayGroupForNavDrawer(final Menu menuNavDrawer)
     {
         JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET,
@@ -234,4 +234,41 @@ public class VolleyRequester
         https://developer.android.com/training/volley/request.html
      */
 
+
+    public void sendMyPosition(Location myPosition){
+        String idUser = FacebookInfosRetrieval.user_id;
+        String json = "{\"iduser\":"+ idUser + ",\"userlt\":"
+                + myPosition.getLatitude() + ",\"userlg\":" + myPosition.getLongitude() +"}";
+        Log.v("JSON POSITION", json);
+
+        try {
+            JSONObject bodyJson = new JSONObject(json);
+
+        JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.POST,
+                URL_SERVEUR + "/users/updateposition/", bodyJson,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Log.v("TAG",response.toString());
+                            if((response.getString("status")).equals("success")){
+                                Log.v("SEND POSITION", "Position envoyée avec succès!");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO Auto-generated method stub
+                //MDR LÉ EREUR C POUR LÉ FèBLe
+                System.out.println("Erreur lors de la demande des groupes: " + error.toString());
+            }
+        });
+            this.addToRequestQueue(grpRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -19,7 +19,7 @@ class MapContainer extends Component {
         return (
             <Map isMarkerShown = {isMarkerShown} mapCenter = {mapCenter}
                  zoom = {zoom} updateMarkersSelect = {updateMarkersSelect}
-                 markers = {markersSelect} markersGeoLocation = {markersGeoLocation} />
+                 markersSelect = {markersSelect} markersGeoLocation = {markersGeoLocation} />
     )
     }
 }

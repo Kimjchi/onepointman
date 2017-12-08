@@ -29,5 +29,7 @@
     <string name="changeName">Changer le nom du groupe</string>
     <string name="oui">Oui</string>
     <string name="non">Non</string>
+    <string name="title_activity_test_login_fb_from_server">TestLoginFbFromServer</string>
+    <string name="se_connecter">Se connecter</string>
 
 </resources>

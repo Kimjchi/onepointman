@@ -131,7 +131,7 @@ router.get('/handleauth', function (req, res, next) {
                                     loggedUser.prenom = response.data.first_name;
                                     loggedUser.nom = response.data.last_name;
                                     loggedUser.photo = response.data.picture;
-                                    loggedUser.photo = facebookdata.userFbId
+                                    loggedUser.iduser = facebookdata.userFbId
                                 })
                                 .catch(error => {
                                     console.log(error);

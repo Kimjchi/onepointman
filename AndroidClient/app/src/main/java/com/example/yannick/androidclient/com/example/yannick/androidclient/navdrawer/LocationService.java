@@ -1,4 +1,4 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -6,10 +6,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 
 /**
  * Created by Arnaud Ricaud on 04/12/2017.

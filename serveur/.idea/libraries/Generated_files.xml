@@ -4,21 +4,23 @@
       <sourceFilesUrls>
         <item url="file://$PROJECT_DIR$/dist/facebookdata.js" />
         <item url="file://$PROJECT_DIR$/dist/routes/groups.js" />
-        <item url="file://$PROJECT_DIR$/dist/connection/index.js" />
         <item url="file://$PROJECT_DIR$/dist/sender.js" />
+        <item url="file://$PROJECT_DIR$/dist/connection/index.js" />
         <item url="file://$PROJECT_DIR$/dist/routes/fblogin.js" />
-        <item url="file://$PROJECT_DIR$/dist/app.js" />
         <item url="file://$PROJECT_DIR$/dist/routes/users.js" />
+        <item url="file://$PROJECT_DIR$/dist/app.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/pinpoint.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
       <root url="file://$PROJECT_DIR$/dist/facebookdata.js" />
       <root url="file://$PROJECT_DIR$/dist/routes/groups.js" />
-      <root url="file://$PROJECT_DIR$/dist/connection/index.js" />
       <root url="file://$PROJECT_DIR$/dist/sender.js" />
+      <root url="file://$PROJECT_DIR$/dist/connection/index.js" />
       <root url="file://$PROJECT_DIR$/dist/routes/fblogin.js" />
-      <root url="file://$PROJECT_DIR$/dist/app.js" />
       <root url="file://$PROJECT_DIR$/dist/routes/users.js" />
+      <root url="file://$PROJECT_DIR$/dist/app.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/pinpoint.js" />
     </CLASSES>
     <SOURCES />
   </library>

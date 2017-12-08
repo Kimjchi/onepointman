@@ -1,13 +1,13 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.login;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.camera2.params.Face;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.NavDrawer;
+import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -17,8 +17,6 @@ import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 
 /**
@@ -69,7 +67,8 @@ public class MainActivity extends Activity {
 
     private void authServer()
     {
-        VolleyRequester.getInstance(getApplicationContext()).authServer(FacebookInfosRetrieval.user_id, AccessToken.getCurrentAccessToken().toString());
+        VolleyRequester.getInstance(getApplicationContext()).authServer(FacebookInfosRetrieval.user_id,
+                AccessToken.getCurrentAccessToken().getToken());
     }
 
     @Override

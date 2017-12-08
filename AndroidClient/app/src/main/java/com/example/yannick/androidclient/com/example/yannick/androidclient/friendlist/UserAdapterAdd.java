@@ -1,4 +1,4 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -15,17 +17,17 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * Created by yannick on 06/12/17.
+ * Created by yannick on 08/12/17.
  */
 
-public class UserAdapter extends ArrayAdapter<UserModel> {
-
-    private ArrayList<UserModel> dataSet;
+public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
+{
+    private ArrayList<UserModelAdd> dataSet;
     private Context context;
     private int lastPosition = -1;
 
-    public UserAdapter(ArrayList<UserModel> data, Context context) {
-        super(context, R.layout.row_item, data);
+    public UserAdapterAdd(ArrayList<UserModelAdd> data, Context context) {
+        super(context, R.layout.row_item_settings, data);
         this.dataSet = data;
         this.context = context;
     }
@@ -36,13 +38,18 @@ public class UserAdapter extends ArrayAdapter<UserModel> {
     }
 
     @Override
-    public UserModel getItem(int pos) {
+    public UserModelAdd getItem(int pos) {
         return dataSet.get(pos);
     }
 
     @Override
     public long getItemId(int pos) {
         return dataSet.get(pos).getId();
+    }
+
+    public int getGroupId()
+    {
+        return dataSet.get(0).getGroupId();
     }
 
     @Override
@@ -52,7 +59,7 @@ public class UserAdapter extends ArrayAdapter<UserModel> {
         if(view == null)
         {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.row_item, null);
+            view = inflater.inflate(R.layout.row_item_settings, null);
         }
 
         CircleImageView pic = view.findViewById(R.id.userImageSettings);
@@ -65,12 +72,21 @@ public class UserAdapter extends ArrayAdapter<UserModel> {
         TextView userName = view.findViewById(R.id.userNameSettings);
         userName.setText(dataSet.get(position).getName());
 
-        ImageButton deleteBtn = view.findViewById(R.id.deleteSettings);
+        final ImageButton deleteBtn = view.findViewById(R.id.deleteSettings);
 
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                dataSet.remove(position);
+                if(getItem(position).isInGroup())
+                {
+                    VolleyRequester.getInstance(getContext()).deleteUserFromGroup(getItemId(position), getGroupId());
+                    deleteBtn.setImageResource(R.drawable.addUser);
+                }
+                else
+                {
+                    VolleyRequester.getInstance(getContext()).addUserToGroup(getItemId(position), getGroupId());
+                    deleteBtn.setImageResource(R.drawable.delete);
+                }
                 notifyDataSetChanged();
             }
         });

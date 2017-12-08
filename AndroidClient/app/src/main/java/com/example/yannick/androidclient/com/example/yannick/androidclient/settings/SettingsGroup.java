@@ -1,4 +1,4 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.settings;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -12,13 +12,15 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.yannick.androidclient.R;
+
 import java.util.ArrayList;
 
 public class SettingsGroup extends AppCompatActivity {
 
-    private ArrayList<UserModel> userModels;
+    private ArrayList<UserModelSettings> userModels;
     private ListView userList;
-    private UserAdapter userAdapter;
+    private UserAdapterSettings userAdapter;
     private String newName;
 
     @Override
@@ -36,9 +38,9 @@ public class SettingsGroup extends AppCompatActivity {
 
         userList = (ListView) findViewById(R.id.listUserGroup);
 
-        userModels = (ArrayList<UserModel>)getIntent().getExtras().getSerializable("usersList");
+        userModels = (ArrayList<UserModelSettings>)getIntent().getExtras().getSerializable("usersList");
 
-        userAdapter = new UserAdapter(userModels, getApplicationContext());
+        userAdapter = new UserAdapterSettings(userModels, getApplicationContext());
         userList.setAdapter(userAdapter);
     }
 
@@ -52,8 +54,6 @@ public class SettingsGroup extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        System.out.println("Ici" + id);
 
         switch (id)
         {

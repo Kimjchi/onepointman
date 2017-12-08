@@ -1,4 +1,4 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.volley;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,19 +12,23 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
-import android.widget.ListView;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+<<<<<<< HEAD:AndroidClient/app/src/main/java/com/example/yannick/androidclient/VolleyRequester.java
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+=======
+import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
+import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.UserModelSettings;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.SettingsGroup;
+>>>>>>> master:AndroidClient/app/src/main/java/com/example/yannick/androidclient/com/example/yannick/androidclient/volley/VolleyRequester.java
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +45,7 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    private final String URL_SERVEUR = "http://10.42.0.1:3001";
 
     private VolleyRequester(Context context)
     {
@@ -69,22 +73,25 @@ public class VolleyRequester
 
     public void authServer(String idUser, String token)
     {
-        String json = "{\"iduser\":"+ idUser + ",\"token\":"
-                + token + "}";
+        String json = "{\"userId\":\""+ idUser + "\",\"token\":\""
+                + token + "\"}";
         try
         {
             JSONObject bodyJson = new JSONObject(json);
             JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
-                    URL_SERVEUR + "/authAndroid", bodyJson,
+                    URL_SERVEUR + "/fblogin/" +
+                            "authAndroid", bodyJson,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            System.out.println("Connexion à TEAM BACKEND OK MAGGLE");
+
+                            Log.v("CONNEXION_BACKEND", "Connexion à TEAM BACKEND OK MAGGLE");
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println("Auth failed");
+                    Log.v("ErrorAuth", "Authentification au serveur echouée");
+                    error.printStackTrace();
                 }
             });
             this.addToRequestQueue(authRequest);
@@ -187,12 +194,12 @@ public class VolleyRequester
                                 final int id = groupe.getInt("idgroup");
                                 final String name = groupe.getString("nomgroup");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
-                                final ArrayList<UserModel> users = new ArrayList<>();
+                                final ArrayList<UserModelSettings> users = new ArrayList<>();
                                 for(int j=0; j<membres.length(); j++)
                                 {
                                     final JSONObject user = (JSONObject) membres.get(j);
-                                    users.add(new UserModel(user.getString("prenom") + user.getString("nomuser"),
-                                            user.getInt("iduser")));
+                                    users.add(new UserModelSettings(user.getString("prenom") + user.getString("nomuser"),
+                                            user.getInt("iduser"), id));
                                 }
                                 MenuItem mi = menuNavDrawer.findItem(R.id.groups)
                                         .getSubMenu().add(0, id, i, name);
@@ -367,4 +374,62 @@ public class VolleyRequester
             e.printStackTrace();
         }
     }
+
+    public void deleteUserFromGroup(final long itemId, final int groupId)
+    {
+        String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
+
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
+                    URL_SERVEUR + "users/deleteuser", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("DELETE_USER", "User " + itemId + " bien delete du groupe " + groupId);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("DELETE_USER", "Fail to delete user "+itemId + "from group "+groupId);
+                }
+            });
+            this.addToRequestQueue(deleteRequest);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public void addUserToGroup(long itemId, int groupId)
+    {
+        String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
+
+        try
+        {
+            /*
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
+                    URL_SERVEUR + "users/deleteuser", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("DELETE_USER", "User " + itemId + " bien delete du groupe " + groupId);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("DELETE_USER", "Fail to delete user "+itemId + "from group "+groupId);
+                }
+            });
+            this.addToRequestQueue(deleteRequest);*/
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
 }

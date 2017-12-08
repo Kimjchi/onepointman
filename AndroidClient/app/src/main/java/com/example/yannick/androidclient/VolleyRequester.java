@@ -64,6 +64,34 @@ public class VolleyRequester
         getRequestQueue().add(req);
     }
 
+    public void authServer(String idUser, String token)
+    {
+        String json = "{\"iduser\":"+ idUser + ",\"token\":"
+                + token + "}";
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/authAndroid", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            System.out.println("Connexion à TEAM BACKEND OK MAGGLE");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    System.out.println("Auth failed");
+                }
+            });
+            this.addToRequestQueue(authRequest);
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.toString());
+        }
+    }
+
     public void connectToFbFromServer()
     {
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,

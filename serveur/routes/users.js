@@ -107,6 +107,35 @@ router.post(('/updatepositionsharing'), function(req, res){
         })
 });
 
+router.post('/createuser/', function (req, res) {
+
+    let toCreate = {
+        usersToAdd: req.body.usersToAdd,
+        idgroup: req.body.idgroup,
+    };
+    let query = "";
+    let response = "";
+    toCreate.usersToAdd.forEach((users) => {
+        query = squel.insert()
+            .into('public."USER_GROUP"')
+            .set('iduser', users.iduser)
+            .set('idgroup', toCreate.idgroup)
+            .toString();
+
+        db.query(query)
+            .then((row)=>{
+                response = "";
+                sender.sendResponse(sender.SUCCESS_STATUS, 'User ' + users.iduser + ' added to group ' + toCreate.idgroup + ' successfully', res)
+            })
+            .catch(e => {
+                sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while adding user ' + users.iduser + ' to group', res);
+                console.log(e);
+            })
+    })
+
+
+});
+
 router.delete(('/deleteuser'), function(req, res){
 
     let toUpdate = {

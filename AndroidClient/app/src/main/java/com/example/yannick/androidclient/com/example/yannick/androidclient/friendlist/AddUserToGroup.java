@@ -24,7 +24,7 @@ public class AddUserToGroup extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_friends_to_group);
+        setContentView(R.layout.activity_add_user_to_group);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.addUserToGroupToolbar);
         toolbar.setTitle(getIntent().getExtras().get("groupName").toString());

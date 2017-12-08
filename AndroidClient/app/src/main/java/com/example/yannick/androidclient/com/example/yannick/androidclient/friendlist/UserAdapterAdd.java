@@ -80,7 +80,7 @@ public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
                 if(getItem(position).isInGroup())
                 {
                     VolleyRequester.getInstance(getContext()).deleteUserFromGroup(getItemId(position), getGroupId());
-                    deleteBtn.setImageResource(R.drawable.addUser);
+                    deleteBtn.setImageResource(R.drawable.adduser);
                 }
                 else
                 {

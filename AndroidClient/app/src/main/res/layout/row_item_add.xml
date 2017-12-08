@@ -27,7 +27,7 @@
 
     <ImageButton
         android:id="@+id/userAddOrRemove"
-        android:src="@drawable/addUser"
+        android:src="@drawable/adduser"
         android:background="@null"
         android:layout_centerVertical="true"
         android:layout_width="wrap_content"

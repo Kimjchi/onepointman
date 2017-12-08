@@ -19,16 +19,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-<<<<<<< HEAD:AndroidClient/app/src/main/java/com/example/yannick/androidclient/VolleyRequester.java
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-=======
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.UserModelSettings;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.SettingsGroup;
->>>>>>> master:AndroidClient/app/src/main/java/com/example/yannick/androidclient/com/example/yannick/androidclient/volley/VolleyRequester.java
+import com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.MapFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;

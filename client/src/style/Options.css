@@ -50,8 +50,7 @@ body .wrapper li a {
     text-decoration: none;
     color: #a1a1a1;
 }
-body .wrapper li a:hover,
-body .wrapper li a:focus {
+body .wrapper li a:hover {
     background-color: #f74f54;
     color: #ffffff;
 }
@@ -166,6 +165,42 @@ input[type="text"]:hover {
 :-moz-placeholder {
     /* Firefox 4 - 18 */
     color: #a1a1a1;
+}
+
+/* Marker CSS */
+
+.markerG {
+
+    animation: bounce 1s;
+    animation-direction: alternate;
+    animation-timing-function: cubic-bezier(.5,0.05,1,.5);
+    animation-iteration-count: infinite;
+}
+
+@keyframes bounce {
+    from { transform: translate3d(0, -0.4em, 0);     }
+    to   { transform: translate3d(0, 0.5em, 0); }
+}
+
+/* Prefix Support */
+.markerG {
+
+    -webkit-animation-name: bounce;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-direction: alternate;
+    -webkit-animation-timing-function: cubic-bezier(.5,0.05,1,.5);
+    -webkit-animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes bounce {
+    from {
+        -webkit-transform: translate3d(0, -0.4em, 0);
+        transform: translate3d(0, -0.4em, 0);
+    }
+    to {
+        -webkit-transform: translate3d(0, 0.5em, 0);
+        transform: translate3d(0, 0.5em, 0);
+    }
 }
 
 label {

@@ -10,26 +10,18 @@ class Map extends Component {
 
     constructor(props) {
         super(props);
-        this._checkLocation = this._checkLocation.bind(this);
-        this._processLocation = this._processLocation.bind(this);
-        setInterval(this._checkLocation, INTERVAL);
+        this._onClickMap = this._onClickMap.bind(this);
     }
 
-    _checkLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(this._processLocation);
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
-    }
-
-    _processLocation (location) {
-        let point = {
-            lat : location.coords.latitude,
-            lng : location.coords.longitude
-        };
-        let pointArray = [point];
-        this.props.updateMarkersGeolocation(pointArray);
+    _onClickMap (event) {
+        let coordinates = event.latLng;
+        let lat = coordinates.lat();
+        let lng = coordinates.lng();
+        let markersArray = [{
+            lat: lat,
+            lng: lng
+        }];
+       this.props.updateMarkersSelect(markersArray);
     }
 
     render()
@@ -43,7 +35,8 @@ class Map extends Component {
                     containerElement={<div style={{ height: '100%'}} />}
                     mapElement={<div style={{ height: '100%' }} />}
                     zoom={this.props.zoom}
-                    center={this.props.mapCenter}>
+                    center={this.props.mapCenter}
+                    onClick={this._onClickMap}>
                         {this.props.isMarkerShown && this.props.markersGeoLocation.map(marker => (
                             <Marker
                                 key={id++}
@@ -51,7 +44,7 @@ class Map extends Component {
                                 icon = {LOCATION_ICON}
                             />
                         ))}
-                        {this.props.isMarkerShown && this.props.markers.map(marker => (
+                        {this.props.isMarkerShown && this.props.markersSelect.map(marker => (
                             <Marker
                                 key={id++}
                                 position={{ lat: marker.lat, lng: marker.lng }}

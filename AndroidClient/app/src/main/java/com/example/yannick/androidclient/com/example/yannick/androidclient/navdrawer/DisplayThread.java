@@ -1,4 +1,4 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer;
 
 import android.Manifest;
 import android.content.Context;
@@ -10,7 +10,9 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.LocationService;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.MapFragment;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -30,6 +32,7 @@ public class DisplayThread implements Runnable {
     public void run() {
         if (displayThreadRunning) {
             activity = MapFragment.instance;
+            VolleyRequester requester = VolleyRequester.getInstance(activity.getActivity().getApplicationContext());
             LocationService locationService = LocationService.getLocationService(activity.getActivity().getApplicationContext());
             LocationManager locationManager;
             locationManager = (LocationManager) activity.getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -53,14 +56,13 @@ public class DisplayThread implements Runnable {
                         Log.v("POSITION", "Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
                         }
                     }));
-                    VolleyRequester requester = VolleyRequester.getInstance(activity.getActivity().getApplicationContext());
                     requester.sendMyPosition(myLocation);
                 }
+                requester.groupPositionUpdate(4);
                 handler.postDelayed(this, MY_POSITION_UPDATE_TIME);
             }
         }
     }
-
     public void stopDisplay(){
         displayThreadRunning = false;
     }

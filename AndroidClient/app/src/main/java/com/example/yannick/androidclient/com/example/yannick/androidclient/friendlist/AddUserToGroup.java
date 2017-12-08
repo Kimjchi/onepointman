@@ -36,7 +36,7 @@ public class AddUserToGroup extends AppCompatActivity
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        userList = (ListView) findViewById(R.id.listUserGroup);
+        userList = (ListView) findViewById(R.id.listUserAdd);
 
         userModels = new ArrayList<>();
 
@@ -51,7 +51,7 @@ public class AddUserToGroup extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        getMenuInflater().inflate(R.menu.menu_settings_group, menu);
+        //getMenuInflater().inflate(R.menu.menu_settings_group, menu);
         return true;
     }
 

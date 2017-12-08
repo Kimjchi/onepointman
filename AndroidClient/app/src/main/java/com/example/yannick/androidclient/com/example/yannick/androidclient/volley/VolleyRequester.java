@@ -44,7 +44,7 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    private final String URL_SERVEUR = "http://10.42.0.1:3001";
+    private final String URL_SERVEUR = "http://192.168.43.66:3001";
 
     private VolleyRequester(Context context)
     {

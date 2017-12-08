@@ -79,7 +79,8 @@ router.get('/', function (req, res, next) {
     var facebookURI = {
         redirectURI: 'https://www.facebook.com/v2.11/dialog/oauth?',
         client_id: '137357800216709',
-        redirect_uri: 'http://localhost:3000/handleauth'
+        redirect_uri: 'http://localhost:3000/handleauth',
+        scope: 'email,user_friends'
     };
 
     _sendResponse(SUCCESS_STATUS, facebookURI, res);
@@ -115,6 +116,7 @@ router.get('/handleauth', function (req, res, next) {
                     loggedUser.prenom = response.data.first_name;
                     loggedUser.nom = response.data.last_name;
                     loggedUser.photo = response.data.picture;
+                    loggedUser.iduser = facebookdata.userFbId;
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -150,7 +152,10 @@ router.get('/handleauth', function (req, res, next) {
 
 router.post('/authAndroid', function (req, res) {
 
-    //TODO : bind parameters to facebokdata
+    //TODO : bind user access token to facebokdata
+
+
+    //TODO : get app access token
 
     //TODO : sendResponse to android client
 });

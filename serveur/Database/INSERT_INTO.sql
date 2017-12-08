@@ -33,21 +33,3 @@ INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VA
 INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('EMMA WATSON IS HOT', 67, 33, 3, 2);
 INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('tous les memes', 23, 45, 4, 6);
 INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('LE PPPPPP DES PUUUUUTES', 23, 45, 2, 7);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

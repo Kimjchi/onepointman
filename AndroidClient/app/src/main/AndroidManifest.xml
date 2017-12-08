@@ -45,12 +45,17 @@
             android:name=".NavDrawer"
             android:label="@string/title_activity_nav_drawer"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".SettingsGroup"
             android:label="@string/title_activity_settings_group"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TestLoginFbFromServer"
+            android:label="@string/title_activity_test_login_fb_from_server"
+            android:theme="@style/AppTheme.NoActionBar">
 
+
+        </activity>
     </application>
 
 </manifest>

@@ -7,13 +7,8 @@ const facebookdata = require("../facebookdata");
 
 const db = require('../connection');
 const squelb = require('squel');
+const sender = require("../sender");
 const squel = squelb.useFlavour('postgres');
-
-const SUCCESS_STATUS = 200;
-const REDIRECT_STATUS = 304;
-const NOT_FOUND_STATUS = 404;
-
-let userFriendList;
 
 const _sendResponse = (status, message, res) => {
     res.status(status);
@@ -84,6 +79,13 @@ const _getUserDataFromFb = (user_id) => {
     return axios.get(userData.uri + userData.user_id + '?access_token=' + userData.access_token + '&fields=id,last_name,first_name,gender,picture');
 };
 
+let loggedUser = {
+    nom: '',
+    prenom: '',
+    iduser: '',
+    photo: ''
+};
+
 router.get('/', function (req, res, next) {
     console.log("GET /fblogin");
 
@@ -94,7 +96,7 @@ router.get('/', function (req, res, next) {
         scope: 'email,user_friends'
     };
 
-    _sendResponse(SUCCESS_STATUS, facebookURI, res)
+    _sendResponse(sender.SUCCESS_STATUS, facebookURI, res)
 
     console.log("end GET /fblogin");
 });
@@ -103,12 +105,6 @@ router.get('/handleauth', function (req, res, next) {
     console.log("GET /fblogin/handleauth");
 
     let str = querystring.parse(req.originalUrl.substring(req.originalUrl.indexOf("?") + 1, req.originalUrl.length));
-    let loggedUser = {
-        nom: '',
-        prenom: '',
-        iduser: '',
-        photo: ''
-    };
 
     console.log('STR VALUE :' + str.code);
 
@@ -145,11 +141,11 @@ router.get('/handleauth', function (req, res, next) {
 
                                         _insertNewUser(facebookdata.userFbId, loggedUser.nom, loggedUser.prenom);
 
-                                        _sendResponse(SUCCESS_STATUS, loggedUser, res);
+                                        _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
                                     } else {
                                         console.log('User with ID : ' + facebookdata.userFbId + 'already exists in database');
 
-                                        _sendResponse(SUCCESS_STATUS, loggedUser, res);
+                                        _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
                                     }
                                 })
                                 .catch(error => {
@@ -173,11 +169,31 @@ router.get('/handleauth', function (req, res, next) {
 
 router.post('/authAndroid', function (req, res) {
 
-    //TODO : bind user access token to facebokdata
+    facebookdata.userAccessToken = req.body.token;
+    facebookdata.userFbId = req.body.userId;
 
+    _getAppAccessToken()
+        .then(response => {
 
-    //TODO : get app access token
+            facebookdata.appAccessToken = response.data.access_token;
 
-    //TODO : sendResponse to android client
+            _getUserDataFromFb(facebookdata.userFbId)
+                .then(response => {
+                    loggedUser.prenom = response.data.first_name;
+                    loggedUser.nom = response.data.last_name;
+                    loggedUser.photo = response.data.picture;
+                    loggedUser.iduser = facebookdata.userFbId
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+
+            _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+        })
+        .catch(e => {
+            console.log(e);
+            
+            _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting app token', res);
+        })
 });
 module.exports = router;

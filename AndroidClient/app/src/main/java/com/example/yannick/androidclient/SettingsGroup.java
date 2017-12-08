@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ public class SettingsGroup extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.settingsToolbar);
         toolbar.setTitle(getIntent().getExtras().get("groupName").toString());
+
+        ((TextView)findViewById(R.id.settingsToolbar)).setText(getIntent().getExtras().get("groupId").toString());
 
         setSupportActionBar(toolbar);
 

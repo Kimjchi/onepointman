@@ -45,6 +45,11 @@ public class UserAdapter extends ArrayAdapter<UserModel> {
         return dataSet.get(pos).getId();
     }
 
+    public int getGroupId()
+    {
+        return dataSet.get(0).getGroupId();
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
@@ -70,6 +75,7 @@ public class UserAdapter extends ArrayAdapter<UserModel> {
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                VolleyRequester.getInstance(getContext()).deleteUserFromGroup(getItemId(position), getGroupId());
                 dataSet.remove(position);
                 notifyDataSetChanged();
             }

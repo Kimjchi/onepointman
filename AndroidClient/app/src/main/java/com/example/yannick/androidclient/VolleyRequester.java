@@ -189,7 +189,7 @@ public class VolleyRequester
                                 {
                                     final JSONObject user = (JSONObject) membres.get(j);
                                     users.add(new UserModel(user.getString("prenom") + user.getString("nomuser"),
-                                            user.getInt("iduser")));
+                                            user.getInt("iduser"), id));
                                 }
                                 MenuItem mi = menuNavDrawer.findItem(R.id.groups)
                                         .getSubMenu().add(0, id, i, name);
@@ -269,6 +269,34 @@ public class VolleyRequester
             this.addToRequestQueue(grpRequest);
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void deleteUserFromGroup(final long itemId, final int groupId)
+    {
+        String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
+
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
+                    URL_SERVEUR + "users/deleteuser", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("DELETE_USER", "User " + itemId + " bien delete du groupe " + groupId);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("DELETE_USER", "Fail to delete user "+itemId + "from group "+groupId);
+                }
+            });
+            this.addToRequestQueue(deleteRequest);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
         }
     }
 }

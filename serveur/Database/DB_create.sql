@@ -8,15 +8,15 @@ DROP TABLE IF EXISTS "USER_GROUP" CASCADE;
 
 
 CREATE TABLE "USER"(
-    iduser serial PRIMARY KEY,
+    iduser bigint PRIMARY KEY,
     isconnected boolean,
     isloggedin boolean,
-    userlg numeric(9,6),
-    userlt numeric(9,6),
     nom varchar(50),
     prenom varchar(50),
     lastconnexion date
 );
+
+
 
 CREATE TABLE "GROUP"(
     idgroup serial PRIMARY KEY,
@@ -29,7 +29,7 @@ CREATE TABLE "PINPOINT"(
     description varchar(255),
     pinlt numeric(9,6),
     pinlg numeric(9,6),
-    creationdate date,
+    daterdv date,
     idcreator integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)
 );
@@ -54,6 +54,9 @@ CREATE TABLE "FRIENDS"(
 CREATE TABLE "USER_GROUP"(
     sharesposition boolean,
     iscreator boolean,
+    userglt numeric(9,6),
+    userglg numeric(9,6),
+    dateposition date,
     iduser integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup),
     CONSTRAINT pk_USER_GROUP PRIMARY KEY (iduser, idgroup)

@@ -5,6 +5,7 @@ import {CHANGE_FORM, LOGIN} from "../actions/opLogin";
 import {CHANGE_MAP_CENTER} from "../actions/opMap";
 import {CHANGE_MARKERS} from "../actions/opMap";
 import {CHANGE_MARKER_GEOLOCATION} from "../actions/opMap";
+import {CHANGE_MARKERS_SELECT} from "../actions/opMap";
 
 //ajouter le reste dans l'import
 
@@ -13,7 +14,7 @@ let initialState = {
     isMarkerShown : true,
     mapCenter : { lat: -34.397, lng: 150.644 },
     zoom : 3,
-    markers : [{ lat: -34.397, lng: 150.644}],
+    markersSelect : [{ lat: -34.397, lng: 150.644}],
     markersGeoLocation : []
 };
 
@@ -21,12 +22,11 @@ export default function reducer (state = initialState, action ){
 
     switch (action.type){
 
-
         case CHANGE_MAP_CENTER:
             return {...state , mapCenter: action.mapCenter, zoom : action.zoom};
 
-        case CHANGE_MARKERS:
-            return {...state , markers: action.markers};
+        case CHANGE_MARKERS_SELECT:
+            return {...state , markersSelect: action.markers};
 
         case CHANGE_MARKER_GEOLOCATION:
             return {...state, markersGeoLocation : action.markers}

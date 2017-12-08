@@ -1,4 +1,4 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.volley;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,16 +12,22 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
-import android.widget.ListView;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.UserModelAdd;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
+import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.UserModelSettings;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.SettingsGroup;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.MapFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +44,7 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
+    //private final String URL_SERVEUR = "http://10.42.0.1:3001";
     private final String URL_SERVEUR = "http://192.168.137.1:3001";
 
     private VolleyRequester(Context context)
@@ -66,22 +73,25 @@ public class VolleyRequester
 
     public void authServer(String idUser, String token)
     {
-        String json = "{\"iduser\":"+ idUser + ",\"token\":"
-                + token + "}";
+        String json = "{\"userId\":\""+ idUser + "\",\"token\":\""
+                + token + "\"}";
         try
         {
             JSONObject bodyJson = new JSONObject(json);
             JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
-                    URL_SERVEUR + "/authAndroid", bodyJson,
+                    URL_SERVEUR + "/fblogin/" +
+                            "authAndroid", bodyJson,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            System.out.println("Connexion à TEAM BACKEND OK MAGGLE");
+
+                            Log.v("CONNEXION_BACKEND", "Connexion à TEAM BACKEND OK MAGGLE");
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println("Auth failed");
+                    Log.v("ErrorAuth", "Authentification au serveur echouée");
+                    error.printStackTrace();
                 }
             });
             this.addToRequestQueue(authRequest);
@@ -184,12 +194,12 @@ public class VolleyRequester
                                 final int id = groupe.getInt("idgroup");
                                 final String name = groupe.getString("nomgroup");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
-                                final ArrayList<UserModel> users = new ArrayList<>();
+                                final ArrayList<UserModelSettings> users = new ArrayList<>();
                                 for(int j=0; j<membres.length(); j++)
                                 {
                                     final JSONObject user = (JSONObject) membres.get(j);
-                                    users.add(new UserModel(user.getString("prenom") + user.getString("nomuser"),
-                                            user.getInt("iduser")));
+                                    users.add(new UserModelSettings(user.getString("prenom") + user.getString("nomuser"),
+                                            user.getInt("iduser"), id));
                                 }
                                 MenuItem mi = menuNavDrawer.findItem(R.id.groups)
                                         .getSubMenu().add(0, id, i, name);
@@ -239,12 +249,11 @@ public class VolleyRequester
         String idUser = FacebookInfosRetrieval.user_id;
         String json = "{\"iduser\":"+ idUser + ",\"userlt\":"
                 + myPosition.getLatitude() + ",\"userlg\":" + myPosition.getLongitude() +"}";
-        Log.v("JSON POSITION", json);
 
         try {
             JSONObject bodyJson = new JSONObject(json);
 
-        JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.POST,
+        JsonObjectRequest postMyPosition = new JsonObjectRequest (Request.Method.POST,
                 URL_SERVEUR + "/users/updateposition/", bodyJson,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -266,9 +275,205 @@ public class VolleyRequester
                 System.out.println("Erreur lors de la demande des groupes: " + error.toString());
             }
         });
-            this.addToRequestQueue(grpRequest);
+            this.addToRequestQueue(postMyPosition);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void groupPositionUpdate(int group){
+
+        String idUser = FacebookInfosRetrieval.user_id;
+        //String idUser = "3";
+        JsonObjectRequest grpInfoRequest = new JsonObjectRequest (Request.Method.GET,
+                URL_SERVEUR + "/groups/positions/" + idUser + "/" + group, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if((response.getString("status")).equals("success")){
+                                Log.v("GET GROUP INFO", "Information des groupes bien reçues");
+                                Log.v("GET GROUP INFO",response.toString());
+                                updateMapFromJson(response.getJSONObject("message"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO Auto-generated method stub
+                //MDR LÉ EREUR C POUR LÉ FèBLe
+                System.out.println("Erreur lors de la demande des positions d'un groupe: " + error.toString());
+            }
+        });
+        this.addToRequestQueue(grpInfoRequest);
+    }
+
+
+    void updateMapFromJson(JSONObject json){
+        try {
+            //On commence par les pinpoints
+            for(int i=0; i< json.getJSONArray("pinpoints").length(); i++) {
+                JSONObject pinPoint =  json.getJSONArray("pinpoints").getJSONObject(i);
+                int idPinPoint = pinPoint.getInt("idpinpoint");
+                int idCreator = pinPoint.getInt("idcreator");
+                double lt = Double.parseDouble(pinPoint.getString("pinlt"));
+                double lg = Double.parseDouble(pinPoint.getString("pinlg"));
+                String desc = pinPoint.getString("description");
+
+                String pinPointTitle = "Point de rdv n°" + idPinPoint
+                        + "Point de rdv n°" + idPinPoint + "\r\n";
+
+
+                String pinPointSnippet = "Createur:" + idCreator +"\r\n"
+                        + "Description: " + desc;
+
+                MarkerOptions marker = new MarkerOptions()
+                        .position(new LatLng(lt, lg))
+                        .title(pinPointTitle)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                        .snippet(pinPointSnippet);
+
+
+                MapFragment activity = MapFragment.instance;
+                activity.addMarker("Pinpoint" + idPinPoint, marker);
+            }
+
+            for(int i=0; i< json.getJSONArray("userpositions").length(); i++) {
+                JSONObject usersPosition =  json.getJSONArray("userpositions").getJSONObject(i);
+
+                int iduser = usersPosition.getInt("iduser");
+                double userlt = Double.parseDouble(usersPosition.getString("userlt"));
+                double userlg = Double.parseDouble(usersPosition.getString("userlg"));
+                String dateposition = usersPosition.getString("dateposition");
+
+                String usersPositionTitle = "IdUser" + iduser;
+                String usersPositionSnippet = "Date dernière position:" + dateposition;
+                float color;
+                if (usersPosition.getBoolean("current")){
+                    color = BitmapDescriptorFactory.HUE_GREEN;
+                } else {
+                    color = BitmapDescriptorFactory.HUE_RED;
+                }
+
+                MarkerOptions marker = new MarkerOptions()
+                        .position(new LatLng(userlt, userlg))
+                        .title(usersPositionTitle)
+                        .snippet(usersPositionSnippet)
+                        .icon(BitmapDescriptorFactory.defaultMarker());
+
+
+                MapFragment activity = MapFragment.instance;
+                activity.addMarker(Integer.toString(iduser), marker);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteUserFromGroup(final long itemId, final int groupId)
+    {
+        String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
+
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
+                    URL_SERVEUR + "/users/deleteuser", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("DELETE_USER", "User " + itemId + " bien delete du groupe " + groupId);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("DELETE_USER", "Fail to delete user "+itemId + "from group "+groupId);
+                }
+            });
+            this.addToRequestQueue(deleteRequest);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public void addUserToGroup(long itemId, int groupId)
+    {
+        String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
+
+        try
+        {
+            /*
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
+                    URL_SERVEUR + "users/deleteuser", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("DELETE_USER", "User " + itemId + " bien delete du groupe " + groupId);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("DELETE_USER", "Fail to delete user "+itemId + "from group "+groupId);
+                }
+            });
+            this.addToRequestQueue(deleteRequest);*/
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public void retreiveUserFriendList(final ArrayList<UserModelSettings> users, final ArrayList<UserModelAdd> toFill, final int idGroup)
+    {
+        JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
+                URL_SERVEUR + "/users/userFriends/"+FacebookInfosRetrieval.user_id, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        try
+                        {
+                            final JSONArray array = (JSONArray) response.get("friendlist");
+                            for(int i=0; i<array.length(); i++)
+                            {
+                                boolean notFound = true;
+                                final JSONObject user = (JSONObject) array.get(i);
+                                final int id = user.getInt("id");
+                                final String name = user.getString("name");
+
+                                for(UserModelSettings tmpUser : users)
+                                {
+                                    if(id == tmpUser.getId())
+                                    {
+                                        notFound = false;
+                                        toFill.add(new UserModelAdd(name, id, tmpUser.getGroupId(), true));
+                                        break;
+                                    }
+                                }
+                                if (notFound)
+                                {
+                                    toFill.add(new UserModelAdd(name, id, idGroup, false));
+                                }
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            Log.v("FRIENDS_LIST", "Erreur lors du fetch de la reponse JSON: "+ex.getMessage());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                    Log.v("FRIENDS_LIST", "Erreur lors de la recupération de la liste d'amis: "+error.getMessage());
+            }
+        });
+        this.addToRequestQueue(grpRequest);
     }
 }

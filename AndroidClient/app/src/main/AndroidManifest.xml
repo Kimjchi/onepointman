@@ -21,7 +21,7 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".com.example.yannick.androidclient.login.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,20 +42,24 @@
             android:value="AIzaSyC_xDop_6Hz8Ko-T80DrMTurvba0UNtQw8" />
 
         <activity
-            android:name=".NavDrawer"
+            android:name=".com.example.yannick.androidclient.navdrawer.NavDrawer"
             android:label="@string/title_activity_nav_drawer"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SettingsGroup"
+            android:name=".com.example.yannick.androidclient.settings.SettingsGroup"
             android:label="@string/title_activity_settings_group"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".TestLoginFbFromServer"
+            android:name=".com.example.yannick.androidclient.login.TestLoginFbFromServer"
             android:label="@string/title_activity_test_login_fb_from_server"
             android:theme="@style/AppTheme.NoActionBar">
 
 
         </activity>
+        <activity
+            android:name=".com.example.yannick.androidclient.friendlist.AddUserToGroup"
+            android:label="@string/title_activity_add_user_to_group"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

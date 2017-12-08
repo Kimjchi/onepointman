@@ -1,7 +1,8 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.settings;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -12,14 +13,18 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
+
 import java.util.ArrayList;
 
 public class SettingsGroup extends AppCompatActivity {
 
-    private ArrayList<UserModel> userModels;
+    private ArrayList<UserModelSettings> userModels;
     private ListView userList;
-    private UserAdapter userAdapter;
-    private String newName;
+    private UserAdapterSettings userAdapter;
+    private String groupName;
+    private int groupId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +32,9 @@ public class SettingsGroup extends AppCompatActivity {
         setContentView(R.layout.activity_settings_group);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.settingsToolbar);
-        toolbar.setTitle(getIntent().getExtras().get("groupName").toString());
+        groupName = getIntent().getExtras().get("groupName").toString();
+        groupId = getIntent().getExtras().getInt("groupId");
+        toolbar.setTitle(groupName);
 
         setSupportActionBar(toolbar);
 
@@ -36,9 +43,9 @@ public class SettingsGroup extends AppCompatActivity {
 
         userList = (ListView) findViewById(R.id.listUserGroup);
 
-        userModels = (ArrayList<UserModel>)getIntent().getExtras().getSerializable("usersList");
+        userModels = (ArrayList<UserModelSettings>)getIntent().getExtras().getSerializable("usersList");
 
-        userAdapter = new UserAdapter(userModels, getApplicationContext());
+        userAdapter = new UserAdapterSettings(userModels, getApplicationContext());
         userList.setAdapter(userAdapter);
     }
 
@@ -53,16 +60,18 @@ public class SettingsGroup extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        System.out.println("Ici" + id);
-
         switch (id)
         {
             case android.R.id.home:
                 onBackPressed();
                 break;
             case R.id.addMemberSettings:
-                //TODO Lancer l'activite d'ajoute de membre
-                System.out.println("Launch activity add member");
+                Intent addUserToGroupIntent = new Intent(getApplicationContext(), AddUserToGroup.class);
+                addUserToGroupIntent.putExtra("groupName", groupName);
+                addUserToGroupIntent.putExtra("groupId", groupId);
+                addUserToGroupIntent.putExtra("usersList", userModels);
+                addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                startActivity(addUserToGroupIntent);
                 break;
             case R.id.changeNameGroup:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -76,8 +85,8 @@ public class SettingsGroup extends AppCompatActivity {
                 builder.setPositiveButton("Changer", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        newName = input.getText().toString();
-                        //TODO Envoyer la requete de changement de nom
+                        groupName = input.getText().toString();
+                        ((Toolbar)findViewById(R.id.settingsToolbar)).setTitle(groupName);
                     }
                 });
                 builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {

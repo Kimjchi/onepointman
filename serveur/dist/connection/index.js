@@ -11,7 +11,6 @@ var router = express.Router(); // setup usage of the Express router engine
 /* PostgreSQL and PostGIS module and connection setup */
 var pg = require("pg"); // require Postgres module
 
-
 // Setup connection
 /*var username = "postgres" ;// sandbox username
 var password = "root" ;// read only privileges on our table
@@ -36,7 +35,7 @@ client.connect();
 var DB = pgp(conString);
 
 DB.query(squel.select().field('NOW()').toString()).then(function (res) {
-    console.log('time is', res[0].now);
+    console.log('time is : ', res[0].now);
 }).catch(function (e) {
     console.error('query error', e.message, e.stack);
 }).catch(function (err) {

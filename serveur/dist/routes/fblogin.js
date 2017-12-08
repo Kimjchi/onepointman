@@ -68,6 +68,12 @@ var _getUserDataFromFb = function _getUserDataFromFb(user_id) {
     return axios.get(userData.uri + userData.user_id + '?access_token=' + userData.access_token + '&fields=id,last_name,first_name,gender,picture');
 };
 
+var _bindLoggedUserData = function _bindLoggedUserData(responseFromfb) {
+    loggedUser.prenom = responseFromfb.first_name;
+    loggedUser.nom = responseFromfb.last_name;
+    loggedUser.photo = responseFromfb.picture;
+    loggedUser.iduser = facebookdata.userFbId;
+};
 var loggedUser = {
     nom: '',
     prenom: '',
@@ -109,10 +115,7 @@ router.get('/handleauth', function (req, res, next) {
                 facebookdata.userFbId = response.data.data.user_id;
 
                 _getUserDataFromFb(facebookdata.userFbId).then(function (response) {
-                    loggedUser.prenom = response.data.first_name;
-                    loggedUser.nom = response.data.last_name;
-                    loggedUser.photo = response.data.picture;
-                    loggedUser.iduser = facebookdata.userFbId;
+                    _bindLoggedUserData(response.data);
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -156,10 +159,7 @@ router.post('/authAndroid', function (req, res) {
         facebookdata.appAccessToken = response.data.access_token;
 
         _getUserDataFromFb(facebookdata.userFbId).then(function (response) {
-            loggedUser.prenom = response.data.first_name;
-            loggedUser.nom = response.data.last_name;
-            loggedUser.photo = response.data.picture;
-            loggedUser.iduser = facebookdata.userFbId;
+            _bindLoggedUserData(response.data);
         }).catch(function (error) {
             console.log(error);
         });

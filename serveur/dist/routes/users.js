@@ -85,6 +85,41 @@ router.post('/updateposition', function (req, res) {
          });*/
 });
 
+router.post('/updatepositionsharing', function (req, res) {
+
+    var toUpdate = {
+        iduser: req.body.iduser,
+        idgroup: req.body.idgroup,
+        positionSharing: req.body.positionSharing
+    };
+
+    var query = squel.update().table('public."USER_GROUP"').set('sharesposition', toUpdate.positionSharing).where('iduser = ?', toUpdate.iduser).where('idgroup = ?', toUpdate.idgroup).toString();
+
+    db.query(query).then(function () {
+        sender.sendResponse(sender.SUCCESS_STATUS, 'Position sharing updated successfully', res);
+    }).catch(function (e) {
+        sender.sendResponse(sender.NOT_FOUND_STATUS, e, res);
+        console.log(e);
+    });
+});
+
+router.get('/deleteuser', function (req, res) {
+
+    var toUpdate = {
+        iduser: req.query.iduser,
+        idgroup: req.query.idgroup
+    };
+
+    var query = squel.delete().from('public."USER_GROUP"').where('iduser = ?', toUpdate.iduser).where('idgroup = ?', toUpdate.idgroup).toString();
+
+    db.query(query).then(function () {
+        sender.sendResponse(sender.SUCCESS_STATUS, 'User deleted from group successfully', res);
+    }).catch(function (e) {
+        sender.sendResponse(sender.NOT_FOUND_STATUS, e, res);
+        console.log(e);
+    });
+});
+
 router.get('/userFriends/:user_id/', function (req, res) {
     console.log("GET /userFriends/:user_id/");
 

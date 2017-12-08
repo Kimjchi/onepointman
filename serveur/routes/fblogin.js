@@ -79,6 +79,12 @@ const _getUserDataFromFb = (user_id) => {
     return axios.get(userData.uri + userData.user_id + '?access_token=' + userData.access_token + '&fields=id,last_name,first_name,gender,picture');
 };
 
+const _bindLoggedUserData = (responseFromfb) => {
+    loggedUser.prenom = responseFromfb.first_name;
+    loggedUser.nom = responseFromfb.last_name;
+    loggedUser.photo = responseFromfb.picture;
+    loggedUser.iduser = facebookdata.userFbId
+}
 let loggedUser = {
     nom: '',
     prenom: '',
@@ -124,10 +130,7 @@ router.get('/handleauth', function (req, res, next) {
 
                             _getUserDataFromFb(facebookdata.userFbId)
                                 .then(response => {
-                                    loggedUser.prenom = response.data.first_name;
-                                    loggedUser.nom = response.data.last_name;
-                                    loggedUser.photo = response.data.picture;
-                                    loggedUser.iduser = facebookdata.userFbId
+                                    _bindLoggedUserData(response.data);
                                 })
                                 .catch(error => {
                                     console.log(error);
@@ -179,10 +182,7 @@ router.post('/authAndroid', function (req, res) {
 
             _getUserDataFromFb(facebookdata.userFbId)
                 .then(response => {
-                    loggedUser.prenom = response.data.first_name;
-                    loggedUser.nom = response.data.last_name;
-                    loggedUser.photo = response.data.picture;
-                    loggedUser.iduser = facebookdata.userFbId
+                    _bindLoggedUserData(response.data);
                 })
                 .catch(error => {
                     console.log(error);
@@ -192,7 +192,7 @@ router.post('/authAndroid', function (req, res) {
         })
         .catch(e => {
             console.log(e);
-            
+
             _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting app token', res);
         })
 });

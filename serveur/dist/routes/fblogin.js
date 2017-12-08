@@ -116,6 +116,7 @@ router.get('/handleauth', function (req, res, next) {
                     loggedUser.prenom = response.data.first_name;
                     loggedUser.nom = response.data.last_name;
                     loggedUser.photo = response.data.picture;
+                    loggedUser.photo = facebookdata.userFbId;
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -151,7 +152,10 @@ router.get('/handleauth', function (req, res, next) {
 
 router.post('/authAndroid', function (req, res) {
 
-    //TODO : bind parameters to facebokdata
+    //TODO : bind user access token to facebokdata
+
+
+    //TODO : get app access token
 
     //TODO : sendResponse to android client
 });

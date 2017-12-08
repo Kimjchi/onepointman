@@ -68,6 +68,13 @@ var _getUserDataFromFb = function _getUserDataFromFb(user_id) {
     return axios.get(userData.uri + userData.user_id + '?access_token=' + userData.access_token + '&fields=id,last_name,first_name,gender,picture');
 };
 
+var _bindLoggedUserData = function _bindLoggedUserData(responseFromfb) {
+    loggedUser.prenom = responseFromfb.first_name;
+    loggedUser.nom = responseFromfb.last_name;
+    loggedUser.photo = responseFromfb.picture;
+    loggedUser.iduser = facebookdata.userFbId;
+};
+
 var loggedUser = {
     nom: '',
     prenom: '',
@@ -109,10 +116,7 @@ router.get('/handleauth', function (req, res, next) {
                 facebookdata.userFbId = response.data.data.user_id;
 
                 _getUserDataFromFb(facebookdata.userFbId).then(function (response) {
-                    loggedUser.prenom = response.data.first_name;
-                    loggedUser.nom = response.data.last_name;
-                    loggedUser.photo = response.data.picture;
-                    loggedUser.iduser = facebookdata.userFbId;
+                    _bindLoggedUserData(response.data);
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -156,20 +160,37 @@ router.post('/authAndroid', function (req, res) {
         facebookdata.appAccessToken = response.data.access_token;
 
         _getUserDataFromFb(facebookdata.userFbId).then(function (response) {
-            loggedUser.prenom = response.data.first_name;
-            loggedUser.nom = response.data.last_name;
-            loggedUser.photo = response.data.picture;
-            loggedUser.iduser = facebookdata.userFbId;
+            _bindLoggedUserData(response.data);
+
+            _checkIfUserExists(facebookdata.userFbId).then(function (existingUser) {
+
+                if (existingUser.length === 0) {
+                    console.log('User does not exist. Creating user with facebook ID : ' + facebookdata.userFbId);
+
+                    _insertNewUser(facebookdata.userFbId, loggedUser.nom, loggedUser.prenom);
+
+                    _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+                } else {
+                    console.log('User with ID : ' + facebookdata.userFbId + 'already exists in database');
+
+                    _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+                }
+            }).catch(function (error) {
+                console.log(error);
+
+                _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting existing user', res);
+            });
         }).catch(function (error) {
             console.log(error);
-        });
 
-        _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+            _sendResponse(sender.NOT_FOUND_STATUS, 'error while binding user data', res);
+        });
     }).catch(function (e) {
-        console.log(e);
+        console.log('Android auth error ' + e);
 
         _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting app token', res);
     });
 });
+
 module.exports = router;
 //# sourceMappingURL=fblogin.js.map

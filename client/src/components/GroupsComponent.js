@@ -59,6 +59,23 @@ class GroupsComponent extends Component {
         }
     }
 
+    _checkLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(this._processLocation);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    _processLocation (location) {
+        let point = {
+            lat : location.coords.latitude,
+            lng : location.coords.longitude
+        };
+        let pointArray = [point];
+        this.props.updateMarkersGeolocation(pointArray);
+    }
+
     render() {
         return (
             <div id="menuToggle">

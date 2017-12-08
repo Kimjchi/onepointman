@@ -50,8 +50,7 @@ body .wrapper li a {
     text-decoration: none;
     color: #a1a1a1;
 }
-body .wrapper li a:hover,
-body .wrapper li a:focus {
+body .wrapper li a:hover {
     background-color: #f74f54;
     color: #ffffff;
 }

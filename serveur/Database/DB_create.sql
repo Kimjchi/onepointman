@@ -15,7 +15,7 @@ CREATE TABLE "USER"(
     lastconnexion date,
     lt numeric(9,6),
     lg numeric(9,6),
-    dateposition timestamp,
+    dateposition timestamp
 );
 
 CREATE TABLE "GROUP"(

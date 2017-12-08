@@ -56,6 +56,10 @@
 
 
         </activity>
+        <activity
+            android:name=".com.example.yannick.androidclient.friendlist.AddUserToGroup"
+            android:label="@string/title_activity_add_user_to_group"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

@@ -382,7 +382,7 @@ public class VolleyRequester
         {
             JSONObject bodyJson = new JSONObject(json);
             JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
-                    URL_SERVEUR + "users/deleteuser", bodyJson,
+                    URL_SERVEUR + "/users/deleteuser", bodyJson,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
@@ -434,7 +434,7 @@ public class VolleyRequester
     public void retreiveUserFriendList(final ArrayList<UserModelSettings> users, final ArrayList<UserModelAdd> toFill, final int idGroup)
     {
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
-                URL_SERVEUR + "/user/userFriends/"+FacebookInfosRetrieval.user_id, null,
+                URL_SERVEUR + "/users/userFriends/"+FacebookInfosRetrieval.user_id, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response)

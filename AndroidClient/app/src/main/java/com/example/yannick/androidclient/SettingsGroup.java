@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -19,7 +18,7 @@ public class SettingsGroup extends AppCompatActivity {
 
     private ArrayList<UserModel> userModels;
     private ListView userList;
-    private static UserAdapter userAdapter;
+    public static UserAdapter userAdapter;
     private String newName;
 
     @Override
@@ -39,14 +38,7 @@ public class SettingsGroup extends AppCompatActivity {
 
         userModels = new ArrayList<>();
 
-        for(int i=0; i<3; i++)
-        {
-            userModels.add(new UserModel("tmpUser", 57+i));
-        }
-
-        userAdapter = new UserAdapter(userModels, getApplicationContext());
-
-        userList.setAdapter(userAdapter);
+        VolleyRequester.getInstance(getApplicationContext()).fillSettingsUserView(userModels, userList);
     }
 
     @Override
@@ -84,6 +76,7 @@ public class SettingsGroup extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         newName = input.getText().toString();
+                        //TODO Envoyer la requete de changement de nom
                     }
                 });
                 builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
@@ -103,6 +96,7 @@ public class SettingsGroup extends AppCompatActivity {
                         .setPositiveButton(R.string.oui, new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                //TODO Envoyer la requete de delete
                                 Toast.makeText(getApplicationContext(), "Groupe delete", Toast.LENGTH_SHORT).show();
                                 onBackPressed();
                             }})

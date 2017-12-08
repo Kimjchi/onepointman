@@ -15,7 +15,7 @@ router.get('/:iduser/', function (req, res) {
                 status: 'success',
                 message: toReturn
             });
-            sender.sendResponse(sender.SUCCESS_STATUS, toReturn, res);
+            //sender.sendResponse(sender.SUCCESS_STATUS, toReturn, res);
 
         })
         .catch(e => {
@@ -24,7 +24,7 @@ router.get('/:iduser/', function (req, res) {
                 status: 'fail',
                 message: e.toString()
             });
-            sender.sendResponse(sender.NOT_FOUND_STATUS, toReturn, res);
+            //sender.sendResponse(sender.NOT_FOUND_STATUS, toReturn, res);
         });
 
 });

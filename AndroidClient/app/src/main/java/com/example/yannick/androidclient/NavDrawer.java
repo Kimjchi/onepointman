@@ -67,48 +67,8 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                     .into(profilePic);
         }
 
-        String urlGetGroup = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";
-        JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET, urlGetGroup, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response)
-                    {
-                        int limit = 19;
-                        for(int i=0; i < limit; i++)
-                        {
-                            MenuItem mi = menu.findItem(R.id.groups)
-                                    .getSubMenu().add(0, i, i, "Groupe" + i + " maggle n ique ta mere je mange des sauterelles par exemple hein");
-                            mi.setIcon(R.drawable.group);
-                            ImageButton settingsButton = new ImageButton(getApplicationContext());
-                            settingsButton.setImageResource(R.drawable.bouton_style);
-                            settingsButton.setBackgroundResource(0);
-                            settingsButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    System.out.println("APPUI SUR LE BOUTON");
-                                    Intent settings = new Intent(getApplicationContext(), SettingsGroup.class);
-                                    settings.putExtra("groupName", "Je suis le groupe");
-                                    settings.putExtra("groupdId", 289);
-                                    startActivity(settings);
-                                }
-                            });
-                            mi.setActionView(settingsButton);
-                            mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                                @Override
-                                public boolean onMenuItemClick(MenuItem menuItem) {
-                                    System.out.println("Clicked on "+menuItem.getItemId());
-                                    return false;
-                                }
-                            });
-                        }
-                    }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
 
-            }
-        });
-        VolleyRequester.getInstance(getApplicationContext()).addToRequestQueue(setGroups);
+        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(menu);
 
         final Handler updateGroupInfos = new Handler();
         final String url = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";

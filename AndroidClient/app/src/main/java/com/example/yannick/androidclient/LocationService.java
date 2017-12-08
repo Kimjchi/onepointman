@@ -75,7 +75,7 @@ public class LocationService implements LocationListener{
     public void onLocationChanged(Location newLocation) {
         location = newLocation;
         VolleyRequester restRequester = VolleyRequester.getInstance(thisContext);
-        restRequester.sendMyPosition(location);
+        //restRequester.sendMyPosition(location);
         Log.v("Location Service","NEW POSITION: Longitude(" + location.getLongitude() + ") Latitude(" + location.getLatitude()+")");
     }
 

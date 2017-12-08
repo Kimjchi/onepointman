@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 retreiveInfos();
+                authServer();
                 System.out.println("Succès login");
                 goToMap();
             }
@@ -61,9 +62,14 @@ public class MainActivity extends Activity {
         if(isLogged())
         {
             retreiveInfos();
-            retreiveInfos();
+            authServer();
             goToMap();
         }
+    }
+
+    private void authServer()
+    {
+        VolleyRequester.getInstance(getApplicationContext()).authServer(FacebookInfosRetrieval.user_id, AccessToken.getCurrentAccessToken().toString());
     }
 
     @Override

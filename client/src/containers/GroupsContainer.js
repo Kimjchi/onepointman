@@ -14,6 +14,7 @@ class GroupsContainer extends Component {
     render() {
         let {groups, groupName} = this.props.opGroups;
         let {groupsUsers} = this.props.opUsers;
+        let {urlPhoto} = this.props.opLogin;
         return (
             <GroupsComponent groups={groups}
                              groupName={groupName}
@@ -21,6 +22,7 @@ class GroupsContainer extends Component {
                              changeGroupName={this.props.changeGroupName}
                              addGroup={this.props.addGroup}
                              addUser={this.props.addUser}
+                             photoUser={urlPhoto}
             />
         )
     }
@@ -30,7 +32,8 @@ function mapStateToProps (state) {
 
     return{
         opGroups: state.opGroups,
-        opUsers: state.opUsers
+        opUsers: state.opUsers,
+        opLogin: state.opLogin
     }
 }
 

@@ -171,10 +171,10 @@ router.post('/authAndroid', function (req, res) {
 
     facebookdata.userAccessToken = req.body.token;
     facebookdata.userFbId = req.body.userId;
-
+	
     _getAppAccessToken()
         .then(response => {
-
+			
             facebookdata.appAccessToken = response.data.access_token;
 
             _getUserDataFromFb(facebookdata.userFbId)
@@ -183,15 +183,17 @@ router.post('/authAndroid', function (req, res) {
                     loggedUser.nom = response.data.last_name;
                     loggedUser.photo = response.data.picture;
                     loggedUser.iduser = facebookdata.userFbId
+					
+					_insertNewUser(facebookdata.userFbId, loggedUser.nom, loggedUser.prenom);
+					
+					_sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
                 })
                 .catch(error => {
                     console.log(error);
                 });
-
-            _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
         })
         .catch(e => {
-            console.log(e);
+            console.log('Android auth error ' + e);
             
             _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting app token', res);
         })

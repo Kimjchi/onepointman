@@ -88,6 +88,7 @@ class GroupsComponent extends Component {
                 <span/>
 
                 <ul id="menu">
+                    <img src={this.props.photoUser} alt="photo de profil" className="photoUser" height="50" width="50"/>
                     {
                         this.props.groups.map((group, index) => {
                             return <a key={index}><li onClick={this._displayUsers} id={group.idgroup}>{group.nomgroup}</li></a>

@@ -177,3 +177,9 @@ a:hover
     margin: 10px auto;
     transition: background-color, .3s;
 }
+
+.photoUser {
+    border-radius: 50%;
+    position: absolute;
+    top: 4em;
+}

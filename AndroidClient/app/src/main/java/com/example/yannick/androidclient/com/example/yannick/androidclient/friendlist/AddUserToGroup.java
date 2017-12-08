@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.UserModelSettings;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 
 import java.util.ArrayList;
 
@@ -36,7 +38,11 @@ public class AddUserToGroup extends AppCompatActivity
 
         userList = (ListView) findViewById(R.id.listUserGroup);
 
-        userModels = (ArrayList<UserModelAdd>)getIntent().getExtras().getSerializable("usersList");
+        userModels = new ArrayList<>();
+
+        VolleyRequester.getInstance(getApplicationContext())
+                .retreiveUserFriendList((ArrayList< UserModelSettings>)getIntent().getExtras().getSerializable("usersList"), userModels,
+                        getIntent().getExtras().getInt("groupId"));
 
         userAdapter = new UserAdapterAdd(userModels, getApplicationContext());
         userList.setAdapter(userAdapter);

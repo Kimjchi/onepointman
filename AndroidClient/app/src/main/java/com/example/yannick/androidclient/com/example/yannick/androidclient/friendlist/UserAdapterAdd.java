@@ -74,23 +74,30 @@ public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
 
         final ImageButton deleteBtn = view.findViewById(R.id.deleteSettings);
 
+        switchImageButton(position, deleteBtn);
+
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if(getItem(position).isInGroup())
-                {
-                    VolleyRequester.getInstance(getContext()).deleteUserFromGroup(getItemId(position), getGroupId());
-                    deleteBtn.setImageResource(R.drawable.adduser);
-                }
-                else
-                {
-                    VolleyRequester.getInstance(getContext()).addUserToGroup(getItemId(position), getGroupId());
-                    deleteBtn.setImageResource(R.drawable.delete);
-                }
+                switchImageButton(position, deleteBtn);
                 notifyDataSetChanged();
             }
         });
 
         return view;
+    }
+
+    private void switchImageButton(int position, ImageButton deleteBtn)
+    {
+        if(getItem(position).isInGroup())
+        {
+            VolleyRequester.getInstance(getContext()).deleteUserFromGroup(getItemId(position), getGroupId());
+            deleteBtn.setImageResource(R.drawable.addUser);
+        }
+        else
+        {
+            VolleyRequester.getInstance(getContext()).addUserToGroup(getItemId(position), getGroupId());
+            deleteBtn.setImageResource(R.drawable.delete);
+        }
     }
 }

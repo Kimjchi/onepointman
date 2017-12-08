@@ -22,6 +22,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.UserModelAdd;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.UserModelSettings;
@@ -430,4 +431,50 @@ public class VolleyRequester
         }
     }
 
+    public void retreiveUserFriendList(final ArrayList<UserModelSettings> users, final ArrayList<UserModelAdd> toFill, final int idGroup)
+    {
+        JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
+                URL_SERVEUR + "/user/userFriends/"+FacebookInfosRetrieval.user_id, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        try
+                        {
+                            final JSONArray array = (JSONArray) response.get("friendlist");
+                            for(int i=0; i<array.length(); i++)
+                            {
+                                boolean notFound = true;
+                                final JSONObject user = (JSONObject) array.get(i);
+                                final int id = user.getInt("id");
+                                final String name = user.getString("name");
+
+                                for(UserModelSettings tmpUser : users)
+                                {
+                                    if(id == tmpUser.getId())
+                                    {
+                                        notFound = false;
+                                        toFill.add(new UserModelAdd(name, id, tmpUser.getGroupId(), true));
+                                        break;
+                                    }
+                                }
+                                if (notFound)
+                                {
+                                    toFill.add(new UserModelAdd(name, id, idGroup, false));
+                                }
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            Log.v("FRIENDS_LIST", "Erreur lors du fetch de la reponse JSON: "+ex.getMessage());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                    Log.v("FRIENDS_LIST", "Erreur lors de la recupération de la liste d'amis: "+error.getMessage());
+            }
+        });
+        this.addToRequestQueue(grpRequest);
+    }
 }

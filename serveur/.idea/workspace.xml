@@ -40,8 +40,8 @@
       <file leaf-file-name="fblogin.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/fblogin.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="158">
-              <caret line="132" column="69" lean-forward="false" selection-start-line="132" selection-start-column="69" selection-end-line="132" selection-end-column="69" />
+            <state relative-caret-position="617">
+              <caret line="189" column="89" lean-forward="false" selection-start-line="189" selection-start-column="89" selection-end-line="189" selection-end-column="89" />
               <folding>
                 <element signature="e#397#447#0" expanded="false" />
                 <element signature="e#487#1000#0" expanded="false" />
@@ -53,6 +53,16 @@
                 <element signature="e#2927#2989#0" expanded="false" />
                 <element signature="e#3034#3401#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sender.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sender.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1" column="32" lean-forward="false" selection-start-line="1" selection-start-column="32" selection-end-line="1" selection-end-column="32" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -93,12 +103,12 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/facebookdata.js" />
         <option value="$PROJECT_DIR$/routes/groups.js" />
-        <option value="$PROJECT_DIR$/sender.js" />
         <option value="$PROJECT_DIR$/connection/index.js" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/routes/users.js" />
         <option value="$PROJECT_DIR$/Database/DB_create.sql" />
         <option value="$PROJECT_DIR$/Database/INSERT_INTO.sql" />
+        <option value="$PROJECT_DIR$/sender.js" />
         <option value="$PROJECT_DIR$/routes/fblogin.js" />
       </list>
     </option>
@@ -204,12 +214,12 @@
       <updated>1512165794068</updated>
       <workItem from="1512165797604" duration="18113000" />
       <workItem from="1512504157837" duration="19204000" />
-      <workItem from="1512579981300" duration="51023000" />
+      <workItem from="1512579981300" duration="51499000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="88340000" />
+    <option name="totallyTimeSpent" value="88816000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1358" y="-8" width="1936" height="1056" extended-state="6" />
@@ -421,14 +431,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sender.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="38" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
@@ -461,10 +463,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/sender.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="32" lean-forward="false" selection-start-line="1" selection-start-column="32" selection-end-line="1" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/routes/fblogin.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="132" column="69" lean-forward="false" selection-start-line="132" selection-start-column="69" selection-end-line="132" selection-end-column="69" />
+        <state relative-caret-position="617">
+          <caret line="189" column="89" lean-forward="false" selection-start-line="189" selection-start-column="89" selection-end-line="189" selection-end-column="89" />
           <folding>
             <element signature="e#397#447#0" expanded="false" />
             <element signature="e#487#1000#0" expanded="false" />

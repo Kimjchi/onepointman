@@ -3,10 +3,6 @@
 var express = require('express');
 var router = express.Router();
 
-var SUCCESS_STATUS = 200;
-var REDIRECT_STATUS = 304;
-var FAIL_STATUS = 400;
-
 var _sendResponse = function _sendResponse(status, message, res) {
     res.status(status);
     res.send(message);

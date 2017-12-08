@@ -162,6 +162,8 @@ router.post('/authAndroid', function (req, res) {
             _bindLoggedUserData(response.data);
         }).catch(function (error) {
             console.log(error);
+
+            _sendResponse(sender.NOT_FOUND_STATUS, 'error while binding user data', res);
         });
 
         _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);

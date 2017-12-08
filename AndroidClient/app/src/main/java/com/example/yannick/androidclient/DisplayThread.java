@@ -53,9 +53,9 @@ public class DisplayThread implements Runnable {
                         Log.v("POSITION", "Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
                         }
                     }));
+                    VolleyRequester requester = VolleyRequester.getInstance(activity.getActivity().getApplicationContext());
+                    requester.sendMyPosition(myLocation);
                 }
-                VolleyRequester requester = VolleyRequester.getInstance(activity.getActivity().getApplicationContext());
-                requester.sendMyPosition(myLocation);
                 handler.postDelayed(this, MY_POSITION_UPDATE_TIME);
             }
         }

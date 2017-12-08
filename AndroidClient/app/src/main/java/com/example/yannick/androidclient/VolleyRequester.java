@@ -12,15 +12,12 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
-import android.widget.ListView;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -38,7 +35,7 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    private final String URL_SERVEUR = "http://10.42.0.1:3001";
 
     private VolleyRequester(Context context)
     {
@@ -66,22 +63,25 @@ public class VolleyRequester
 
     public void authServer(String idUser, String token)
     {
-        String json = "{\"iduser\":"+ idUser + ",\"token\":"
-                + token + "}";
+        String json = "{\"userId\":\""+ idUser + "\",\"token\":\""
+                + token + "\"}";
         try
         {
             JSONObject bodyJson = new JSONObject(json);
             JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
-                    URL_SERVEUR + "/authAndroid", bodyJson,
+                    URL_SERVEUR + "/fblogin/" +
+                            "authAndroid", bodyJson,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            System.out.println("Connexion à TEAM BACKEND OK MAGGLE");
+
+                            Log.v("CONNEXION_BACKEND", "Connexion à TEAM BACKEND OK MAGGLE");
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    System.out.println("Auth failed");
+                    Log.v("ErrorAuth", "Authentification au serveur echouée");
+                    error.printStackTrace();
                 }
             });
             this.addToRequestQueue(authRequest);

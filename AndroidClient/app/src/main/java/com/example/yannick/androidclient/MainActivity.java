@@ -69,7 +69,8 @@ public class MainActivity extends Activity {
 
     private void authServer()
     {
-        VolleyRequester.getInstance(getApplicationContext()).authServer(FacebookInfosRetrieval.user_id, AccessToken.getCurrentAccessToken().toString());
+        VolleyRequester.getInstance(getApplicationContext()).authServer(FacebookInfosRetrieval.user_id,
+                AccessToken.getCurrentAccessToken().getToken());
     }
 
     @Override

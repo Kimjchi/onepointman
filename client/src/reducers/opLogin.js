@@ -2,7 +2,7 @@ import {
     CHANGE_FORM,
     SET_AUTH,
     SENDING_REQUEST,
-    LOGIN, IDUSER
+    LOGIN, IDUSER, SET_PHOTO_USER
 } from '../actions/opLogin';
 
 //ajouter le reste dans l'import
@@ -13,7 +13,8 @@ let initialState = {
     isLoading: false,
     loggedIn: false,
     idUser: '',
-    cookie:''
+    cookie:'',
+    urlPhoto: ''
 };
 
 export default function reducer (state = initialState, action ){
@@ -25,6 +26,8 @@ export default function reducer (state = initialState, action ){
             return {...state, loggedIn: action.newAuthState, error:''};
         case IDUSER:
             return {...state, idUser: action.id, error:''};
+        case SET_PHOTO_USER:
+            return {...state, urlPhoto: action.url, error: ''};
         default:
             return state
     }

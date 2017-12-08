@@ -2,7 +2,7 @@ import {take, fork} from 'redux-saga/effects';
 import axios from 'axios';
 import {HANDLE_AUTH_REQ} from "../actions/opHandleAuth";
 import {store} from '../store';
-import {idUser, setAuthState} from "../actions/opLogin";
+import {getPhotoUser, idUser, setAuthState} from "../actions/opLogin";
 import {push} from "react-router-redux";
 
 export function* HandleAuth() {
@@ -19,7 +19,10 @@ export function* HandleAuth() {
             .then(function (response) {
                 if (!!response.status && response.status === 200) {
                     alert('Welcome ' + JSON.stringify(response.data.prenom).replace(/\"/g, ""));
+                    console.log(response.data);
                     store.dispatch(setAuthState(true));
+                    store.dispatch(idUser(response.data.iduser));
+                    store.dispatch(getPhotoUser(response.data.iduser));
                     store.dispatch(push("/Home"));
                 } else {
                     alert('auth error');

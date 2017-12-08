@@ -59,7 +59,6 @@ export function * requestAddGroup() {
     }
 }
 
-
 export function * GroupsFlow() {
     yield fork(requestGroups);
     yield fork(requestAddGroup);

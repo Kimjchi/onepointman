@@ -5,13 +5,17 @@ import {CHANGE_ADRESS} from "../actions/opOptions";
 import {CHANGE_ADDRESS} from "../actions/opOptions";
 import {CHANGE_ADDRESS_FORMATTED} from "../actions/opOptions";
 import {CHANGE_ADDRESS_ENTRY} from "../actions/opOptions";
+import {CHANGE_SHARING_MODE} from "../actions/opOptions";
+import {CHANGE_RDV_MODAL_VISIBILITY} from "../actions/opOptions";
 
 //ajouter le reste dans l'import
 
 //pour le register e mail
 let initialState = {
     address : "",
-    validAddress : false
+    validAddress : false,
+    isSharingPosition : false,
+    showModalRdv : false
 };
 
 export default function reducer (state = initialState, action ){
@@ -19,6 +23,10 @@ export default function reducer (state = initialState, action ){
     switch (action.type){
         case CHANGE_ADDRESS:
             return {...state , address : action.newAddress, validAddress : action.validAddress};
+        case CHANGE_SHARING_MODE:
+            return {...state, isSharingPosition : !state.isSharingPosition};
+        case CHANGE_RDV_MODAL_VISIBILITY:
+            return {...state, showModalRdv : !state.showModalRdv};
 
         default:
             return state

@@ -4,9 +4,10 @@ import {MapFlow} from "./MapSaga";
 import {HandleAuthFlow} from "./HandleAuthSaga";
 import {GroupsFlow} from "./GroupsSaga";
 import {UsersFlow} from "./UsersSaga";
+import {OptionsFlow} from "./OptionsSaga";
 
 export default function * root() {
 
-    yield all([LoginFlow(), HandleAuthFlow(), MapFlow(), GroupsFlow(), UsersFlow()]);
+    yield all([LoginFlow(), HandleAuthFlow(), MapFlow(), GroupsFlow(), UsersFlow(), OptionsFlow()]);
 
 }

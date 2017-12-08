@@ -30,6 +30,7 @@ public class DisplayThread implements Runnable {
     public void run() {
         if (displayThreadRunning) {
             activity = MapFragment.instance;
+            VolleyRequester requester = VolleyRequester.getInstance(activity.getActivity().getApplicationContext());
             LocationService locationService = LocationService.getLocationService(activity.getActivity().getApplicationContext());
             LocationManager locationManager;
             locationManager = (LocationManager) activity.getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -53,14 +54,13 @@ public class DisplayThread implements Runnable {
                         Log.v("POSITION", "Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
                         }
                     }));
-                    VolleyRequester requester = VolleyRequester.getInstance(activity.getActivity().getApplicationContext());
                     requester.sendMyPosition(myLocation);
                 }
+                requester.groupPositionUpdate(4);
                 handler.postDelayed(this, MY_POSITION_UPDATE_TIME);
             }
         }
     }
-
     public void stopDisplay(){
         displayThreadRunning = false;
     }

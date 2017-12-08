@@ -22,6 +22,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -239,12 +242,11 @@ public class VolleyRequester
         String idUser = FacebookInfosRetrieval.user_id;
         String json = "{\"iduser\":"+ idUser + ",\"userlt\":"
                 + myPosition.getLatitude() + ",\"userlg\":" + myPosition.getLongitude() +"}";
-        Log.v("JSON POSITION", json);
 
         try {
             JSONObject bodyJson = new JSONObject(json);
 
-        JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.POST,
+        JsonObjectRequest postMyPosition = new JsonObjectRequest (Request.Method.POST,
                 URL_SERVEUR + "/users/updateposition/", bodyJson,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -266,7 +268,101 @@ public class VolleyRequester
                 System.out.println("Erreur lors de la demande des groupes: " + error.toString());
             }
         });
-            this.addToRequestQueue(grpRequest);
+            this.addToRequestQueue(postMyPosition);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void groupPositionUpdate(int group){
+
+        //String idUser = FacebookInfosRetrieval.user_id;
+        String idUser = "3";
+        JsonObjectRequest grpInfoRequest = new JsonObjectRequest (Request.Method.GET,
+                URL_SERVEUR + "/groups/positions/" + idUser + "/" + group, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if((response.getString("status")).equals("success")){
+                                Log.v("GET GROUP INFO", "Information des groupes bien reçues");
+                                Log.v("GET GROUP INFO",response.toString());
+                                updateMapFromJson(response.getJSONObject("message"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO Auto-generated method stub
+                //MDR LÉ EREUR C POUR LÉ FèBLe
+                System.out.println("Erreur lors de la demande des positions d'un groupe: " + error.toString());
+            }
+        });
+        this.addToRequestQueue(grpInfoRequest);
+    }
+
+
+    void updateMapFromJson(JSONObject json){
+        try {
+            //On commence par les pinpoints
+            for(int i=0; i< json.getJSONArray("pinpoints").length(); i++) {
+                JSONObject pinPoint =  json.getJSONArray("pinpoints").getJSONObject(i);
+                int idPinPoint = pinPoint.getInt("idpinpoint");
+                int idCreator = pinPoint.getInt("idcreator");
+                double lt = Double.parseDouble(pinPoint.getString("pinlt"));
+                double lg = Double.parseDouble(pinPoint.getString("pinlg"));
+                String desc = pinPoint.getString("description");
+
+                String pinPointTitle = "Createur:" + idCreator +"\r\n"
+                        + "Point de rdv n°" + idPinPoint + "\r\n"
+                        + "Description: " + desc;
+
+                MarkerOptions marker = new MarkerOptions()
+                        .position(new LatLng(lt, lg))
+                        .title(pinPointTitle)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
+                MapFragment activity = MapFragment.instance;
+                activity.addMarker("Pinpoint" + idPinPoint, marker);
+            }
+
+            for(int i=0; i< json.getJSONArray("userpositions").length(); i++) {
+                JSONObject usersPosition =  json.getJSONArray("userpositions").getJSONObject(i);
+                //{"status":"success","message":{"idgroup":"4","pinpoints":
+                // [{"idpinpoint":4,"idcreator":6,"pinlt":"23.000000","pinlg":"45.000000","description":"tous les memes","daterdv":null}],
+                // "userpositions":[{"iduser":3,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null},
+                // {"iduser":4,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null},
+                // {"iduser":5,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null},
+                // {"iduser":6,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null},
+                // "iduser":7,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null}]}}
+
+                int iduser = usersPosition.getInt("iduser");
+                double userlt = Double.parseDouble(usersPosition.getString("userlt"));
+                double userlg = Double.parseDouble(usersPosition.getString("userlg"));
+                String dateposition = usersPosition.getString("dateposition");
+
+                String usersPositionTitle = "IdUser" + iduser;
+                String usersPositionSnippet = "Date dernière position:" + dateposition;
+                float color;
+                if (usersPosition.getBoolean("current")){
+                    color = BitmapDescriptorFactory.HUE_GREEN;
+                } else {
+                    color = BitmapDescriptorFactory.HUE_RED;
+                }
+
+                MarkerOptions marker = new MarkerOptions()
+                        .position(new LatLng(userlt, userlg))
+                        .title(usersPositionTitle)
+                        .snippet(usersPositionSnippet)
+                        .icon(BitmapDescriptorFactory.defaultMarker());
+
+
+                MapFragment activity = MapFragment.instance;
+                activity.addMarker(Integer.toString(iduser), marker);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

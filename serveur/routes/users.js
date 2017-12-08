@@ -97,6 +97,29 @@ router.post(('/updateposition'), function(req, res){
 
 });
 
+router.post(('/updatepositionsharing'), function(req, res){
+
+    console.log(req.body);
+    let toUpdate = {
+        iduser : req.body.iduser,
+        idgroup : req.body.idgroup,
+        positionSharing : req.body.positionSharing,
+    };
+
+    let query = squel.update()
+        .table('public."USER_GROUP"')
+        .set('sharesposition', toUpdate.positionSharing)
+        .where('iduser = ?', toUpdate.iduser)
+        .where('idgroup = ?', toUpdate.idgroup)
+        .toString();
+    console.log(query);
+    db.query(query)
+        .then(()=>{
+            sender.sendResponse(sender.SUCCESS_STATUS, 'Position sharing updated successfully', res)
+            console.log('Cest fini!');
+        })
+});
+
 router.get('/userFriends/:iuser_id', function(req, res, next) {
     console.log("GET /userFriends/:iuser_id");
 
@@ -109,7 +132,6 @@ router.get('/userFriends/:iuser_id', function(req, res, next) {
 
             console.log(userFriendList);
 
-            //TODO: Send response to client
             sender.sendResponse(sender.SUCCESS_STATUS, userFriendList, res)
         })
         .catch(error => {

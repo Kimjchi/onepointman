@@ -79,7 +79,8 @@ router.get('/', function (req, res, next) {
     var facebookURI = {
         redirectURI: 'https://www.facebook.com/v2.11/dialog/oauth?',
         client_id: '137357800216709',
-        redirect_uri: 'http://localhost:3000/handleauth'
+        redirect_uri: 'http://localhost:3000/handleauth',
+        scope: 'email,user_friends'
     };
 
     _sendResponse(SUCCESS_STATUS, facebookURI, res);

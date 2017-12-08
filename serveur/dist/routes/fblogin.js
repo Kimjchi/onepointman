@@ -6,11 +6,10 @@ var router = express.Router();
 var querystring = require('querystring');
 var facebookdata = require("../facebookdata");
 
-var SUCCESS_STATUS = 200;
-var REDIRECT_STATUS = 304;
-var NOT_FOUND_STATUS = 404;
-
-var userFriendList = void 0;
+var db = require('../connection');
+var squelb = require('squel');
+var sender = require("../sender");
+var squel = squelb.useFlavour('postgres');
 
 var _sendResponse = function _sendResponse(status, message, res) {
     res.status(status);
@@ -51,7 +50,30 @@ var _inspectUserToken = function _inspectUserToken() {
     return axios.get(inspectTokenRequest.redirectURI + 'input_token=' + inspectTokenRequest.input_token + '&access_token=' + inspectTokenRequest.access_token);
 };
 
-var _checkIfUserExists = function _checkIfUserExists() {};
+var _checkIfUserExists = function _checkIfUserExists(user_id) {
+    return db.query(squel.select().from('"USER"').where('iduser = ?', user_id).toString());
+};
+
+var _insertNewUser = function _insertNewUser(user_id, userlastname, userfirstname) {
+    return db.query(squel.insert().into('"USER"').set('iduser', user_id).set('nom', userlastname).set('prenom', userfirstname).toString());
+};
+
+var _getUserDataFromFb = function _getUserDataFromFb(user_id) {
+    var userData = {
+        uri: 'https://graph.facebook.com/v2.11/',
+        user_id: user_id,
+        access_token: facebookdata.userAccessToken
+    };
+
+    return axios.get(userData.uri + userData.user_id + '?access_token=' + userData.access_token + '&fields=id,last_name,first_name,gender,picture');
+};
+
+var loggedUser = {
+    nom: '',
+    prenom: '',
+    iduser: '',
+    photo: ''
+};
 
 router.get('/', function (req, res, next) {
     console.log("GET /fblogin");
@@ -59,10 +81,11 @@ router.get('/', function (req, res, next) {
     var facebookURI = {
         redirectURI: 'https://www.facebook.com/v2.11/dialog/oauth?',
         client_id: '137357800216709',
-        redirect_uri: 'http://localhost:3000/handleauth'
+        redirect_uri: 'http://localhost:3000/handleauth',
+        scope: 'email,user_friends'
     };
 
-    _sendResponse(SUCCESS_STATUS, facebookURI, res);
+    _sendResponse(sender.SUCCESS_STATUS, facebookURI, res);
 
     console.log("end GET /fblogin");
 });
@@ -85,8 +108,31 @@ router.get('/handleauth', function (req, res, next) {
             _inspectUserToken().then(function (response) {
                 facebookdata.userFbId = response.data.data.user_id;
 
-                //TODO: Send response to client
-                _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res);
+                _getUserDataFromFb(facebookdata.userFbId).then(function (response) {
+                    loggedUser.prenom = response.data.first_name;
+                    loggedUser.nom = response.data.last_name;
+                    loggedUser.photo = response.data.picture;
+                    loggedUser.iduser = facebookdata.userFbId;
+                }).catch(function (error) {
+                    console.log(error);
+                });
+
+                _checkIfUserExists(facebookdata.userFbId).then(function (existingUser) {
+
+                    if (existingUser.length === 0) {
+                        console.log('User does not exist. Creating user with facebook ID : ' + facebookdata.userFbId);
+
+                        _insertNewUser(facebookdata.userFbId, loggedUser.nom, loggedUser.prenom);
+
+                        _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+                    } else {
+                        console.log('User with ID : ' + facebookdata.userFbId + 'already exists in database');
+
+                        _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
             }).catch(function (error) {
                 console.log(error);
             });
@@ -100,5 +146,30 @@ router.get('/handleauth', function (req, res, next) {
     console.log("end GET /fblogin/handleauth");
 });
 
+router.post('/authAndroid', function (req, res) {
+
+    facebookdata.userAccessToken = req.body.token;
+    facebookdata.userFbId = req.body.userId;
+
+    _getAppAccessToken().then(function (response) {
+
+        facebookdata.appAccessToken = response.data.access_token;
+
+        _getUserDataFromFb(facebookdata.userFbId).then(function (response) {
+            loggedUser.prenom = response.data.first_name;
+            loggedUser.nom = response.data.last_name;
+            loggedUser.photo = response.data.picture;
+            loggedUser.iduser = facebookdata.userFbId;
+        }).catch(function (error) {
+            console.log(error);
+        });
+
+        _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+    }).catch(function (e) {
+        console.log(e);
+
+        _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting app token', res);
+    });
+});
 module.exports = router;
 //# sourceMappingURL=fblogin.js.map

@@ -6,12 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by yannick on 06/12/17.
@@ -54,7 +55,7 @@ public class UserAdapter extends ArrayAdapter<UserModel> {
             view = inflater.inflate(R.layout.row_item, null);
         }
 
-        ImageView pic = view.findViewById(R.id.userImageSettings);
+        CircleImageView pic = view.findViewById(R.id.userImageSettings);
 
         Picasso.with(getContext()).load("https://graph.facebook.com/"+getItemId(position)+"/picture?type=large")
                 .placeholder(R.drawable.hamburger)

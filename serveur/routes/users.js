@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+const axios = require('axios');
+
 const db = require('../connection');
 const squelb = require('squel');
 const squel = squelb.useFlavour('postgres');
@@ -8,14 +10,14 @@ const sender = require('../sender');
 const facebookdata = require("../facebookdata");
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', function (req, res, next) {
+    res.send('respond with a resource user id :' + facebookdata.userAccessToken);
 });
 
-router.post(('/updateposition'), function(req, res){
+router.post(('/updateposition'), function (req, res) {
 
     let toUpdate = {
-        iduser : req.body.iduser,
+        iduser: req.body.iduser,
         userlg: req.body.userlg,
         userlt: req.body.userlt,
     };
@@ -24,7 +26,7 @@ router.post(('/updateposition'), function(req, res){
         .from('public."USER_GROUP"', 'ugr')
         .field('ugr.idgroup')
         .field('ugr.sharesposition')
-        .where('ugr.iduser = ?', parseInt(toUpdate.iduser,10))
+        .where('ugr.iduser = ?', parseInt(toUpdate.iduser, 10))
         .toString();
     db.any(getGroups)
         .then((groups) =>{
@@ -65,6 +67,7 @@ router.post(('/updateposition'), function(req, res){
 
                 })
             });
+
             res.send({
                 status: 'success',
                 message: 'Position updated successfully'
@@ -76,11 +79,59 @@ router.post(('/updateposition'), function(req, res){
                 status: 'fail',
                 message: e.toString()
             })
+        });
+});
+
+router.post(('/updatepositionsharing'), function(req, res){
+
+    let toUpdate = {
+        iduser : req.body.iduser,
+        idgroup : req.body.idgroup,
+        positionSharing : req.body.positionSharing,
+    };
+
+    let query = squel.update()
+        .table('public."USER_GROUP"')
+        .set('sharesposition', toUpdate.positionSharing)
+        .where('iduser = ?', toUpdate.iduser)
+        .where('idgroup = ?', toUpdate.idgroup)
+        .toString();
+
+    db.query(query)
+        .then(()=>{
+            sender.sendResponse(sender.SUCCESS_STATUS, 'Position sharing updated successfully', res)
+        })
+        .catch(e => {
+            sender.sendResponse(sender.NOT_FOUND_STATUS, e, res);
+            console.log(e);
         })
 });
 
-router.get('/userFriends/:iuser_id', function(req, res, next) {
-    console.log("GET /userFriends/:iuser_id");
+router.get(('/deleteuser'), function(req, res){
+
+    let toUpdate = {
+        iduser : req.query.iduser,
+        idgroup : req.query.idgroup,
+    };
+
+    let query = squel.delete()
+        .from('public."USER_GROUP"')
+        .where('iduser = ?', toUpdate.iduser)
+        .where('idgroup = ?', toUpdate.idgroup)
+        .toString();
+
+    db.query(query)
+        .then(()=>{
+            sender.sendResponse(sender.SUCCESS_STATUS, 'User deleted from group successfully', res)
+        })
+        .catch(e => {
+            sender.sendResponse(sender.NOT_FOUND_STATUS, e, res);
+            console.log(e);
+        })
+});
+
+router.get('/userFriends/:user_id/', function (req, res) {
+    console.log("GET /userFriends/:user_id/");
 
     let user_id = req.params.user_id;
     let userFriendList;
@@ -89,14 +140,13 @@ router.get('/userFriends/:iuser_id', function(req, res, next) {
         .then(response => {
             userFriendList = response.data.data;
 
-            console.log(userFriendList);
+            console.log('userFriendList : ' + userFriendList);
 
-            //TODO: Send response to client
             sender.sendResponse(sender.SUCCESS_STATUS, userFriendList, res)
         })
         .catch(error => {
-            console.log(error)
-        });
+        console.log(error)
+    });
 });
 
 const _getUserFriendList = (user_id) => {

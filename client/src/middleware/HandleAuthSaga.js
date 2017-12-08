@@ -18,7 +18,7 @@ export function* HandleAuth() {
         axios.get(server + window.location.href.substring(window.location.href.indexOf("?") + 1, window.location.href.length))
             .then(function (response) {
                 if (!!response.status && response.status === 200) {
-                    alert('liste d\'amis : ' + JSON.stringify(response.data));
+                    alert('Welcome ' + JSON.stringify(response.data.prenom).replace(/\"/g, ""));
                     store.dispatch(setAuthState(true));
                     store.dispatch(push("/Home"));
                 } else {

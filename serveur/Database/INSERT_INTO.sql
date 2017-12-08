@@ -1,13 +1,12 @@
-SELECT setval('public."USER_iduser_seq"', 1, FALSE);
 SELECT setval('public."GROUP_idgroup_seq"',1,FALSE);
 
-INSERT INTO public."USER" (position, nom, prenom) VALUES (ST_GeomFromText('POINT(-71.060316 48.432044)', 4326), 'NIQUETA', 'Maman');
-INSERT INTO public."USER" (nom, prenom) VALUES ('Watson', 'Emma');
-INSERT INTO public."USER" (nom, prenom) VALUES ('Radcliffe', 'Daniel');
-INSERT INTO public."USER" (nom, prenom) VALUES ('QuifaitRonWeaslay', 'LacteurRoux');
-INSERT INTO public."USER" (nom, prenom) VALUES ('Smeagol', 'Gollum');
-INSERT INTO public."USER" (nom, prenom) VALUES ('LeSage', 'Samwise');
-INSERT INTO public."USER" (nom, prenom) VALUES ('LeFag', 'Frodon');
+INSERT INTO public."USER" (iduser, position, nom, prenom) VALUES (1, ST_GeomFromText('POINT(-71.060316 48.432044)', 4326), 'NIQUETA', 'Maman');
+INSERT INTO public."USER" (iduser, nom, prenom) VALUES (2, 'Watson', 'Emma');
+INSERT INTO public."USER" (iduser, nom, prenom) VALUES (3, 'Radcliffe', 'Daniel');
+INSERT INTO public."USER" (iduser, nom, prenom) VALUES (4, 'QuifaitRonWeaslay', 'LacteurRoux');
+INSERT INTO public."USER" (iduser, nom, prenom) VALUES (5, 'Smeagol', 'Gollum');
+INSERT INTO public."USER" (iduser, nom, prenom) VALUES (6, 'LeSage', 'Samwise');
+INSERT INTO public."USER" (iduser, nom, prenom) VALUES (7, 'LeFag', 'Frodon');
 
 INSERT INTO public."GROUP" (nom) VALUES ('HarryPotter');
 INSERT INTO public."GROUP" (nom) VALUES ('LOTR');

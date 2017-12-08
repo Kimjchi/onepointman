@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS "USER_GROUP" CASCADE;
 
 
 CREATE TABLE "USER"(
-    iduser serial PRIMARY KEY,
+    iduser bigint PRIMARY KEY,
     isconnected boolean,
     isloggedin boolean,
     position geometry(Point,4326),
@@ -53,5 +53,7 @@ CREATE TABLE "USER_GROUP"(
     iscreator boolean,
     iduser integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup),
+    userlatitude double,
+    userlongitude double,
     CONSTRAINT pk_USER_GROUP PRIMARY KEY (iduser, idgroup)
 );

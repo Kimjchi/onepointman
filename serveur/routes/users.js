@@ -1,16 +1,17 @@
 var express = require('express');
 var router = express.Router();
+const axios = require('axios');
 
 const sender = require('../sender');
 const facebookdata = require("../facebookdata");
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+    res.send('respond with a resource user id :' + facebookdata.userAccessToken);
 });
 
-router.get('/userFriends/:iuser_id', function(req, res, next) {
-    console.log("GET /userFriends/:iuser_id");
+router.get('/userFriends/:user_id/', function(req, res) {
+    console.log("GET /userFriends/:iuser_id/");
 
     let user_id = req.params.user_id;
     let userFriendList;

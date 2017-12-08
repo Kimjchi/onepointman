@@ -6,6 +6,10 @@ var router = express.Router();
 var querystring = require('querystring');
 var facebookdata = require("../facebookdata");
 
+var db = require('../connection');
+var squelb = require('squel');
+var squel = squelb.useFlavour('postgres');
+
 var SUCCESS_STATUS = 200;
 var REDIRECT_STATUS = 304;
 var NOT_FOUND_STATUS = 404;
@@ -51,7 +55,13 @@ var _inspectUserToken = function _inspectUserToken() {
     return axios.get(inspectTokenRequest.redirectURI + 'input_token=' + inspectTokenRequest.input_token + '&access_token=' + inspectTokenRequest.access_token);
 };
 
-var _checkIfUserExists = function _checkIfUserExists() {};
+var _checkIfUserExists = function _checkIfUserExists(user_id) {
+    return db.query(squel.select().from('"USER"').where('iduser = ?', user_id).toString());
+};
+
+var _insertNewUser = function _insertNewUser(user_id) {
+    return db.query(squel.insert().into('"USER"').set('iduser', user_id).toString());
+};
 
 router.get('/', function (req, res, next) {
     console.log("GET /fblogin");
@@ -85,8 +95,25 @@ router.get('/handleauth', function (req, res, next) {
             _inspectUserToken().then(function (response) {
                 facebookdata.userFbId = response.data.data.user_id;
 
-                //TODO: Send response to client
-                _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res);
+                _checkIfUserExists(facebookdata.userFbId).then(function (existingUser) {
+
+                    if (existingUser.length === 0) {
+                        console.log('User does not exist. Creating user with facebook ID : ' + facebookdata.userFbId);
+
+                        //TODO :insert user into DB
+                        _insertNewUser(facebookdata.userFbId);
+
+                        //TODO: Send response to client
+                        _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res);
+                    } else {
+                        console.log('User with ID : ' + facebookdata.userFbId + 'already exists in database');
+
+                        //TODO: Send response to client
+                        _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res);
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
             }).catch(function (error) {
                 console.log(error);
             });
@@ -100,5 +127,11 @@ router.get('/handleauth', function (req, res, next) {
     console.log("end GET /fblogin/handleauth");
 });
 
+router.post('/authAndroid', function (req, res) {
+
+    //TODO : bind parameters to facebokdata
+
+    //TODO : sendResponse to android client
+});
 module.exports = router;
 //# sourceMappingURL=fblogin.js.map

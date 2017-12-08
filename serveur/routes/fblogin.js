@@ -64,12 +64,24 @@ const _checkIfUserExists = (user_id) => {
         .toString())
 };
 
-const _insertNewUser = (user_id) => {
+const _insertNewUser = (user_id, userlastname, userfirstname) => {
     return db.query(squel
         .insert()
         .into('"USER"')
         .set('iduser', user_id)
+        .set('nom', userlastname)
+        .set('prenom', userfirstname)
         .toString())
+};
+
+const _getUserDataFromFb = (user_id) => {
+    let userData = {
+        uri: 'https://graph.facebook.com/v2.11/',
+        user_id: user_id,
+        access_token: facebookdata.userAccessToken
+    };
+
+    return axios.get(userData.uri + userData.user_id + '?access_token=' + userData.access_token + '&fields=id,last_name,first_name,gender,picture');
 };
 
 router.get('/', function (req, res, next) {
@@ -90,6 +102,12 @@ router.get('/handleauth', function (req, res, next) {
     console.log("GET /fblogin/handleauth");
 
     let str = querystring.parse(req.originalUrl.substring(req.originalUrl.indexOf("?") + 1, req.originalUrl.length));
+    let loggedUser = {
+        nom: '',
+        prenom: '',
+        iduser: '',
+        photo: ''
+    };
 
     console.log('STR VALUE :' + str.code);
 
@@ -107,22 +125,29 @@ router.get('/handleauth', function (req, res, next) {
                         .then(response => {
                             facebookdata.userFbId = response.data.data.user_id;
 
+                            _getUserDataFromFb(facebookdata.userFbId)
+                                .then(response => {
+                                    loggedUser.prenom = response.data.first_name;
+                                    loggedUser.nom = response.data.last_name;
+                                    loggedUser.photo = response.data.picture;
+                                })
+                                .catch(error => {
+                                    console.log(error);
+                                });
+
                             _checkIfUserExists(facebookdata.userFbId)
                                 .then(existingUser => {
 
                                     if (existingUser.length === 0) {
                                         console.log('User does not exist. Creating user with facebook ID : ' + facebookdata.userFbId);
 
-                                        //TODO :insert user into DB
-                                        _insertNewUser(facebookdata.userFbId);
+                                        _insertNewUser(facebookdata.userFbId, loggedUser.nom, loggedUser.prenom);
 
-                                        //TODO: Send response to client
-                                        _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res);
+                                        _sendResponse(SUCCESS_STATUS, loggedUser, res);
                                     } else {
                                         console.log('User with ID : ' + facebookdata.userFbId + 'already exists in database');
 
-                                        //TODO: Send response to client
-                                        _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res);
+                                        _sendResponse(SUCCESS_STATUS, loggedUser, res);
                                     }
                                 })
                                 .catch(error => {

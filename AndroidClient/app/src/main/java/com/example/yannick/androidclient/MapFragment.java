@@ -36,6 +36,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private LocationService locationService;
     private DisplayThread updateMyPosition;
     public static MapFragment instance = null;
+    public VolleyRequester restRequester = null;
     private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>() {
     };
     Location myLocation;
@@ -49,6 +50,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onStart(){
         super.onStart();
+        restRequester = VolleyRequester.getInstance(getActivity().getApplicationContext());
+        restRequester.groupsRequest();
         instance = this;
         startGpsService();
     }
@@ -94,8 +97,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             String provider = bestProvider();
             locationManager.requestLocationUpdates(provider, 3000, 1, locationService);
-            //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationService);
-            //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationService);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, locationService);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 1, locationService);
             locationManager.getLastKnownLocation(provider);
             Log.v("GPS Service", "Service STARTED!");
             return true;

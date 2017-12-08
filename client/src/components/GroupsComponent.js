@@ -47,15 +47,15 @@ class GroupsComponent extends Component {
     }
 
     _displayUsers(event) {
-        let users = this.props.groupsUsers;
+        let users = this.props.groups;
         let usersToDisplay = users.filter(group => {
-            return group.id === parseInt(event.target.id, 10);
+            return group.idgroup === parseInt(event.target.id, 10);
         });
         if(usersToDisplay.length === 0) {
             this.props.addUser([], event.target.id);
         }
         else {
-            this.props.addUser(usersToDisplay[0].users, event.target.id);
+            this.props.addUser(usersToDisplay[0].membres, event.target.id);
         }
     }
 
@@ -73,7 +73,7 @@ class GroupsComponent extends Component {
                 <ul id="menu">
                     {
                         this.props.groups.map((group, index) => {
-                            return <a key={index}><li onClick={this._displayUsers} id={group.id}>{group.nom}</li></a>
+                            return <a key={index}><li onClick={this._displayUsers} id={group.idgroup}>{group.nomgroup}</li></a>
                         })
                     }
                     <i className="fa fa-plus fa-lg" style={{color: '#232323'}} onClick={this._open}/>

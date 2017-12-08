@@ -59,8 +59,18 @@ var _checkIfUserExists = function _checkIfUserExists(user_id) {
     return db.query(squel.select().from('"USER"').where('iduser = ?', user_id).toString());
 };
 
-var _insertNewUser = function _insertNewUser(user_id) {
-    return db.query(squel.insert().into('"USER"').set('iduser', user_id).toString());
+var _insertNewUser = function _insertNewUser(user_id, userlastname, userfirstname) {
+    return db.query(squel.insert().into('"USER"').set('iduser', user_id).set('nom', userlastname).set('prenom', userfirstname).toString());
+};
+
+var _getUserDataFromFb = function _getUserDataFromFb(user_id) {
+    var userData = {
+        uri: 'https://graph.facebook.com/v2.11/',
+        user_id: user_id,
+        access_token: facebookdata.userAccessToken
+    };
+
+    return axios.get(userData.uri + userData.user_id + '?access_token=' + userData.access_token + '&fields=id,last_name,first_name,gender,picture');
 };
 
 router.get('/', function (req, res, next) {
@@ -81,6 +91,12 @@ router.get('/handleauth', function (req, res, next) {
     console.log("GET /fblogin/handleauth");
 
     var str = querystring.parse(req.originalUrl.substring(req.originalUrl.indexOf("?") + 1, req.originalUrl.length));
+    var loggedUser = {
+        nom: '',
+        prenom: '',
+        iduser: '',
+        photo: ''
+    };
 
     console.log('STR VALUE :' + str.code);
 
@@ -95,21 +111,26 @@ router.get('/handleauth', function (req, res, next) {
             _inspectUserToken().then(function (response) {
                 facebookdata.userFbId = response.data.data.user_id;
 
+                _getUserDataFromFb(facebookdata.userFbId).then(function (response) {
+                    loggedUser.prenom = response.data.first_name;
+                    loggedUser.nom = response.data.last_name;
+                    loggedUser.photo = response.data.picture;
+                }).catch(function (error) {
+                    console.log(error);
+                });
+
                 _checkIfUserExists(facebookdata.userFbId).then(function (existingUser) {
 
                     if (existingUser.length === 0) {
                         console.log('User does not exist. Creating user with facebook ID : ' + facebookdata.userFbId);
 
-                        //TODO :insert user into DB
-                        _insertNewUser(facebookdata.userFbId);
+                        _insertNewUser(facebookdata.userFbId, loggedUser.nom, loggedUser.prenom);
 
-                        //TODO: Send response to client
-                        _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res);
+                        _sendResponse(SUCCESS_STATUS, loggedUser, res);
                     } else {
                         console.log('User with ID : ' + facebookdata.userFbId + 'already exists in database');
 
-                        //TODO: Send response to client
-                        _sendResponse(SUCCESS_STATUS, 'Welcome on Onepointman, man !', res);
+                        _sendResponse(SUCCESS_STATUS, loggedUser, res);
                     }
                 }).catch(function (error) {
                     console.log(error);

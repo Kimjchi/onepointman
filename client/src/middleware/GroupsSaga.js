@@ -13,6 +13,7 @@ export function * requestGroups() {
         axios.get(server)
             .then(function (response) {
                 if (!!response.data.status && response.data.status === 'success') {
+                    console.log(response.data.message);
                     store.dispatch(changeGroups(response.data.message));
                 }
                 else if(response.data.status === 'fail') {

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, ControlLabel, FormControl, FormGroup, Grid, Modal, PageHeader, Row} from 'react-bootstrap';
+import {Button, Col, ControlLabel, FormControl, FormGroup, Grid, Modal, PageHeader, Row} from 'react-bootstrap';
 import '../style/Users.css';
 
 class UsersComponent extends Component {
@@ -34,17 +34,19 @@ class UsersComponent extends Component {
 
     render() {
         return (
-            <div className="text-centerUser">
-                <ul id="navlist">
+            <Row className="text-centerUser show-grid">
+                <Col md={10}>
+                    <ul id="navlist">
+                        {
+                            this.props.users.map((user, index) => {
+                                return <li key={index}><a href="#">{user.prenom} {user.nomuser}</a></li>
+                            })
+                        }
+                    </ul>
+                </Col>
                     {
-                        this.props.users.map((user, index) => {
-                            return <li key={index}><a href="#">{user.nom}</a></li>
-                        })
+                        this.props.groupToDisplay && <Col md={2}><i className="fa fa-plus fa-lg addButton" style={{color: 'white'}} onClick={this._open}/></Col>
                     }
-                    {
-                        this.props.groupToDisplay && <i className="fa fa-plus fa-lg" style={{color: 'white'}} onClick={this._open}/>
-                    }
-                </ul>
                 <Modal show={this.state.showModal} onHide={this._close} className="moddal">
                     <Modal.Header closeButton>
                         <Modal.Title>Ajout d'un membre</Modal.Title>
@@ -65,7 +67,7 @@ class UsersComponent extends Component {
                         </form>
                     </Modal.Body>
                 </Modal>
-            </div>
+            </Row>
         )
     }
 }

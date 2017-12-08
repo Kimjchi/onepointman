@@ -10,11 +10,12 @@ DROP TABLE IF EXISTS "USER_GROUP" CASCADE;
 CREATE TABLE "USER"(
     iduser bigint PRIMARY KEY,
     isconnected boolean,
-    isloggedin boolean,
-    position geometry(Point,4326),
     nom varchar(50),
     prenom varchar(50),
-    lastconnexion date
+    lastconnexion date,
+    lt numeric(9,6),
+    lg numeric(9,6),
+    dateposition timestamp,
 );
 
 CREATE TABLE "GROUP"(
@@ -26,8 +27,9 @@ CREATE TABLE "GROUP"(
 CREATE TABLE "PINPOINT"(
     idpinpoint serial PRIMARY KEY,
     description varchar(255),
-    position geometry(Point,4326),
-    creationdate date,
+    pinlt numeric(9,6),
+    pinlg numeric(9,6),
+    daterdv date,
     idcreator integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)
 );
@@ -35,7 +37,8 @@ CREATE TABLE "PINPOINT"(
 CREATE TABLE "DRAWING"(
     iddrawing serial PRIMARY KEY,
     description varchar(255),
-    position geometry(Point,4326),
+    drawinglg numeric(9,6),
+    drawinglt numeric(9,6),
     actif boolean,
     img bytea,
     idcreator integer REFERENCES "USER" (iduser),
@@ -51,9 +54,10 @@ CREATE TABLE "FRIENDS"(
 CREATE TABLE "USER_GROUP"(
     sharesposition boolean,
     iscreator boolean,
+    userglt numeric(9,6),
+    userglg numeric(9,6),
+    dateposition timestamp,
     iduser integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup),
-    userlatitude double,
-    userlongitude double,
     CONSTRAINT pk_USER_GROUP PRIMARY KEY (iduser, idgroup)
 );

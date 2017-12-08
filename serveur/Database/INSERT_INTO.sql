@@ -1,12 +1,13 @@
 SELECT setval('public."GROUP_idgroup_seq"',1,FALSE);
+SELECT setval('public."PINPOINT_idpinpoint_seq"', 1, FALSE);
 
-INSERT INTO public."USER" (iduser, position, nom, prenom) VALUES (1, ST_GeomFromText('POINT(-71.060316 48.432044)', 4326), 'NIQUETA', 'Maman');
+INSERT INTO public."USER" (iduser, nom, prenom) VALUES (1, 'NIQUETA', 'Maman');
 INSERT INTO public."USER" (iduser, nom, prenom) VALUES (2, 'Watson', 'Emma');
 INSERT INTO public."USER" (iduser, nom, prenom) VALUES (3, 'Radcliffe', 'Daniel');
 INSERT INTO public."USER" (iduser, nom, prenom) VALUES (4, 'QuifaitRonWeaslay', 'LacteurRoux');
-INSERT INTO public."USER" (iduser, nom, prenom) VALUES (5, 'Smeagol', 'Gollum');
-INSERT INTO public."USER" (iduser, nom, prenom) VALUES (6, 'LeSage', 'Samwise');
-INSERT INTO public."USER" (iduser, nom, prenom) VALUES (7, 'LeFag', 'Frodon');
+INSERT INTO public."USER" (iduser,nom, prenom) VALUES (5, 'Smeagol', 'Gollum');
+INSERT INTO public."USER" (iduser,nom, prenom) VALUES (6, 'LeSage', 'Samwise');
+INSERT INTO public."USER" (iduser,nom, prenom) VALUES (7, 'LeFag', 'Frodon');
 
 INSERT INTO public."GROUP" (nom) VALUES ('HarryPotter');
 INSERT INTO public."GROUP" (nom) VALUES ('LOTR');
@@ -26,6 +27,16 @@ INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (4, 4);
 INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (5, 4);
 INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (6, 4);
 INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (7, 4);
+
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('slt sa va tu ??', 23, 45, 1, 2);
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('LE PP DES PD ', 54, 67, 2, 5);
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('EMMA WATSON IS HOT', 67, 33, 3, 2);
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('tous les memes', 23, 45, 4, 6);
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('LE PPPPPP DES PUUUUUTES', 23, 45, 2, 7);
+
+
+
+
 
 
 

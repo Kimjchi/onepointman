@@ -1,4 +1,4 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
@@ -17,15 +17,16 @@ import android.view.ViewGroup;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.yannick.androidclient.LocationService.getLocationService;
+import static com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.LocationService.getLocationService;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
     //call this method in your onCreateMethod

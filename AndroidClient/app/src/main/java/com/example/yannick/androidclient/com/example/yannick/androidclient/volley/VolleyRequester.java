@@ -1,4 +1,4 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.volley;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -19,6 +19,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
+import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.UserModelSettings;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.SettingsGroup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -184,11 +188,11 @@ public class VolleyRequester
                                 final int id = groupe.getInt("idgroup");
                                 final String name = groupe.getString("nomgroup");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
-                                final ArrayList<UserModel> users = new ArrayList<>();
+                                final ArrayList<UserModelSettings> users = new ArrayList<>();
                                 for(int j=0; j<membres.length(); j++)
                                 {
                                     final JSONObject user = (JSONObject) membres.get(j);
-                                    users.add(new UserModel(user.getString("prenom") + user.getString("nomuser"),
+                                    users.add(new UserModelSettings(user.getString("prenom") + user.getString("nomuser"),
                                             user.getInt("iduser"), id));
                                 }
                                 MenuItem mi = menuNavDrawer.findItem(R.id.groups)
@@ -299,4 +303,34 @@ public class VolleyRequester
             ex.printStackTrace();
         }
     }
+
+    public void addUserToGroup(long itemId, int groupId)
+    {
+        String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
+
+        try
+        {
+            /*
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
+                    URL_SERVEUR + "users/deleteuser", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("DELETE_USER", "User " + itemId + " bien delete du groupe " + groupId);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("DELETE_USER", "Fail to delete user "+itemId + "from group "+groupId);
+                }
+            });
+            this.addToRequestQueue(deleteRequest);*/
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
 }

@@ -119,16 +119,16 @@ router.post(('/updatepositionsharing'), function(req, res){
             sender.sendResponse(sender.SUCCESS_STATUS, 'Position sharing updated successfully', res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, e, res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while updating position sharing', res);
             console.log(e);
         })
 });
 
-router.get(('/deleteuser'), function(req, res){
+router.delete(('/deleteuser'), function(req, res){
 
     let toUpdate = {
-        iduser : req.query.iduser,
-        idgroup : req.query.idgroup,
+        iduser : req.body.iduser,
+        idgroup : req.body.idgroup,
     };
 
     let query = squel.delete()
@@ -142,7 +142,7 @@ router.get(('/deleteuser'), function(req, res){
             sender.sendResponse(sender.SUCCESS_STATUS, 'User deleted from group successfully', res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, e, res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while deleting user from group', res);
             console.log(e);
         })
 });

@@ -134,11 +134,13 @@ router.get('/userFriends/:user_id/', function (req, res) {
     console.log("GET /userFriends/:user_id/");
 
     let user_id = req.params.user_id;
-    let userFriendList;
+    let userFriendList = {
+        friendlist : []
+    };
 
     _getUserFriendList(user_id)
         .then(response => {
-            userFriendList = response.data.data;
+            userFriendList.friendlist = response.data.data;
 
             console.log('userFriendList : ' + userFriendList);
 

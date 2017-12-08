@@ -100,10 +100,12 @@ router.get('/userFriends/:user_id/', function (req, res) {
     console.log("GET /userFriends/:user_id/");
 
     var user_id = req.params.user_id;
-    var userFriendList = void 0;
+    var userFriendList = {
+        friendlist: []
+    };
 
     _getUserFriendList(user_id).then(function (response) {
-        userFriendList = response.data.data;
+        userFriendList.friendlist = response.data.data;
 
         console.log('userFriendList : ' + userFriendList);
 

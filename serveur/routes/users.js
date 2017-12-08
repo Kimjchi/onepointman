@@ -29,36 +29,45 @@ router.post(('/updateposition'), function (req, res) {
         .where('ugr.iduser = ?', parseInt(toUpdate.iduser, 10))
         .toString();
     db.any(getGroups)
-        .then((groups) => {
-            console.log(groups);
-            groups.forEach(element => {
-                //pour chaque groupe, s'il décide de partager sa position avec, on update sa position
-                let currentdate = new Date();
-                console.log(currentdate);
-                console.log(currentdate.toISOString());
-                if (element.sharesposition === true) {
-                    console.log("CRAZY DIAMOND");
-                    let query = squel.update()
-                        .table('public."USER_GROUP"')
-                        .set('userglt', toUpdate.userlt)
-                        .set('userglg', toUpdate.userlg)
-                        .set('dateposition', currentdate.toISOString())
-                        .where('iduser = ?', toUpdate.iduser)
-                        .toString();
-                    console.log(query);
-                    db.none(query)
-                        .then(() => {
-                            console.log('Updated position of user in group ' + element.idgroup);
-                        })
-                        .catch(e => {
-                            res.status(400);
-                            res.send({
-                                status: 'fail',
-                                message: 'failing to update userposition in a group'
-                            })
-                        })
-                }
-            })
+        .then((groups) =>{
+            let currentTime = new Date();
+            let updateUserTable = squel.update()
+                .table('public."USER"')
+                .set('lg', toUpdate.userlg)
+                .set('lt',toUpdate.userlt)
+                .set('dateposition', currentTime.toISOString())
+                .where('iduser = ?', toUpdate.iduser)
+                .toString();
+            db.none(updateUserTable)
+                .then(() => {
+                    console.log('Updated position of user in USER ');
+                    console.log(groups);
+                    groups.forEach(element => {
+                        //pour chaque groupe, s'il décide de partager sa position avec, on update sa position
+                        if (element.sharesposition === true) {
+                            let query = squel.update()
+                                .table('public."USER_GROUP"')
+                                .set('userglt', toUpdate.userlt)
+                                .set('userglg', toUpdate.userlg)
+                                .set('dateposition', currentTime.toISOString())
+                                .where('iduser = ?', toUpdate.iduser)
+                                .toString();
+                            db.none(query)
+                                .then(() => {
+                                    console.log('Updated position of user in group ' + element.idgroup);
+                                })
+                                .catch(e => {
+                                    res.status(400);
+                                    res.send({
+                                        status: 'fail',
+                                        message: 'failing to update userposition in a group'
+                                    })
+                                })
+                        }
+
+                })
+            });
+
             res.send({
                 status: 'success',
                 message: 'Position updated successfully'
@@ -70,33 +79,7 @@ router.post(('/updateposition'), function (req, res) {
                 status: 'fail',
                 message: e.toString()
             })
-            //sender gnagnanga
         });
-
-    /* let query = squel.update()
-         .table('public."USER"')
-         .set('userlt', toUpdate.userlt)
-         .set('userlg', toUpdate.userlg)
-         .where('iduser = ?', toUpdate.iduser)
-         .toString();
-     console.log(query);
-     db.none(query)
-         .then(() => {
-             res.send({
-                 status: 'success',
-                 message: "La position a été mise à jour avec succès "
-             });
-             //sender blablabla
-         })
-         .catch(e => {
-             res.status(400);
-             res.send({
-                 status: 'fail',
-                 message: e.toString()
-             })
-             //sender gnagnanga
-         });*/
-
 });
 
 router.post(('/updatepositionsharing'), function(req, res){

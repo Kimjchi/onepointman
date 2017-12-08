@@ -74,6 +74,7 @@ var _bindLoggedUserData = function _bindLoggedUserData(responseFromfb) {
     loggedUser.photo = responseFromfb.picture;
     loggedUser.iduser = facebookdata.userFbId;
 };
+
 var loggedUser = {
     nom: '',
     prenom: '',
@@ -160,18 +161,36 @@ router.post('/authAndroid', function (req, res) {
 
         _getUserDataFromFb(facebookdata.userFbId).then(function (response) {
             _bindLoggedUserData(response.data);
+
+            _checkIfUserExists(facebookdata.userFbId).then(function (existingUser) {
+
+                if (existingUser.length === 0) {
+                    console.log('User does not exist. Creating user with facebook ID : ' + facebookdata.userFbId);
+
+                    _insertNewUser(facebookdata.userFbId, loggedUser.nom, loggedUser.prenom);
+
+                    _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+                } else {
+                    console.log('User with ID : ' + facebookdata.userFbId + 'already exists in database');
+
+                    _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+                }
+            }).catch(function (error) {
+                console.log(error);
+
+                _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting existing user', res);
+            });
         }).catch(function (error) {
             console.log(error);
 
             _sendResponse(sender.NOT_FOUND_STATUS, 'error while binding user data', res);
         });
-
-        _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
     }).catch(function (e) {
-        console.log(e);
+        console.log('Android auth error ' + e);
 
         _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting app token', res);
     });
 });
+
 module.exports = router;
 //# sourceMappingURL=fblogin.js.map

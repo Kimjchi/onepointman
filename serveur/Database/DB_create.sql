@@ -29,7 +29,8 @@ CREATE TABLE "PINPOINT"(
     description varchar(255),
     pinlt numeric(9,6),
     pinlg numeric(9,6),
-    daterdv date,
+    daterdv timestamp NOT NULL,
+    dateexp timestamp,
     idcreator integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)
 );

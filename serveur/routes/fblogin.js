@@ -4,7 +4,6 @@ const router = express.Router();
 const querystring = require('querystring');
 const facebookdata = require("../facebookdata");
 
-
 const db = require('../connection');
 const squelb = require('squel');
 const sender = require("../sender");
@@ -85,6 +84,7 @@ const _bindLoggedUserData = (responseFromfb) => {
     loggedUser.photo = responseFromfb.picture;
     loggedUser.iduser = facebookdata.userFbId
 }
+
 let loggedUser = {
     nom: '',
     prenom: '',
@@ -183,19 +183,39 @@ router.post('/authAndroid', function (req, res) {
             _getUserDataFromFb(facebookdata.userFbId)
                 .then(response => {
                     _bindLoggedUserData(response.data);
+
+                    _checkIfUserExists(facebookdata.userFbId)
+                        .then(existingUser => {
+
+                            if (existingUser.length === 0) {
+                                console.log('User does not exist. Creating user with facebook ID : ' + facebookdata.userFbId);
+
+                                _insertNewUser(facebookdata.userFbId, loggedUser.nom, loggedUser.prenom);
+
+                                _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+                            } else {
+                                console.log('User with ID : ' + facebookdata.userFbId + 'already exists in database');
+
+                                _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+
+                            _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting existing user', res);
+                        });
                 })
                 .catch(error => {
                     console.log(error);
 
                     _sendResponse(sender.NOT_FOUND_STATUS, 'error while binding user data', res);
                 });
-
-            _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
         })
         .catch(e => {
-            console.log(e);
+            console.log('Android auth error ' + e);
 
             _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting app token', res);
         })
 });
+
 module.exports = router;

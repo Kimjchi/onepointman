@@ -28,8 +28,8 @@ INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (5, 4);
 INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (6, 4);
 INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (7, 4);
 
-INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('slt sa va tu ??', 23, 45, 1, 2);
-INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('LE PP DES PD ', 54, 67, 2, 5);
-INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('EMMA WATSON IS HOT', 67, 33, 3, 2);
-INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('tous les memes', 23, 45, 4, 6);
-INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator) VALUES ('LE PPPPPP DES PUUUUUTES', 23, 45, 2, 7);
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator, daterdv) VALUES ('slt sa va tu ??', 23, 45, 1, 2, now());
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator, daterdv) VALUES ('LE PP DES PD ', 54, 67, 2, 5, now());
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator, daterdv) VALUES ('EMMA WATSON IS HOT', 67, 33, 3, 2, now());
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator, daterdv) VALUES ('tous les memes', 23, 45, 4, 6, now());
+INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator, daterdv) VALUES ('LE PPPPPP DES PUUUUUTES', 23, 45, 2, 7, now());

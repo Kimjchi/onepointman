@@ -44,7 +44,8 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    private final String URL_SERVEUR = "http://10.42.0.1:3001";
+    //private final String URL_SERVEUR = "http://10.42.0.1:3001";
+    private final String URL_SERVEUR = "http://192.168.137.1:3001";
 
     private VolleyRequester(Context context)
     {
@@ -282,8 +283,8 @@ public class VolleyRequester
 
     public void groupPositionUpdate(int group){
 
-        //String idUser = FacebookInfosRetrieval.user_id;
-        String idUser = "3";
+        String idUser = FacebookInfosRetrieval.user_id;
+        //String idUser = "3";
         JsonObjectRequest grpInfoRequest = new JsonObjectRequest (Request.Method.GET,
                 URL_SERVEUR + "/groups/positions/" + idUser + "/" + group, null,
                 new Response.Listener<JSONObject>() {
@@ -322,14 +323,19 @@ public class VolleyRequester
                 double lg = Double.parseDouble(pinPoint.getString("pinlg"));
                 String desc = pinPoint.getString("description");
 
-                String pinPointTitle = "Createur:" + idCreator +"\r\n"
-                        + "Point de rdv n°" + idPinPoint + "\r\n"
+                String pinPointTitle = "Point de rdv n°" + idPinPoint
+                        + "Point de rdv n°" + idPinPoint + "\r\n";
+
+
+                String pinPointSnippet = "Createur:" + idCreator +"\r\n"
                         + "Description: " + desc;
 
                 MarkerOptions marker = new MarkerOptions()
                         .position(new LatLng(lt, lg))
                         .title(pinPointTitle)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                        .snippet(pinPointSnippet);
+
 
                 MapFragment activity = MapFragment.instance;
                 activity.addMarker("Pinpoint" + idPinPoint, marker);
@@ -337,13 +343,6 @@ public class VolleyRequester
 
             for(int i=0; i< json.getJSONArray("userpositions").length(); i++) {
                 JSONObject usersPosition =  json.getJSONArray("userpositions").getJSONObject(i);
-                //{"status":"success","message":{"idgroup":"4","pinpoints":
-                // [{"idpinpoint":4,"idcreator":6,"pinlt":"23.000000","pinlg":"45.000000","description":"tous les memes","daterdv":null}],
-                // "userpositions":[{"iduser":3,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null},
-                // {"iduser":4,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null},
-                // {"iduser":5,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null},
-                // {"iduser":6,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null},
-                // "iduser":7,"userlt":"7.000000","userlg":"5.000000","current":true,"dateposition":null}]}}
 
                 int iduser = usersPosition.getInt("iduser");
                 double userlt = Double.parseDouble(usersPosition.getString("userlt"));

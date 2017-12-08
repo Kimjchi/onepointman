@@ -62,6 +62,7 @@ router.post(('/updateposition'), function (req, res) {
                                         status: 'fail',
                                         message: 'failing to update userposition in a group'
                                     })
+                                    console.log('failes at updating position in group');
                                 })
                         }
 

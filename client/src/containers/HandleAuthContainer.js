@@ -7,8 +7,6 @@ class HandleAuthContainer extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log('I passed here');
-
         this.props.handleauth();
     }
 

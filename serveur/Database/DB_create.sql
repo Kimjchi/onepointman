@@ -10,13 +10,13 @@ DROP TABLE IF EXISTS "USER_GROUP" CASCADE;
 CREATE TABLE "USER"(
     iduser bigint PRIMARY KEY,
     isconnected boolean,
-    isloggedin boolean,
     nom varchar(50),
     prenom varchar(50),
-    lastconnexion date
+    lastconnexion date,
+    lt numeric(9,6),
+    lg numeric(9,6),
+    dateposition timestamp
 );
-
-
 
 CREATE TABLE "GROUP"(
     idgroup serial PRIMARY KEY,
@@ -56,7 +56,7 @@ CREATE TABLE "USER_GROUP"(
     iscreator boolean,
     userglt numeric(9,6),
     userglg numeric(9,6),
-    dateposition date,
+    dateposition timestamp,
     iduser integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup),
     CONSTRAINT pk_USER_GROUP PRIMARY KEY (iduser, idgroup)

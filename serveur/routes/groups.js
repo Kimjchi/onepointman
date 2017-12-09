@@ -102,6 +102,7 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
         .then((result) =>{
             let JSONToReturn = {idgroup: idgroup, pinpoints:[], userpositions:[]};
             result.forEach(element => {
+
                 // CHECK SI LA DATE est supérieure de 1 jour de plus de la date de RDV. sinon ne
                 //pas renvoyer
                 let pinpoint = {
@@ -117,18 +118,26 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
             });
             db.any(getUsersPositions(idgroup))
                 .then((userpositions) => {
+                console.log(getUsersPositions(idgroup));
+                    let currentDate = new Date();
                     let userCorrectRequest = false;
                     userpositions.forEach(element =>{
-                        console.log(typeof element.iduser);
-                        console.log(typeof iduser);
-                        if(element.iduser === iduser){
+                        if(parseInt(element.iduser,10) === iduser) {
                             userCorrectRequest = true; // on vérifie ici si le gars qui demande est bien dans le groupe
                         }
+                        let isCurrent = compareTimes(currentDate, element.dateposition);
+                        // Comparaison des dates ici
+                        console.log(currentDate.toISOString());
+                        console.log(currentDate.getHours());
+
+                        console.log(element.dateposition);
+                        console.log(element.dateposition.getTimezoneOffset());
+
                         let userposition = {
                            iduser: element.iduser,
                            userlt:element.userglt,
                            userlg:element.userglg,
-                           current:true, // A CHANGER CO LO APRES LE TRAITEMENT LO
+                           current:isCurrent,
                            dateposition:element.dateposition
                        };
                        JSONToReturn.userpositions.push(userposition);
@@ -191,11 +200,28 @@ let getUsersPositions = (idgroup) =>
         .field('ugr.sharesposition')
         .field('ugr.userglt')
         .field('ugr.userglg')
-        .field('ugr.dateposition')
+        .field("ugr.dateposition")
         .left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = gr.idgroup')
         .where('gr.idgroup = ?', idgroup)
         .toString();
 
 
+//Si la dernière position stockée est > 15min, l'utilisateur est considéré comme inactif
+function compareTimes(currentTime, lastLocationTime){
+    let toReturn = false;
+    if(currentTime.getMonth() === lastLocationTime.getMonth()){
+        if(currentTime.getDay() === lastLocationTime.getDay()){
+            if(currentTime.getHours() === lastLocationTime.getHours()){
+                if(currentTime.getMinutes() - lastLocationTime.getMinutes() < 15){
+                    toReturn = true;
+                }
+            }
+        }
+    }
+    console.log(toReturn);
+    return toReturn;
+
+
+}
 
 module.exports = router;

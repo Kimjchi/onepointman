@@ -42,11 +42,6 @@ public class UserAdapterSettings extends ArrayAdapter<UserModelSettings> {
         return dataSet.get(pos);
     }
 
-    @Override
-    public long getItemId(int pos) {
-        return dataSet.get(pos).getId();
-    }
-
     public int getGroupId()
     {
         return dataSet.get(0).getGroupId();
@@ -64,7 +59,7 @@ public class UserAdapterSettings extends ArrayAdapter<UserModelSettings> {
 
         CircleImageView pic = view.findViewById(R.id.userImageSettings);
 
-        Picasso.with(getContext()).load("https://graph.facebook.com/"+getItemId(position)+"/picture?type=large")
+        Picasso.with(getContext()).load("https://graph.facebook.com/"+getItem(position).getId()+"/picture?type=large")
                 .placeholder(R.drawable.hamburger)
                 .error(R.drawable.ic_menu_camera)
                 .into(pic);
@@ -77,7 +72,7 @@ public class UserAdapterSettings extends ArrayAdapter<UserModelSettings> {
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                VolleyRequester.getInstance(getContext()).deleteUserFromGroup(getItemId(position), getGroupId());
+                VolleyRequester.getInstance(getContext()).deleteUserFromGroup(getItem(position).getId(), getGroupId());
                 dataSet.remove(position);
                 notifyDataSetChanged();
             }

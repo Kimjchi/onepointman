@@ -106,10 +106,17 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
     let requete = getGroupPinpoints(idgroup);
     db.any(requete)
         .then((result) =>{
-            let JSONToReturn = {idgroup: idgroup, pinpoints:[], userpositions:[]};
+            let JSONToReturn = {idgroup: idgroup, issharing: false,  pinpoints:[], userpositions:[]};
             result.forEach(element => {
 
                 // CHECK SI LA DATE est supérieure de 1 jour de plus de la date de RDV. sinon ne
+                let currentTime = new Date();
+                let diff = currentTime - element.daterdv;// donne la diff en millisecondes
+                let dontPush = false;
+                if(diff > 8.64e+7){// le nombre de millisecs en 1 jour hehe
+                    dontPush = true;
+                }
+                console.log(diff);
                 //pas renvoyer
                 let pinpoint = {
                     idpinpoint: element.idpinpoint,
@@ -122,16 +129,23 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
                     daterdv:element.daterdv
                 };
                 //si la date est ok on le push dans l'array
-                JSONToReturn.pinpoints.push(pinpoint);
+                if(!dontPush){
+                    JSONToReturn.pinpoints.push(pinpoint);
+
+                }
             });
             db.any(getUsersPositions(idgroup))
                 .then((userpositions) => {
-                console.log(getUsersPositions(idgroup));
+
                     let currentDate = new Date();
                     let userCorrectRequest = false;
                     userpositions.forEach(element =>{
+
                         if(parseInt(element.iduser,10) === iduser) {
                             userCorrectRequest = true; // on vérifie ici si le gars qui demande est bien dans le groupe
+                            JSONToReturn.issharing = element.sharesposition;
+
+
                         }
                         let isCurrent = false;
                         if(element.dateposition !== null){
@@ -185,7 +199,6 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
                 message: e.toString()
             })
         });
-    console.log(requete);
 
 
 });
@@ -237,9 +250,68 @@ function compareTimes(currentTime, lastLocationTime){
         }
     }
     return toReturn;
-
-
 }
+
+router.get('/drawings/:iduser/:idgroup', function(req,res){
+    let iduser = req.params.iduser;
+    let idgroup = req.params.idgroup;
+    let query = getDrawings(idgroup);
+    let JSONToReturn = {
+        idgroup: idgroup,
+        drawings:[]
+    };
+    console.log(query);
+
+    db.any(query)
+        .then((result) =>{
+            result.forEach(element =>{
+                let objectToPush = {
+                    iddrawing : element.iddrawing,
+                    idcreator: element.idcreator,
+                    nomcreator: element.nom,
+                    prenomcreator: element.prenom,
+                    description: element.description,
+                    lt: element.lt,
+                    lg: element.lg,
+                    img: element.img
+                };
+                if(element.actif){
+                    JSONToReturn.drawings.push(objectToPush);
+                }
+            });
+            console.log(JSONToReturn);
+            res.send({
+                status: 'success',
+                message: JSONToReturn
+            });
+        })
+        .catch( e => {
+            res.status(400);
+            res.send({
+                status: 'fail',
+                message: e.toString()
+            });
+        });
+
+});
+
+
+let getDrawings = (idgroup) =>
+    squel.select()
+        .from('public."DRAWING"', 'draw')
+        .field('draw.iddrawing')
+        .field('draw.idcreator')
+        .field('draw.actif')
+        .field('draw.img')
+        .field('draw.drawinglg', 'lg')
+        .field('draw.drawinglt', 'lt')
+        .field('description')
+        .field('usr.nom')
+        .field('usr.prenom')
+        .left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator')
+        .where('draw.idgroup = ?', idgroup)
+        .toString();
+
 
 router.get('/creategroup/:group_name/', function (req, res) {
 
@@ -256,7 +328,7 @@ router.get('/creategroup/:group_name/', function (req, res) {
         .then((row)=>{
             let response = {
                 idgroup : row.idgroup
-            }
+            };
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e => {

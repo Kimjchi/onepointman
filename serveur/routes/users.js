@@ -116,8 +116,8 @@ router.post('/createuser/', function (req, res) {
     };
     let query = squel.insert()
         .into('public."USER_GROUP"')
-        .set('iduser', toCreate.iduser)
-        .set('idgroup', toCreate.idgroup)
+        .set('iduser', parseInt(toCreate.iduser))
+        .set('idgroup', parseInt(toCreate.idgroup))
         .toString();
 
     db.none(query)
@@ -131,7 +131,7 @@ router.post('/createuser/', function (req, res) {
 });
 
 router.delete('/deleteuser/', function(req, res){
-
+    console.log(req.body);
     let toUpdate = {
         iduser : req.body.iduser,
         idgroup : req.body.idgroup,
@@ -139,10 +139,10 @@ router.delete('/deleteuser/', function(req, res){
 
     let query = squel.delete()
         .from('public."USER_GROUP"')
-        .where('iduser = ?', toUpdate.iduser)
-        .where('idgroup = ?', toUpdate.idgroup)
+        .where('iduser = ?', parseInt(toUpdate.iduser))
+        .where('idgroup = ?', parseInt(toUpdate.idgroup))
         .toString();
-
+    console.log(query);
     db.query(query)
         .then(()=>{
             sender.sendResponse(sender.SUCCESS_STATUS, 'User deleted from group successfully', res)

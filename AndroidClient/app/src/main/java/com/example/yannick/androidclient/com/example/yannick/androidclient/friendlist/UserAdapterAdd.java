@@ -42,11 +42,6 @@ public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
         return dataSet.get(pos);
     }
 
-    @Override
-    public long getItemId(int pos) {
-        return dataSet.get(pos).getId();
-    }
-
     public int getGroupId()
     {
         return dataSet.get(0).getGroupId();
@@ -64,7 +59,7 @@ public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
 
         CircleImageView pic = view.findViewById(R.id.userImageSettings);
 
-        Picasso.with(getContext()).load("https://graph.facebook.com/"+getItemId(position)+"/picture?type=large")
+        Picasso.with(getContext()).load("https://graph.facebook.com/"+getItem(position).getId()+"/picture?type=large")
                 .placeholder(R.drawable.hamburger)
                 .error(R.drawable.ic_menu_camera)
                 .into(pic);
@@ -89,14 +84,14 @@ public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
 
     private void switchImageButton(int position, ImageButton deleteBtn)
     {
-        if(getItem(position).isInGroup())
+        if(!getItem(position).isInGroup())
         {
-            VolleyRequester.getInstance(getContext()).deleteUserFromGroup(getItemId(position), getGroupId());
+            VolleyRequester.getInstance(getContext()).deleteUserFromGroup(getItem(position).getId(), getGroupId());
             deleteBtn.setImageResource(R.drawable.adduser);
         }
         else
         {
-            VolleyRequester.getInstance(getContext()).addUserToGroup(getItemId(position), getGroupId());
+            VolleyRequester.getInstance(getContext()).addUserToGroup(getItem(position).getId(), getGroupId());
             deleteBtn.setImageResource(R.drawable.delete);
         }
     }

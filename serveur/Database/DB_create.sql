@@ -15,7 +15,7 @@ CREATE TABLE "USER"(
     lastconnexion date,
     lt numeric(9,6),
     lg numeric(9,6),
-    dateposition timestamp
+    dateposition timestamp with time zone
 );
 
 CREATE TABLE "GROUP"(
@@ -40,7 +40,7 @@ CREATE TABLE "DRAWING"(
     description varchar(255),
     drawinglg numeric(9,6),
     drawinglt numeric(9,6),
-    actif boolean,
+    actif boolean DEFAULT true,
     img bytea,
     idcreator integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)
@@ -53,11 +53,11 @@ CREATE TABLE "FRIENDS"(
 );
 
 CREATE TABLE "USER_GROUP"(
-    sharesposition boolean,
+    sharesposition boolean DEFAULT true,
     iscreator boolean,
     userglt numeric(9,6),
     userglg numeric(9,6),
-    dateposition timestamp,
+    dateposition timestamp with time zone,
     iduser integer REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup),
     CONSTRAINT pk_USER_GROUP PRIMARY KEY (iduser, idgroup)

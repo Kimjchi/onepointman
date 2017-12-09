@@ -42,10 +42,7 @@ public class AddUserToGroup extends AppCompatActivity
 
         VolleyRequester.getInstance(getApplicationContext())
                 .retreiveUserFriendList((ArrayList< UserModelSettings>)getIntent().getExtras().getSerializable("usersList"), userModels,
-                        getIntent().getExtras().getInt("groupId"));
-
-        userAdapter = new UserAdapterAdd(userModels, getApplicationContext());
-        userList.setAdapter(userAdapter);
+                        getIntent().getExtras().getInt("groupId"), userList);
     }
 
     @Override

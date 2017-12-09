@@ -22,16 +22,15 @@ router.post('/createpinpoint/', function (req, res) {
 
     let query = squel.insert()
         .into('public."PINPOINT"')
-        .set('idcreator', toCreate.iduser)
-        .set('idgroup', toCreate.idgroup)
-        .set('pinlt', toCreate.pinlt)
-        .set('pinlg', toCreate.pinlg)
+        .set('idcreator', parseInt(toCreate.iduser,10))
+        .set('idgroup', parseInt(toCreate.idgroup,10))
+        .set('pinlt', parseInt(toCreate.pinlt,10))
+        .set('pinlg', parseInt(toCreate.pinlg,10))
         .set('description', toCreate.description)
         .set('daterdv', toCreate.daterdv)
-        .set('dateexpiration', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString())
+        .set('dateexp', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString())
         .returning('idpinpoint')
         .toString();
-
     db.one(query)
         .then((row)=>{
             let response = {

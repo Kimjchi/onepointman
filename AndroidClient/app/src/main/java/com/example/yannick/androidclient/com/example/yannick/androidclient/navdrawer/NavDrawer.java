@@ -194,7 +194,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 builder.show();
                 break;
             case R.id.nav_logout:
-                
+
                 break;
             default:
                 break;

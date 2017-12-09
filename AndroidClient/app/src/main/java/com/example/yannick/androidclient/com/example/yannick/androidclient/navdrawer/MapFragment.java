@@ -16,6 +16,8 @@ import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +49,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     //call this method in your onCreateMethod
     public GoogleMap mMap;
     private Calendar myCalendar;
-    private EditText hourPickerText;
+    private Button rdvOkButton;
+    private boolean nameRdvSet;
+    private boolean dateRdvSet;
+    private boolean hourRdvSet;
     private EditText datePickerText;
     private final int REQUEST_PERMISSION_PHONE_LOCATION = 1;
     private Criteria critere = new Criteria();
@@ -102,6 +107,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //Groupe
                 //Date RDV
                 //Description
+                hourRdvSet = false;
+                dateRdvSet = false;
+                nameRdvSet = false;
                 final Dialog rdvDialog = new Dialog(getActivity());
                 rdvDialog.setTitle("Placer un point de rendez-vous");
                 rdvDialog.setContentView(R.layout.rdv_dialog);
@@ -109,6 +117,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                 datePickerText = rdvDialog.findViewById(R.id.rdvDate);
                 myCalendar = Calendar.getInstance();
+
+                final EditText descriptionRdv = ((EditText)rdvDialog.findViewById(R.id.rdvDescription));
+
+                descriptionRdv.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        if(charSequence.toString().trim().length() == 0)
+                        {
+                            nameRdvSet = false;
+                        }
+                        else
+                        {
+                            nameRdvSet = true;
+                        }
+                        checkIfDialogButtonCanBeClickable();
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        if(descriptionRdv.getText().length() > 0)
+                        {
+                            nameRdvSet = true;
+                            checkIfDialogButtonCanBeClickable();
+                        }
+                    }
+                });
 
                 final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -118,6 +157,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         myCalendar.set(Calendar.MONTH, monthOfYear);
                         myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         updateLabel(datePickerText);
+                        dateRdvSet = true;
+                        checkIfDialogButtonCanBeClickable();
                     }
                 };
 
@@ -141,6 +182,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             @Override
                             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                                 hourPickerText.setText( selectedHour + ":" + selectedMinute);
+                                hourRdvSet = true;
+                                checkIfDialogButtonCanBeClickable();
                             }
                         }, hour, minute, true);
                         mTimePicker.setTitle("Choissez l'heure du rendez-vous");
@@ -148,7 +191,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 });
 
-                Button rdvOkButton = rdvDialog.findViewById(R.id.rdvOkButton);
+                rdvOkButton = rdvDialog.findViewById(R.id.rdvOkButton);
+                rdvOkButton.setEnabled(false);
                 rdvOkButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -300,6 +344,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.CANADA_FRENCH);
 
         datePickerPlaceholder.setText(sdf.format(myCalendar.getTime()));
+    }
+
+    private void checkIfDialogButtonCanBeClickable()
+    {
+        if(hourRdvSet && dateRdvSet && nameRdvSet)
+        {
+            rdvOkButton.setEnabled(true);
+        }
+        else
+        {
+            rdvOkButton.setEnabled(false);
+        }
     }
 
 }

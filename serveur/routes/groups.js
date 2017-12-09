@@ -137,6 +137,8 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
 
                         let userposition = {
                            iduser: element.iduser,
+                            prenom: element.prenom,
+                            nom:element.nom,
                            userlt:element.userglt,
                            userlg:element.userglg,
                            current:isCurrent,
@@ -207,7 +209,10 @@ let getUsersPositions = (idgroup) =>
         .field('ugr.userglt')
         .field('ugr.userglg')
         .field("ugr.dateposition")
+        .field('usr.nom')
+        .field('usr.prenom')
         .left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = gr.idgroup')
+        .left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser')
         .where('gr.idgroup = ?', idgroup)
         .toString();
 
@@ -224,7 +229,6 @@ function compareTimes(currentTime, lastLocationTime){
             }
         }
     }
-    console.log(toReturn);
     return toReturn;
 
 

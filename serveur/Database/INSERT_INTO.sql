@@ -33,3 +33,19 @@ INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator, da
 INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator, daterdv) VALUES ('EMMA WATSON IS HOT', 67, 33, 3, 2, now());
 INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator, daterdv) VALUES ('tous les memes', 23, 45, 4, 6, now());
 INSERT INTO public."PINPOINT" (description, pinlt, pinlg, idgroup, idcreator, daterdv) VALUES ('LE PPPPPP DES PUUUUUTES', 23, 45, 2, 7, now());
+
+-- insert de devon et vincent ds ts les groupes
+﻿INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (1638237456238594, 1);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (1638237456238594, 2);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (1638237456238594, 3);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (1638237456238594, 4);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (1638237456238594, 5);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (1638237456238594, 6);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (10210309534404438, 1);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (10210309534404438, 2);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (10210309534404438, 3);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (10210309534404438, 4);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (10210309534404438, 5);
+INSERT INTO public."USER_GROUP" (iduser, idgroup) VALUES (10210309534404438, 6);
+
+

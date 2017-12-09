@@ -60,13 +60,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private LocationManager locationManager;
     private LocationService locationService;
     private DisplayThread updateMyPosition;
+    private int currentGroup = 0;
     public static MapFragment instance = null;
     public VolleyRequester restRequester = null;
     private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>() {
     };
-    private Map<String, MarkerOptions> pinPoints = new HashMap<String, MarkerOptions>() {
-    };
-    Location myLocation;
+
+    public int getCurrentGroup(){return currentGroup;}
+    public void setCurrentGroup(int group){currentGroup = group;}
 
     @Nullable
     @Override
@@ -78,11 +79,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onClick(View view) {
                 Log.v("BOUTTON", "Clic");
-                if ((mMap != null)&& (markers.get("_MY_SELF_")!= null)){
-                    LatLng ltLg = markers.get("_MY_SELF_").getPosition();
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ltLg, 15));
-                } else{
-                    Toast.makeText(getActivity().getApplicationContext(), "Impossible de trouver votre position...:", Toast.LENGTH_SHORT).show();
+                synchronized(markers) {
+                    if ((mMap != null) && (markers.get("_MY_SELF_") != null)) {
+                        LatLng ltLg = markers.get("_MY_SELF_").getPosition();
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ltLg, 15));
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "Impossible de trouver votre position...:", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -323,22 +326,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void addMarker(String name, MarkerOptions marker){
-        markers.put(name, marker);
+        synchronized(markers) {
+            markers.put(name, marker);
+        }
     }
-    public void addPinPoint(String name, MarkerOptions marker){
-        pinPoints.put(name, marker);
-    }
-
 
     public void updateDisplayMarkers(){
         if (mMap != null) {
             mMap.clear();
-            for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
-                mMap.addMarker(marker.getValue());
+            synchronized(markers) {
+                for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
+                    mMap.addMarker(marker.getValue());
+                }
             }
-            for (Map.Entry<String, MarkerOptions> pinPoint : pinPoints.entrySet()) {
-                mMap.addMarker(pinPoint.getValue());
-            }
+        }
+    }
+    public void clearMarkers(){
+        synchronized(markers) {
+            markers.clear();
         }
     }
 

@@ -62,8 +62,8 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    private final String URL_SERVEUR = "http://192.168.0.108:3001";
-    //private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    //private final String URL_SERVEUR = "http://192.168.0.108:3001";
+    private final String URL_SERVEUR = "http://192.168.137.1:3001";
 
     private VolleyRequester(Context context)
     {
@@ -213,7 +213,7 @@ public class VolleyRequester
                                 final JSONObject groupe = (JSONObject) array.get(i);
                                 final int id = groupe.getInt("idgroup");
                                 final String name = groupe.getString("nomgroup");
-                                //final boolean isSharing = groupe.getBoolean("issharing");
+                                final boolean isSharing = groupe.getBoolean("issharing");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
                                 final ArrayList<UserModelSettings> users = new ArrayList<>();
                                 for(int j=0; j<membres.length(); j++)
@@ -257,6 +257,9 @@ public class VolleyRequester
                                         }
                                     }
                                 });
+                                if (isSharing){
+                                    sharingPositionBox.setChecked(true);
+                                }
 
                                 LinearLayout test = new LinearLayout(context);
                                 test.addView(sharingPositionBox);
@@ -269,6 +272,9 @@ public class VolleyRequester
                                     @Override
                                     public boolean onMenuItemClick(MenuItem menuItem) {
                                         System.out.println("Clicked on " + menuItem.getItemId());
+                                        MapFragment activity = MapFragment.instance;
+                                        activity.setCurrentGroup(id);
+                                        activity.clearMarkers();
                                         return false;
                                     }
                                 });

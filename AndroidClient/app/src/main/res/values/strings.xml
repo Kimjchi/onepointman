@@ -31,5 +31,11 @@
     <string name="non">Non</string>
     <string name="title_activity_test_login_fb_from_server">TestLoginFbFromServer</string>
     <string name="se_connecter">Se connecter</string>
+    <string name="nommez_votre_point_de_rdv">Nommez votre point de RDV...</string>
+    <string name="s_lectionnez_la_date_du_rdv">Sélectionnez la date du RDV...</string>
+    <string name="cr_er_rdv">Créer RDV</string>
+    <string name="annuler">annuler</string>
+    <string name="s_lectionnez_l_heure_du_rdv">Sélectionnez l\'heure du RDV...</string>
+    <string name="ajouter_un_point_de_rendez_vous">Ajouter un point de rendez-vous</string>
 
 </resources>

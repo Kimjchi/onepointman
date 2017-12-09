@@ -192,4 +192,8 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public Menu getMenu(){
+        return menu;
+    }
 }

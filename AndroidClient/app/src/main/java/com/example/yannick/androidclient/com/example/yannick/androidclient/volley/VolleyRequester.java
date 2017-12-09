@@ -207,6 +207,7 @@ public class VolleyRequester
                         System.out.println(response.toString());
                         try {
                             JSONArray array = (JSONArray) response.get("message");
+                            menuNavDrawer.findItem(R.id.groups).getSubMenu().clear();
 
                             for(int i=0; i < array.length(); i++)
                             {

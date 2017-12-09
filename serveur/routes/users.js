@@ -142,9 +142,31 @@ router.post('/deleteuser/', function(req, res){
         .where('iduser = ?', parseInt(toUpdate.iduser))
         .where('idgroup = ?', parseInt(toUpdate.idgroup))
         .toString();
-    console.log(query);
     db.query(query)
         .then(()=>{
+        let query2 = squel.select()
+            .from('public."USER_GROUP"')
+            .where('idgroup = ? ', toUpdate.idgroup)
+            .toString();
+        db.any(query2)
+            .then((result)=>{
+                if(result.length === 1){
+                    let deleteGroup=squel.delete()
+                        .from('public."GROUP"')
+                        .where('idgroup = ?', toUpdate.idgroup)
+                        .toString();
+                    db.query(deleteGroup)
+                        .then(()=>{
+                            console.log("group deleted bc no more users");
+                        })
+                        .catch(err=>{
+                            console.log("failed at deleting empty group" + err);
+                        })
+                }
+            })
+            .catch(e=>{
+                console.log('Failed at deleting group' + e)
+            });
             sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'User deleted from group successfully'}, res)
         })
         .catch(e => {

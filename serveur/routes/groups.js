@@ -369,11 +369,11 @@ router.post('/changegroupname', function(req,res){
         .toString();
     db.none(query)
         .then(()=>{
-        let response = {status: 'success'};
+        let response = {status: 'success',message:'groupname updated successfully'};
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e=>{
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Failed to update groupname', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail',message:'Failed to update groupname'}, res);
             console.log(e);
         })
 

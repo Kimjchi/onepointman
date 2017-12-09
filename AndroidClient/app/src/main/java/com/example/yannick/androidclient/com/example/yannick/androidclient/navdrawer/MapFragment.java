@@ -183,12 +183,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
     public void updateDisplayMarkers(){
-        mMap.clear();
-        for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
-            mMap.addMarker(marker.getValue());
-        }
-        for (Map.Entry<String, MarkerOptions> pinPoint : pinPoints.entrySet()) {
-            mMap.addMarker(pinPoint.getValue());
+        if (mMap != null) {
+            mMap.clear();
+            for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
+                mMap.addMarker(marker.getValue());
+            }
+            for (Map.Entry<String, MarkerOptions> pinPoint : pinPoints.entrySet()) {
+                mMap.addMarker(pinPoint.getValue());
+            }
         }
     }
 

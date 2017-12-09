@@ -329,7 +329,7 @@ public class VolleyRequester
                 double lg = Double.parseDouble(pinPoint.getString("pinlg"));
                 String daterdv = pinPoint.getString("daterdv");
                 String desc = pinPoint.getString("description");
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
                 Date date = format.parse(daterdv);
                 String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
 

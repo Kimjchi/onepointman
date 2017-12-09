@@ -2,7 +2,6 @@ export const CHANGE_GROUP_NAME = 'CHANGE_GROUP_NAME';
 export const ADD_GROUP = 'ADD_GROUP';
 export const GET_GROUPS = 'GET_GROUPS';
 export const CHANGE_GROUPS = 'CHANGE_GROUPS';
-export const ADD_GROUP_TEST = 'ADD_GROUP_TEST';
 export const GET_PHOTO = 'GET_PHOTO';
 export const SET_PHOTO = 'SET_PHOTO';
 export const GET_INFOS_GROUP = 'GET_INFOS_GROUP';
@@ -11,8 +10,8 @@ export function changeGroupName (groupName){
     return {type: CHANGE_GROUP_NAME, groupName}
 }
 
-export function addGroup (arrayGroups, idUser){
-    return {type: ADD_GROUP, arrayGroups, idUser}
+export function addGroup (groupName, idUser){
+    return {type: ADD_GROUP, groupName, idUser}
 }
 
 export function getGroups(idUser) {
@@ -21,10 +20,6 @@ export function getGroups(idUser) {
 
 export function changeGroups(groups) {
     return {type: CHANGE_GROUPS, groups}
-}
-
-export function addGroupTest(groupName, idUser) {
-    return {type: ADD_GROUP_TEST, groupName, idUser}
 }
 
 export function getPhoto(idUser) {

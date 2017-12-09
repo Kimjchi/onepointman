@@ -2,6 +2,7 @@ import {take, fork} from 'redux-saga/effects';
 import axios from 'axios';
 import {store} from '../store';
 import {
+    ADD_GROUP,
     ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_PHOTO, getGroups, getPhoto,
     setPhoto
 } from "../actions/opGroups";
@@ -56,19 +57,15 @@ export function * requestGroups() {
 
 export function * requestAddGroup() {
     while (true) {
-        let user = yield take(ADD_GROUP_TEST);
+        let user = yield take(ADD_GROUP);
         let id = user.idUser;
         let groupName = user.groupName;
 
-        let server = "http://localhost:3001/groups/create";
+        let server = "http://localhost:3001/groups/creategroup/"+groupName;
 
-        axios.post(server, {
-            id: id,
-            groupName: groupName
-        })
+        axios.get(server)
             .then(function (response) {
-                if (!!response.data.status && response.data.status === 'success') {
-                    alert('La création du groupe est un succès !');
+                if (!!response.status && response.status === 200) {
                     store.dispatch(getGroups(id));
                 }
                 else if(response.data.status === 'fail') {

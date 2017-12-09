@@ -10,6 +10,7 @@ import {CHANGE_PINPOINTS} from "../actions/opMap";
 import {CHANGE_LOCATION_SELECT} from "../actions/opMap";
 import {CHANGE_MARKER_SELECT} from "../actions/opMap";
 import {CHANGE_NEW_PINPOINT} from "../actions/opOptions";
+import {CHANGE_MAP} from "../actions/opMap";
 
 //ajouter le reste dans l'import
 
@@ -21,7 +22,8 @@ let initialState = {
     markerSelect : { lat: -34.397, lng: 150.644},
     locationSelect : "",
     pinPoints : [],
-    markersGeoLocation : []
+    markersGeoLocation : [],
+    map : null
 };
 
 export default function reducer (state = initialState, action ){
@@ -41,6 +43,9 @@ export default function reducer (state = initialState, action ){
 
         case CHANGE_PINPOINTS:
             return {...state, pinPoints : action.pinPoints};
+
+        case CHANGE_MAP:
+            return {...state, map : action.map};
 
         default:
             return state

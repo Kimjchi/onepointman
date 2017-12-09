@@ -2,6 +2,37 @@
 /* Variables */
 /* Styles */
 
+img.profilFb {
+    border-radius: 50%;
+    padding: 10px;
+}
+.liPinPoint div {
+    display:inline-block;
+}
+
+body .wrapper li a.aPinPoint {
+    padding: 0px 0px;
+    text-indent: 10px;
+    position: relative;
+}
+
+.liPinPoint {
+}
+.imagePinPoint {
+
+}
+
+.infoPinPoint {
+    position: absolute;
+    top: 50%; /* poussé de la moitié de hauteur du référent */
+    transform: translateY(-50%); /* tiré de la moitié de sa propre hauteur */
+}
+
+.infoPinPoint div {
+    font-size: 10px;
+    clear:both; float:left
+}
+
 p.accordion {
     margin-bottom: 14px;
     margin-top: 14px;
@@ -21,7 +52,7 @@ body .wrapper label {
     display: block;
     position: relative;
     color: #a1a1a1;
-    overflow: hidden;
+    overflow: scroll;
     cursor: pointer;
     height: 56px;
     -webkit-transition: text-indent 0.2s;
@@ -73,11 +104,11 @@ body .wrapper span {
     padding: 0;
 }
 body .wrapper .content {
-    height: 0;
     background: #212735;
-    height: 300px;
     position: relative;
     top: 10px;
+    display:block;
+    overflow:scroll;
 }
 body .wrapper .lil_arrow {
     width: 5px;

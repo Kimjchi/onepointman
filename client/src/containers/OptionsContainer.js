@@ -20,6 +20,7 @@ import Button from "react-bootstrap/es/Button";
 import Datetime from "react-datetime";
 import dateFormat from "dateformat";
 import {hours} from "moment";
+import fbDefaultImage from "../pictures/SMART_BOY_FB.jpg"
 
 var ATLANTIC_OCEAN = {
     latitude: 29.532804,
@@ -52,7 +53,7 @@ class OptionsContainer extends Component {
         this._handlePinPointDescChange = this._handlePinPointDescChange.bind(this);
         this._handlePinPointDateChange = this._handlePinPointDateChange.bind(this);
         this._getValidationPinPoint = this._getValidationPinPoint.bind(this);
-        this._getUser = this._getUser.bind(this);
+        this._getUserUrlPhoto = this._getUserUrlPhoto.bind(this);
     }
 
     _open() {
@@ -74,10 +75,15 @@ class OptionsContainer extends Component {
         this.props.recenterMap(point, 15);
     }
 
+    _convertDate(dateString) {
+        var date = new Date(dateString);
+        date = dateFormat(date, "yyyy-mm-dd hh:MM:ss");
+        return date;
+    }
+
     _handlePinPointDateChange(event) {
         let {pinPoint} = this.props.opOptions;
-        var date = new Date(event._d);
-        date = dateFormat(date, "yyyy-mm-dd hh:MM:ss");
+        var date = this._convertDate(event._d);
         pinPoint.date = date;
         this.props.changeNewPinPoint(pinPoint);
     }
@@ -93,15 +99,15 @@ class OptionsContainer extends Component {
         console.log(event);
         let pinPoint = {
             iduser : this.props.opLogin.idUser,
-            idgroup : Number(this.props.opUser.groupToDisplay),
+            idgroup : Number(this.props.opUsers.groupToDisplay),
             pinlg : this.props.opMap.markerSelect.lng,
             pinlt : this.props.opMap.markerSelect.lat,
             description : this.props.opOptions.pinPoint.desc,
             daterdv : this.props.opOptions.pinPoint.date
         }
         console.log("Lolilol");
-        if(Number(this.props.opUser.groupToDisplay) != 0) {
-            //this.props.createPinPoint(pinPoint, this.props.opLogin.idUser, Number(this.props.opUser.groupToDisplay));
+        if(Number(this.props.opUsers.groupToDisplay) != 0) {
+            //this.props.createPinPoint(pinPoint, this.props.opLogin.idUser, Number(this.props.opUsers.groupToDisplay));
         }
     }
 
@@ -148,6 +154,10 @@ class OptionsContainer extends Component {
         this.props.changeAddress(event.target.value);
     }
 
+    _deletePinPoint(idPinPoint) {
+        console.log("loool");
+    }
+
     _geocodeAddress () {
         let {address} = this.props.opOptions;
         googleMapsClient.geocode({
@@ -178,9 +188,12 @@ class OptionsContainer extends Component {
         }.bind(this));
     }
 
-    _getUser(idUser) {
-        let {users} = this.props.opUser;
-        let {friends} = this.props.opUser;
+    _getUserUrlPhoto(idUser) {
+        console.log(idUser);
+        let {users} = this.props.opUsers;
+        let {friends} = this.props.opUsers;
+        console.log(users);
+        console.log(friends);
         let allUsers = users.concat(friends);
         let user = null;
         user = allUsers.filter((obj) => {
@@ -190,9 +203,12 @@ class OptionsContainer extends Component {
                 return false;
             }
         });
-        console.log(idUser);
+
+        if(user.length == 0) {
+            return fbDefaultImage;
+        }
         console.log(user);
-        return user[0];
+        return user[0].urlPhoto;
     }
 
     _reverseGeocodeAddress () {
@@ -258,11 +274,15 @@ class OptionsContainer extends Component {
                                 </li>
                                 {pinPoints.map((pinPoint) => (
                                     <li key={pinPoint.id}>
-                                        <a href='#' onClick = {this._displayPinPoint.bind(this, pinPoint.pos.lt, pinPoint.pos.lg)}>
-                                            <img src={(this._getUser(pinPoint.idCreator)).urlPhoto} alt="photo de profil" height="70" width="70"/>
-                                            <div>
-                                                {pinPoint.date}
-                                                {pinPoint.desc}
+                                        <a href='#' className='aPinPoint' onClick = {this._displayPinPoint.bind(this, pinPoint.pos.lt, pinPoint.pos.lg)}>
+                                            <div className='liPinPoint'>
+                                                <div className='imagePinPoint'>
+                                                    <img className='profilFb' src={(this._getUserUrlPhoto(pinPoint.idCreator))} alt="photo de profil" height="60" width="60"/>
+                                                </div>
+                                                <div className='infoPinPoint'>
+                                                    <div>{(pinPoint.desc.length) > 20 ? pinPoint.desc.substring(0,20) + "..." : pinPoint.desc}</div>
+                                                    <div>{this._convertDate(pinPoint.date)}</div>
+                                                </div>
                                             </div>
                                         </a>
                                     </li>
@@ -345,7 +365,7 @@ function mapStateToProps (state) {
     return{
         opOptions: state.opOptions,
         opMap : state.opMap,
-        opUser : state.opUsers,
+        opUsers : state.opUsers,
         opLogin : state.opLogin
     }
 }

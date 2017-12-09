@@ -3,6 +3,7 @@ export const CHANGE_MARKER_SELECT = 'CHANGE_MARKER_SELECT';
 export const CHANGE_MARKER_GEOLOCATION = 'CHANGE_MARKER_GEOLOCATION';
 export const CHANGE_PINPOINTS = 'CHANGE_PINPOINTS';
 export const CHANGE_LOCATION_SELECT = 'CHANGE_LOCATION_SELECT';
+export const CHANGE_MAP = 'CHANGE_MAP';
 
 export function recenterMap (mapCenter, zoom){
     return {type: CHANGE_MAP_CENTER, mapCenter, zoom}
@@ -22,4 +23,8 @@ export function changePinPoints (pinPoints) {
 
 export function changeLocationSelect (locationSelect) {
     return {type : CHANGE_LOCATION_SELECT, locationSelect}
+}
+
+export function changeMap (map) {
+    return {type : CHANGE_MAP, map}
 }

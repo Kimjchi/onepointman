@@ -47,6 +47,8 @@ class Map extends Component {
                     loadingElement={<div style={{ height: '100%' }} />}
                     containerElement={<div style={{ height: '100%'}} />}
                     mapElement={<div style={{ height: '100%' }} />}
+                    _onMapMounted={this.props._onMapMounted}
+                    _onIdleChanged={this.props._onIdleChanged}
                     zoom={this.props.zoom}
                     center={this.props.mapCenter}
                     onClick={this._onClickMap}>

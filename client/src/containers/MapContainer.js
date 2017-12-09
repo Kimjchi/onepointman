@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import Map from "../components/Map";
 import {
+    changeMap,
     changePinPoints, recenterMap, updateMarkerGeoLocation, updateMarkers, updateMarkerSelect,
     updateMarkersSelect
 } from "../actions/opMap";
@@ -10,6 +11,23 @@ import {
 class MapContainer extends Component {
     constructor(props) {
         super(props);
+        this._onMapMounted = this._onMapMounted.bind(this);
+        this._onIdleChanged = this._onIdleChanged.bind(this);
+    }
+
+    _onMapMounted(mapRef) {
+        this.props.changeMap(mapRef);
+    }
+
+    _onIdleChanged(){
+        if(!!this.props.opMap.map) {
+            let zoom = this.props.opMap.map.getZoom();
+            let center = this.props.opMap.map.getCenter();
+            if(this.props.opMap.zoom != zoom || this.props.opMap.mapCenter.lat != center.lat() || this.props.opMap.mapCenter.lng != center.lng()) {
+                let centerPoint = {lat : center.lat(), lng : center.lng()};
+                this.props.recenterMap(centerPoint, zoom);
+            }
+        }
     }
 
     render() {
@@ -25,7 +43,8 @@ class MapContainer extends Component {
             <Map isMarkerShown = {isMarkerShown} mapCenter = {mapCenter}
                  zoom = {zoom} updateMarkerSelect = {updateMarkerSelect}
                  markerSelect = {markerSelect} markersGeoLocation = {markersGeoLocation}
-                 markersPinPoint = {pinPoints} changePinPoints = {changePinPoints}/>
+                 markersPinPoint = {pinPoints} changePinPoints = {changePinPoints}
+                 _onMapMounted = {this._onMapMounted} _onIdleChanged = {this._onIdleChanged} />
     )
     }
 }
@@ -45,6 +64,12 @@ const  mapDispatchToProps = (dispatch) => {
         },
         changePinPoints: (pinPoints) => {
             dispatch(changePinPoints(pinPoints))
+        },
+        changeMap: (map) => {
+            dispatch(changeMap(map))
+        },
+        recenterMap: (mapCenter, zoom) => {
+            dispatch(recenterMap(mapCenter, zoom))
         }
     }
 };

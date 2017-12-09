@@ -100,10 +100,10 @@ router.post(('/updatepositionsharing/'), function(req, res){
 
     db.query(query)
         .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, 'Position sharing updated successfully', res)
+            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'Position sharing updated successfully'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while updating position sharing', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail', message:'Error while updating position sharing'}, res);
             console.log(e);
         })
 });
@@ -122,33 +122,55 @@ router.post('/createuser/', function (req, res) {
 
     db.none(query)
         .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, 'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully', res)
+            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while adding user ' + toCreate.iduser + ' to group', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail',message:'Error while adding user ' + toCreate.iduser + ' to group'}, res);
             console.log(e);
         })
 });
 
-router.delete('/deleteuser/', function(req, res){
+router.post('/deleteuser/', function(req, res){
     console.log(req.body);
     let toUpdate = {
         iduser : req.body.iduser,
         idgroup : req.body.idgroup,
     };
-
+// check si ya 1 personne dans le groupe
     let query = squel.delete()
         .from('public."USER_GROUP"')
         .where('iduser = ?', parseInt(toUpdate.iduser))
         .where('idgroup = ?', parseInt(toUpdate.idgroup))
         .toString();
-    console.log(query);
     db.query(query)
         .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, 'User deleted from group successfully', res)
+        let query2 = squel.select()
+            .from('public."USER_GROUP"')
+            .where('idgroup = ? ', toUpdate.idgroup)
+            .toString();
+        db.any(query2)
+            .then((result)=>{
+                if(result.length === 1){
+                    let deleteGroup=squel.delete()
+                        .from('public."GROUP"')
+                        .where('idgroup = ?', toUpdate.idgroup)
+                        .toString();
+                    db.query(deleteGroup)
+                        .then(()=>{
+                            console.log("group deleted bc no more users");
+                        })
+                        .catch(err=>{
+                            console.log("failed at deleting empty group" + err);
+                        })
+                }
+            })
+            .catch(e=>{
+                console.log('Failed at deleting group' + e)
+            });
+            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'User deleted from group successfully'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while deleting user from group', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'success',message:'Error while deleting user from group'}, res);
             console.log(e);
         })
 });

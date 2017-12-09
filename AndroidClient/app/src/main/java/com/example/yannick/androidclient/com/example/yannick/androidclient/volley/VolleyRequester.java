@@ -418,7 +418,14 @@ public class VolleyRequester
                 public void onErrorResponse(VolleyError error) {
                     Log.v("DELETE_USER", "Fail to delete user "+itemId + " from group "+groupId + " : "+error.getMessage());
                 }
-            });
+
+            }){
+                @Override
+                public String getBodyContentType() {
+                    return "application/json";
+                }
+                };
+
             this.addToRequestQueue(deleteRequest);
         }
         catch(Exception ex)
@@ -512,26 +519,64 @@ public class VolleyRequester
 
     public void createNewGroup(final String newGroupName)
     {
-        JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.GET,
-                URL_SERVEUR + "/groups/create/"+newGroupName, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response)
-                    {
-                        Log.v("CREATE_GROUP", "Groupe "+newGroupName+ " bien cree");
-                        Intent addUserToGroupIntent = new Intent(context, AddUserToGroup.class);
-                        addUserToGroupIntent.putExtra("groupName", newGroupName);
-                        addUserToGroupIntent.putExtra("groupId", 2789);
-                        addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                        context.startActivity(addUserToGroupIntent);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
+        String json = "{\"iduser\":"+FacebookInfosRetrieval.user_id+", \"groupname\":\""+newGroupName+"\"}";
+
+        try
+        {
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/groups/creategroup"+newGroupName, null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response)
+                        {
+                            Log.v("CREATE_GROUP", "Groupe "+newGroupName+ " bien cree");
+                            Intent addUserToGroupIntent = new Intent(context, AddUserToGroup.class);
+                            addUserToGroupIntent.putExtra("groupName", newGroupName);
+                            addUserToGroupIntent.putExtra("groupId", 2789);
+                            addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                            context.startActivity(addUserToGroupIntent);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
                     Toast.makeText(context, "Erreur lors de la création du groupe", Toast.LENGTH_LONG).show();
-                Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
-            }
-        });
-        this.addToRequestQueue(deleteRequest);
+                    Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
+                }
+            });
+            this.addToRequestQueue(deleteRequest);
+        }
+        catch(Exception ex)
+        {
+            Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
+        }
+    }
+
+    public void changeGroupName(String groupName, final int groupId)
+    {
+        String json = "{\"idgroup\":"+groupId+", \"newgroupname\":\""+groupName+"\"}";
+
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/groups/changegroupname/", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response)
+                        {
+                            Log.v("CHANGE_GROUP_NAME", "GROUPE "+groupId+": Nom du groupe bien changé");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("CHANGE_GROUP_NAME", "GROUPE "+groupId+": Erreur changement de nom du groupe");
+                }
+            });
+            this.addToRequestQueue(deleteRequest);
+        }
+        catch(Exception ex)
+        {
+            Log.v("CHANGE_GROUP_NAME", "GROUPE "+groupId+": Erreur changement de nom du groupe");
+        }
     }
 }

@@ -169,7 +169,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 builder.setView(input);
                 builder.setMessage("Rentrer le nouveau nom du groupe");
 
-                builder.setPositiveButton("Changer", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Créer", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         newGroupName = input.getText().toString();

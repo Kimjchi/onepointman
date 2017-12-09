@@ -47,6 +47,8 @@ public class SettingsGroup extends AppCompatActivity {
 
         userAdapter = new UserAdapterSettings(userModels, getApplicationContext());
         userList.setAdapter(userAdapter);
+
+        userList.setNestedScrollingEnabled(true);
     }
 
     @Override

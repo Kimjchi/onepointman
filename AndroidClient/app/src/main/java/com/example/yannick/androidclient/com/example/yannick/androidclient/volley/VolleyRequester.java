@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
@@ -493,7 +494,6 @@ public class VolleyRequester
 
                             UserAdapterAdd userAdapter = new UserAdapterAdd(toFill, context);
                             listView.setAdapter(userAdapter);
-
                             Log.v("FRIENDS_LIST", "Done, friends list bien retrieve");
                         }
                         catch(Exception ex)
@@ -528,15 +528,7 @@ public class VolleyRequester
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                new AlertDialog.Builder(context)
-                        .setTitle("Erreur lors de la création de groupe")
-                        .setMessage(error.getMessage())
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                            }
-                        }).show();
+                    Toast.makeText(context, "Erreur lors de la création du groupe", Toast.LENGTH_LONG).show();
                 Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
             }
         });

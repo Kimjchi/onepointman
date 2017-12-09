@@ -100,10 +100,10 @@ router.post(('/updatepositionsharing/'), function(req, res){
 
     db.query(query)
         .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, 'Position sharing updated successfully', res)
+            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'Position sharing updated successfully'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while updating position sharing', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail', message:'Error while updating position sharing'}, res);
             console.log(e);
         })
 });
@@ -122,21 +122,21 @@ router.post('/createuser/', function (req, res) {
 
     db.none(query)
         .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, 'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully', res)
+            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while adding user ' + toCreate.iduser + ' to group', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail',message:'Error while adding user ' + toCreate.iduser + ' to group'}, res);
             console.log(e);
         })
 });
 
-router.delete('/deleteuser/', function(req, res){
+router.post('/deleteuser/', function(req, res){
     console.log(req.body);
     let toUpdate = {
         iduser : req.body.iduser,
         idgroup : req.body.idgroup,
     };
-
+// check si ya 1 personne dans le groupe
     let query = squel.delete()
         .from('public."USER_GROUP"')
         .where('iduser = ?', parseInt(toUpdate.iduser))
@@ -145,10 +145,10 @@ router.delete('/deleteuser/', function(req, res){
     console.log(query);
     db.query(query)
         .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, 'User deleted from group successfully', res)
+            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'User deleted from group successfully'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while deleting user from group', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'success',message:'Error while deleting user from group'}, res);
             console.log(e);
         })
 });

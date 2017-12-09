@@ -112,6 +112,8 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
                 let pinpoint = {
                     idpinpoint: element.idpinpoint,
                     idcreator: element.idcreator,
+                    nomcreator: element.nom,
+                    prenomcreator: element.prenom,
                     pinlt: element.pinlt,
                     pinlg:element.pinlg,
                     description:element.description,
@@ -197,7 +199,10 @@ let getGroupPinpoints = (idgroup) =>
         .field('pin.pinlg')
         .field('pin.description')
         .field('pin.daterdv')
+        .field('usr.prenom')
+        .field('usr.nom')
         .left_join('public."PINPOINT"', 'pin', 'pin.idgroup = gr.idgroup')
+        .left_join('public."USER"', 'usr', 'usr.iduser = pin.idcreator')
         .where('gr.idgroup = ?', idgroup)
         .toString();
 

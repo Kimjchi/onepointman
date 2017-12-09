@@ -5,7 +5,7 @@ import {
     ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_PHOTO, getGroups, getPhoto,
     setPhoto
 } from "../actions/opGroups";
-import {changeUsers} from "../actions/opUsers";
+import {changeIdGroup, changeUsers} from "../actions/opUsers";
 
 export function * requestGroups() {
     while (true) {
@@ -38,7 +38,8 @@ export function * requestGroups() {
                         group.membres.forEach(membre => {
                             store.dispatch(getPhoto(membre.iduser))
                         })
-                    })
+                    });
+                    store.dispatch(changeIdGroup(''));
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);

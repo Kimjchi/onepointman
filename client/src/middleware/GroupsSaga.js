@@ -6,6 +6,7 @@ import {
     setPhoto
 } from "../actions/opGroups";
 import {changeUsers} from "../actions/opUsers";
+import {changePinPoints} from "../actions/opMap";
 
 export function * requestGroups() {
     while (true) {
@@ -114,6 +115,22 @@ export function * requestInfosGroup() {
             .then(function (response) {
                 if(!!response.data.status && response.data.status === 'success') {
                     console.log(response.data.message);
+                    let pinpoints = response.data.message.pinpoints;
+                    let newPinpoints = [];
+                    pinpoints.map((pinPoint => {
+                        if(pinPoint.idpinpoint) {
+                            let newPinPoint = {
+                                id: pinPoint.idpinpoint,
+                                pos: {lt: Number(pinPoint.pinlt), lg: Number(pinPoint.pinlg)},
+                                desc: pinPoint.description,
+                                idCreator: pinPoint.idcreator,
+                                date: pinPoint.daterdv,
+                                showInfo: false
+                            }
+                            newPinpoints.push(newPinPoint);
+                        }
+                    }))
+                    store.dispatch(changePinPoints(newPinpoints));
                 }
             })
             .catch(function (error) {

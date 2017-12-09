@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import Map from "../components/Map";
-import {recenterMap, updateMarkerGeoLocation, updateMarkers, updateMarkersSelect} from "../actions/opMap";
+import {
+    changePinPoints, recenterMap, updateMarkerGeoLocation, updateMarkers, updateMarkerSelect,
+    updateMarkersSelect
+} from "../actions/opMap";
 
 
 class MapContainer extends Component {
@@ -13,13 +16,16 @@ class MapContainer extends Component {
         let {isMarkerShown} = this.props.opMap;
         let {mapCenter} = this.props.opMap;
         let {zoom} = this.props.opMap;
-        let {markersSelect} = this.props.opMap;
+        let {markerSelect} = this.props.opMap;
         let {markersGeoLocation} = this.props.opMap;
-        let updateMarkersSelect = this.props.updateMarkersSelect;
+        let updateMarkerSelect = this.props.updateMarkerSelect;
+        let {pinPoints} = this.props.opMap;
+        let changePinPoints = this.props.changePinPoints;
         return (
             <Map isMarkerShown = {isMarkerShown} mapCenter = {mapCenter}
-                 zoom = {zoom} updateMarkersSelect = {updateMarkersSelect}
-                 markersSelect = {markersSelect} markersGeoLocation = {markersGeoLocation} />
+                 zoom = {zoom} updateMarkerSelect = {updateMarkerSelect}
+                 markerSelect = {markerSelect} markersGeoLocation = {markersGeoLocation}
+                 markersPinPoint = {pinPoints} changePinPoints = {changePinPoints}/>
     )
     }
 }
@@ -34,8 +40,11 @@ function mapStateToProps (state) {
 //fonctions
 const  mapDispatchToProps = (dispatch) => {
     return{
-        updateMarkersSelect: (newMarkers) => {
-            dispatch(updateMarkersSelect(newMarkers))
+        updateMarkerSelect: (newMarker) => {
+            dispatch(updateMarkerSelect(newMarker))
+        },
+        changePinPoints: (pinPoints) => {
+            dispatch(changePinPoints(pinPoints))
         }
     }
 };

@@ -2,10 +2,14 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import ReactDOM from 'react-dom';
 import '../style/Options.css';
-import {recenterMap, updateMarkerGeoLocation, updateMarkersSelect} from "../actions/opMap";
 import {
-    changeAddress, changeAddressEntry, changeAddressFormatted, changeRdvModalVisibility,
-    changeSendingMode
+    changeLocationSelect, recenterMap, updateMarkerGeoLocation, updateMarkerSelect,
+    updateMarkersSelect
+} from "../actions/opMap";
+import {
+    changeAddress, changeAddressEntry, changeAddressFormatted, changeNewPinPoint, changePinPoints,
+    changeRdvModalVisibility,
+    changeSendingMode, createPinPoint
 } from "../actions/opOptions";
 import GoogleMaps from '@google/maps';
 import Modal from "react-bootstrap/es/Modal";
@@ -13,6 +17,9 @@ import FormGroup from "react-bootstrap/es/FormGroup";
 import ControlLabel from "react-bootstrap/es/ControlLabel";
 import FormControl from "react-bootstrap/es/FormControl";
 import Button from "react-bootstrap/es/Button";
+import Datetime from "react-datetime";
+import dateFormat from "dateformat";
+import {hours} from "moment";
 
 var ATLANTIC_OCEAN = {
     latitude: 29.532804,
@@ -40,19 +47,62 @@ class OptionsContainer extends Component {
         this._handleConstantPositionSending = this._handleConstantPositionSending.bind(this);
         this._open = this._open.bind(this);
         this._close = this._close.bind(this);
+        this._displayPinPoint = this._displayPinPoint.bind(this);
+        this._reverseGeocodeAddress = this._reverseGeocodeAddress.bind(this);
+        this._handlePinPointDescChange = this._handlePinPointDescChange.bind(this);
+        this._handlePinPointDateChange = this._handlePinPointDateChange.bind(this);
+        this._getValidationPinPoint = this._getValidationPinPoint.bind(this);
+        this._getUser = this._getUser.bind(this);
     }
 
     _open() {
         this.props.changeRdvModalVisibility();
+        this._reverseGeocodeAddress();
     }
 
     _close() {
         this.props.changeRdvModalVisibility();
     }
 
-    _getValidation(event) {
+    _displayPinPoint(lat, lng, event) {
+        console.log(lat);
+        console.log(lng);
+        let point = {
+            lat : lat,
+            lng : lng
+        };
+        this.props.recenterMap(point, 15);
+    }
+
+    _handlePinPointDateChange(event) {
+        let {pinPoint} = this.props.opOptions;
+        var date = new Date(event._d);
+        date = dateFormat(date, "yyyy-mm-dd hh:MM:ss");
+        pinPoint.date = date;
+        this.props.changeNewPinPoint(pinPoint);
+    }
+
+    _handlePinPointDescChange(event) {
+        let {pinPoint} = this.props.opOptions;
+        pinPoint.desc = event.target.value;
+        this.props.changeNewPinPoint(pinPoint);
+    }
+
+    _getValidationPinPoint(event) {
         event.preventDefault();
+        console.log(event);
+        let pinPoint = {
+            iduser : this.props.opLogin.idUser,
+            idgroup : Number(this.props.opUser.groupToDisplay),
+            pinlg : this.props.opMap.markerSelect.lng,
+            pinlt : this.props.opMap.markerSelect.lat,
+            description : this.props.opOptions.pinPoint.desc,
+            daterdv : this.props.opOptions.pinPoint.date
+        }
         console.log("Lolilol");
+        if(Number(this.props.opUser.groupToDisplay) != 0) {
+            //this.props.createPinPoint(pinPoint, this.props.opLogin.idUser, Number(this.props.opUser.groupToDisplay));
+        }
     }
 
     _handlePositionSending(event) {
@@ -103,16 +153,13 @@ class OptionsContainer extends Component {
         googleMapsClient.geocode({
             address: address
         }, function(err, response) {
-            console.log(response);
-            console.log(err);
-            if (!err) {
+            if (!err && response.json.status == "OK") {
                 let position = response.json.results[0].geometry.location;
                 let address = response.json.results[0].formatted_address;
                 console.log(JSON.stringify(address));
                 this.props.changeAddress(address, true);
                 this.props.recenterMap(position, 15);
-                let markersArray = [position];
-                this.props.updateMarkersSelect(markersArray);
+                this.props.updateMarkerSelect(position);
                 return;
             }
 
@@ -122,18 +169,56 @@ class OptionsContainer extends Component {
                 lng: ATLANTIC_OCEAN.longitude
             }, 3);
 
-            let markersArray = [{
+            let marker= {
                 lat: ATLANTIC_OCEAN.latitude,
                 lng: ATLANTIC_OCEAN.longitude
-            }];
+            };
 
-            this.props.updateMarkersSelect(markersArray);
+            this.props.updateMarkerSelect(marker);
+        }.bind(this));
+    }
+
+    _getUser(idUser) {
+        let {users} = this.props.opUser;
+        let {friends} = this.props.opUser;
+        let allUsers = users.concat(friends);
+        let user = null;
+        user = allUsers.filter((obj) => {
+            if(obj.iduser == idUser) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+        console.log(idUser);
+        console.log(user);
+        return user[0];
+    }
+
+    _reverseGeocodeAddress () {
+        let {markerSelect} = this.props.opMap;
+        googleMapsClient.reverseGeocode({
+            latlng: [markerSelect.lat, markerSelect.lng]
+        }, function(err, response) {
+            let address = "";
+            let result = response.json.results;
+            if (!err && response.json.status == "OK") {
+                console.log(result);
+                address = result[0].formatted_address;
+                console.log(address);
+                this.props.changeLocationSelect(address);
+                return;
+            }
+            address = "Adresse non formalisable";
+            this.props.changeLocationSelect(address);
         }.bind(this));
     }
 
     render() {
         let {address} = this.props.opOptions;
         let {isSharingPosition} = this.props.opOptions;
+        let {pinPoints} = this.props.opMap;
+        let {locationSelect} = this.props.opMap;
         return (
 
             <div className='wrapper'>
@@ -171,9 +256,17 @@ class OptionsContainer extends Component {
                                  <li>
                                     <a href='#' onClick = {this._open}>Créer un rendez-vous</a>
                                 </li>
-                                <li>
-                                    <a href='#'>Heure</a>
-                                </li>
+                                {pinPoints.map((pinPoint) => (
+                                    <li key={pinPoint.id}>
+                                        <a href='#' onClick = {this._displayPinPoint.bind(this, pinPoint.pos.lt, pinPoint.pos.lg)}>
+                                            <img src={(this._getUser(pinPoint.idCreator)).urlPhoto} alt="photo de profil" height="70" width="70"/>
+                                            <div>
+                                                {pinPoint.date}
+                                                {pinPoint.desc}
+                                            </div>
+                                        </a>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                         <span/>
@@ -215,15 +308,28 @@ class OptionsContainer extends Component {
                         <Modal.Title>Création d'un rendez-vous</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <form onSubmit={this._getValidation}>
+                        <form onSubmit={this._getValidationPinPoint}>
                             <FormGroup
                                 controlId="formBasicText"
                             >
+                                <ControlLabel>Adresse</ControlLabel>
+                                <FormControl
+                                    readOnly
+                                    type="text"
+                                    placeholder={locationSelect}
+                                />
                                 <ControlLabel>Heure</ControlLabel>
+                                <Datetime
+                                    inputProps={{readOnly:true}}
+                                    onChange={this._handlePinPointDateChange}
+                                    defaultValue={new Date()}
+                                    timeFormat="HH:mm"
+                                />
+                                <ControlLabel>Description</ControlLabel>
                                 <FormControl
                                     type="text"
+                                    onChange={this._handlePinPointDescChange.bind(this)}
                                 />
-                                <FormControl.Feedback />
                                 <Button type="submit">Créer un rendez-vous</Button>
                             </FormGroup>
                         </form>
@@ -237,7 +343,10 @@ class OptionsContainer extends Component {
 function mapStateToProps (state) {
 
     return{
-        opOptions: state.opOptions
+        opOptions: state.opOptions,
+        opMap : state.opMap,
+        opUser : state.opUsers,
+        opLogin : state.opLogin
     }
 }
 
@@ -250,8 +359,8 @@ const  mapDispatchToProps = (dispatch) => {
         changeAddress: (newAddress, validAddress) => {
             dispatch(changeAddress(newAddress, validAddress))
         },
-        updateMarkersSelect: (newMarkers) => {
-            dispatch(updateMarkersSelect(newMarkers))
+        updateMarkerSelect: (newMarker) => {
+            dispatch(updateMarkerSelect(newMarker))
         },
         updateMarkerGeoLocation: (markers) => {
             dispatch(updateMarkerGeoLocation(markers))
@@ -261,6 +370,15 @@ const  mapDispatchToProps = (dispatch) => {
         },
         changeRdvModalVisibility: () => {
             dispatch(changeRdvModalVisibility())
+        },
+        changeLocationSelect: (location) => {
+            dispatch(changeLocationSelect(location))
+        },
+        changeNewPinPoint: (pinPoint) => {
+            dispatch(changeNewPinPoint(pinPoint))
+        },
+        createPinPoint: (pinPoint, idUser, idGroup) => {
+            dispatch(createPinPoint(pinPoint, idUser, idGroup))
         }
     }
 };

@@ -8,6 +8,16 @@
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.MapFragment">
 
+        <Button
+            android:id="@+id/center_position"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="top|right"
+            android:layout_margin="10dp"
+            android:background="@drawable/center_location" />
+
     </fragment>
+
+
 
 </FrameLayout>

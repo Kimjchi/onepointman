@@ -90,6 +90,10 @@ function buildGroupsObject(queryResult) {
 // Pour check les daaaates hehehe
 
 
+//SSSSIIII l'utilisateur partage sa position avec le groupe , ne pas l'envoyer
+// +++ ne pas envoyer les user si leur position est nulle
+
+
 // les infos d'un groupe en particulier (les pinpoints et les positions des utilisateurs du groupe
 router.get('/positions/:iduser/:idgroup', function(req,res){
     //vérifier si l'utilisateur est bien dans le groupe avant de faire le traitement
@@ -125,13 +129,12 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
                         if(parseInt(element.iduser,10) === iduser) {
                             userCorrectRequest = true; // on vérifie ici si le gars qui demande est bien dans le groupe
                         }
-                        let isCurrent = compareTimes(currentDate, element.dateposition);
+                        let isCurrent = false;
+                        if(element.dateposition !== null){
+                            isCurrent = compareTimes(currentDate, element.dateposition);
+                        }
                         // Comparaison des dates ici
-                        console.log(currentDate.toISOString());
-                        console.log(currentDate.getHours());
-
-                        console.log(element.dateposition);
-                        console.log(element.dateposition.getTimezoneOffset());
+                        
 
                         let userposition = {
                            iduser: element.iduser,

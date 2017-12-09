@@ -7,6 +7,7 @@ import {history, store} from './store.js';
 import LoginContainer from "./containers/LoginContainer";
 import DashboardContainer from "./containers/DashboardContainer";
 import HandleAuthContainer from "./containers/HandleAuthContainer";
+import CanvasContainer from "./containers/CanvasContainer";
 
 
 class App extends Component {
@@ -23,6 +24,10 @@ class App extends Component {
                         exact
                         path="/handleauth"
                         component={HandleAuthContainer}/>
+                    <PublicRoute
+                        exact
+                        path="/canvas"
+                        component={CanvasContainer}/>
                     <PrivateRoute
                         exact
                         path="/Home"

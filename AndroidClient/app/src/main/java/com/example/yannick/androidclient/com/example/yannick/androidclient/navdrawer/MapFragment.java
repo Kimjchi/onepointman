@@ -2,8 +2,11 @@ package com.example.yannick.androidclient.com.example.yannick.androidclient.navd
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.Manifest;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -13,21 +16,32 @@ import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.LocationService.getLocationService;
@@ -35,6 +49,12 @@ import static com.example.yannick.androidclient.com.example.yannick.androidclien
 public class MapFragment extends Fragment implements OnMapReadyCallback {
     //call this method in your onCreateMethod
     public GoogleMap mMap;
+    private Calendar myCalendar;
+    private Button rdvOkButton;
+    private boolean nameRdvSet;
+    private boolean dateRdvSet;
+    private boolean hourRdvSet;
+    private EditText datePickerText;
     private final int REQUEST_PERMISSION_PHONE_LOCATION = 1;
     private Criteria critere = new Criteria();
     private LocationManager locationManager;
@@ -51,7 +71,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_map, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+        Button upButton = (Button) view.findViewById(R.id.center_position);
+        upButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.v("BOUTTON", "Clic");
+                if ((mMap != null)&& (markers.get("_MY_SELF_")!= null)){
+                    LatLng ltLg = markers.get("_MY_SELF_").getPosition();
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ltLg, 15));
+                } else{
+                    Toast.makeText(getActivity().getApplicationContext(), "Impossible de trouver votre position...:", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        return view;
     }
 
     @Override
@@ -75,9 +110,122 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                popupBuilder(marker).show();
+                popupBuilderInfoMarker(marker).show();
                 //Toast.makeText(getActivity().getApplicationContext(), "Description: " + marker.getSnippet(), Toast.LENGTH_LONG).show();
                 return false;
+            }
+        });
+
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                //Ouvrir un popup
+                //Groupe
+                //Date RDV
+                //Description
+                hourRdvSet = false;
+                dateRdvSet = false;
+                nameRdvSet = false;
+                final Dialog rdvDialog = new Dialog(getActivity());
+                rdvDialog.setTitle("Placer un point de rendez-vous");
+                rdvDialog.setContentView(R.layout.rdv_dialog);
+                rdvDialog.create();
+
+                datePickerText = rdvDialog.findViewById(R.id.rdvDate);
+                myCalendar = Calendar.getInstance();
+
+                final EditText descriptionRdv = ((EditText)rdvDialog.findViewById(R.id.rdvDescription));
+
+                descriptionRdv.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        if(charSequence.toString().trim().length() == 0)
+                        {
+                            nameRdvSet = false;
+                        }
+                        else
+                        {
+                            nameRdvSet = true;
+                        }
+                        checkIfDialogButtonCanBeClickable();
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        if(descriptionRdv.getText().length() > 0)
+                        {
+                            nameRdvSet = true;
+                            checkIfDialogButtonCanBeClickable();
+                        }
+                    }
+                });
+
+                final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                          int dayOfMonth) {
+                        myCalendar.set(Calendar.YEAR, year);
+                        myCalendar.set(Calendar.MONTH, monthOfYear);
+                        myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        updateLabel(datePickerText);
+                        dateRdvSet = true;
+                        checkIfDialogButtonCanBeClickable();
+                    }
+                };
+
+                datePickerText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        new DatePickerDialog(getActivity(), date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                                myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                    }
+                });
+
+                final EditText hourPickerText = rdvDialog.findViewById(R.id.rdvHour);
+                hourPickerText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int hour = myCalendar.get(Calendar.HOUR_OF_DAY);
+                        int minute = myCalendar.get(Calendar.MINUTE);
+
+                        TimePickerDialog mTimePicker;
+                        mTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                                hourPickerText.setText( selectedHour + ":" + selectedMinute);
+                                hourRdvSet = true;
+                                checkIfDialogButtonCanBeClickable();
+                            }
+                        }, hour, minute, true);
+                        mTimePicker.setTitle("Choissez l'heure du rendez-vous");
+                        mTimePicker.show();
+                    }
+                });
+
+                rdvOkButton = rdvDialog.findViewById(R.id.rdvOkButton);
+                rdvOkButton.setEnabled(false);
+                rdvOkButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //TODO Placer le point de RDV sur la carte + envoyer au backend
+                        rdvDialog.dismiss();
+                    }
+                });
+
+                Button dismissButton = rdvDialog.findViewById(R.id.rdvDismissButton);
+                dismissButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        rdvDialog.dismiss();
+                    }
+                });
+
+                rdvDialog.show();
             }
         });
     }
@@ -183,16 +331,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
     public void updateDisplayMarkers(){
-        mMap.clear();
-        for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
-            mMap.addMarker(marker.getValue());
-        }
-        for (Map.Entry<String, MarkerOptions> pinPoint : pinPoints.entrySet()) {
-            mMap.addMarker(pinPoint.getValue());
+        if (mMap != null) {
+            mMap.clear();
+            for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
+                mMap.addMarker(marker.getValue());
+            }
+            for (Map.Entry<String, MarkerOptions> pinPoint : pinPoints.entrySet()) {
+                mMap.addMarker(pinPoint.getValue());
+            }
         }
     }
 
-    public AlertDialog popupBuilder(Marker marker){
+    public AlertDialog popupBuilderInfoMarker(Marker marker){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(marker.getSnippet())
                 .setTitle(marker.getTitle());
@@ -206,6 +356,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return builder.create();
     }
 
+    private void updateLabel(EditText datePickerPlaceholder) {
+        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.CANADA_FRENCH);
 
+        datePickerPlaceholder.setText(sdf.format(myCalendar.getTime()));
+    }
+
+    private void checkIfDialogButtonCanBeClickable()
+    {
+        if(hourRdvSet && dateRdvSet && nameRdvSet)
+        {
+            rdvOkButton.setEnabled(true);
+        }
+        else
+        {
+            rdvOkButton.setEnabled(false);
+        }
+    }
 
 }

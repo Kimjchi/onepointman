@@ -33,11 +33,35 @@ router.post('/createdrawing', function(req,res){
         .then((row)=>{
             let response = {
                 iddrawing : row.iddrawing
-            }
+            };
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e => {
             sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while creating drawing', res);
+            console.log(e);
+        })
+});
+
+//Ce serait peut etre mieux de le supprimer carrément? plutôt que de le set inactif
+router.post('deletedrawing', function(req,res){
+   let toDelete = {
+       iddrawing: req.body.iddrawing
+   };
+
+   let query = squel.update()
+       .table('public."DRAWING"')
+       .set('actif', false)
+       .where('iddrawing = ?', toDelete.iddrawing)
+       .toString();
+    db.none(query)
+        .then(()=>{
+            let response = {
+                status : 'success'
+            };
+            sender.sendResponse(sender.SUCCESS_STATUS, response, res)
+        })
+        .catch(e=>{
+            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while deleting drawing', res);
             console.log(e);
         })
 });

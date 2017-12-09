@@ -2,6 +2,8 @@ package com.example.yannick.androidclient.com.example.yannick.androidclient.navd
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +19,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,6 +35,10 @@ import com.example.yannick.androidclient.com.example.yannick.androidclient.volle
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -169,7 +177,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 builder.setView(input);
                 builder.setMessage("Rentrer le nouveau nom du groupe");
 
-                builder.setPositiveButton("Changer", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Créer", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         newGroupName = input.getText().toString();
@@ -186,7 +194,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 builder.show();
                 break;
             case R.id.nav_logout:
-                System.out.println("Logout");
+
                 break;
             default:
                 break;

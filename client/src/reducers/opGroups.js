@@ -1,10 +1,11 @@
-import {ADD_GROUP, CHANGE_GROUP_NAME, CHANGE_GROUPS, SET_PHOTO} from "../actions/opGroups";
+import {ADD_GROUP, CHANGE_GROUP_ID, CHANGE_GROUP_NAME, CHANGE_GROUPS, SET_PHOTO} from "../actions/opGroups";
 
 //ajouter le reste dans l'import
 
 //pour le register e mail
 let initialState = {
     groupName: '',
+    idGroup: '',
     groups: [],
     errors: '',
     isLoading: false,
@@ -29,6 +30,8 @@ export default function reducer (state = initialState, action ){
                 });
             });
             return {...state, groups: groups, error: ''};
+        case CHANGE_GROUP_ID:
+            return {...state, idGroup: action.id, error:''};
         default:
             return state
 

@@ -74,6 +74,16 @@ public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                if(getItem(position).isInGroup())
+                {
+                    //TODO Remove from
+                    getItem(position).setInGroup(false);
+                }
+                else
+                {
+                    //TODO add in group
+                    getItem(position).setInGroup(true);
+                }
                 switchImageButton(position, deleteBtn);
                 notifyDataSetChanged();
             }

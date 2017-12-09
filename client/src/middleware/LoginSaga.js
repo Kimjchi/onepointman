@@ -33,12 +33,11 @@ export function * requestPhotoUser() {
         let user = yield take(GET_PHOTO_USER);
         let id = user.idUser;
 
-        let server = "http://graph.facebook.com/"+id+"/picture?redirect=false";
+        let server = "http://graph.facebook.com/"+id+"/picture?redirect=false&type=normal";
 
         axios.get(server)
             .then(function (response) {
                 if(!!response.status && response.status === 200) {
-                    console.log(response);
                     store.dispatch(setPhotoUser(response.data.data.url));
                 }
             })

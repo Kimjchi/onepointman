@@ -2,7 +2,7 @@
 //ajouter le reste dans l'import
 
 //pour le register e mail
-import {ADD_USER, CHANGE_FRIENDS, CHANGE_SEARCH, CHANGE_USERS, DELETE_USER} from "../actions/opUsers";
+import {ADD_USER, CHANGE_FRIENDS, CHANGE_SEARCH, CHANGE_USERS, DELETE_USER, SET_PHOTO} from "../actions/opUsers";
 
 let initialState = {
     users: [],

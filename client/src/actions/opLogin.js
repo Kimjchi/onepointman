@@ -6,7 +6,7 @@ export const LOGOUT = 'LOGOUT';
 export const SET_AUTH = 'SET_AUTH';
 export const LOGIN = 'LOGIN';
 export const IDUSER = 'IDUSER';
-export const GET_PHOTO_USER = 'GET_PHOTO';
+export const GET_PHOTO_USER = 'GET_PHOTO_USER';
 export const SET_PHOTO_USER = 'SET_PHOTO_USER';
 
 export function loginRequest (){

@@ -39,13 +39,15 @@ class UsersComponent extends Component {
                     <ul id="navlist">
                         {
                             this.props.users.map((user, index) => {
-                                return <li key={index}><a href="#">{user.prenom} {user.nomuser}</a></li>
+                                if(user.urlPhoto) {
+                                    return <li key={index}><img src={user.urlPhoto} alt="photo de profil" height="70" width="70"/></li>
+                                }
                             })
                         }
                     </ul>
                 </Col>
                     {
-                        this.props.groupToDisplay && <Col md={2}><i className="fa fa-plus fa-lg addButton" style={{color: 'white'}} onClick={this._open}/></Col>
+                        this.props.groupToDisplay && <Col md={2}><i className="fa fa-plus fa-2x addButton" style={{color: 'white'}} onClick={this._open}/></Col>
                     }
                 <Modal show={this.state.showModal} onHide={this._close} className="moddal">
                     <Modal.Header closeButton>

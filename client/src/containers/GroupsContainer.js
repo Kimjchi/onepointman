@@ -8,7 +8,7 @@ import {addUser} from "../actions/opUsers";
 class GroupsContainer extends Component {
     constructor(props) {
         super(props);
-        this.props.getGroups(5);
+        this.props.getGroups(this.props.opLogin.idUser);
     }
 
     render() {

@@ -35,7 +35,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by yannick on 05/12/17.
@@ -326,11 +329,14 @@ public class VolleyRequester
                 double lg = Double.parseDouble(pinPoint.getString("pinlg"));
                 String daterdv = pinPoint.getString("daterdv");
                 String desc = pinPoint.getString("description");
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                Date date = format.parse(daterdv);
+                String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
 
                 String pinPointTitle = "Point de rdv n°" + idPinPoint;
 
 
-                String pinPointSnippet = "Date: " + daterdv + "\r\n"
+                String pinPointSnippet = "Date: " + dateDisplayed + "\r\n"
                         + "Createur: " + userName + "\r\n"
                         + "Description: " + desc;
 
@@ -346,6 +352,8 @@ public class VolleyRequester
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
         try {
             for(int i=0; i< json.getJSONArray("userpositions").length(); i++) {
@@ -355,9 +363,13 @@ public class VolleyRequester
                 double userlt = Double.parseDouble(usersPosition.getString("userlt"));
                 double userlg = Double.parseDouble(usersPosition.getString("userlg"));
                 String dateposition = usersPosition.getString("dateposition");
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                Date date = format.parse(dateposition);
+                String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
+
 
                 String usersPositionTitle = userName;
-                String usersPositionSnippet = "Date dernière position:" + dateposition;
+                String usersPositionSnippet = "Date dernière position:\r\n" + dateDisplayed;
                 float color;
                 if (usersPosition.getBoolean("current")) {
                     color = BitmapDescriptorFactory.HUE_GREEN;
@@ -377,6 +389,8 @@ public class VolleyRequester
 
             }
         } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
     }

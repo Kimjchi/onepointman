@@ -133,8 +133,7 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
                         if(element.dateposition !== null){
                             isCurrent = compareTimes(currentDate, element.dateposition);
                         }
-                        // Comparaison des dates ici
-                        
+
 
                         let userposition = {
                            iduser: element.iduser,
@@ -143,7 +142,11 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
                            current:isCurrent,
                            dateposition:element.dateposition
                        };
-                       JSONToReturn.userpositions.push(userposition);
+                        if(element.dateposition !== null){
+                            if(!(parseInt(element.iduser,10) === iduser && element.sharesposition)){
+                                JSONToReturn.userpositions.push(userposition);
+                            }
+                        }
                     });
 
                     if(userCorrectRequest){

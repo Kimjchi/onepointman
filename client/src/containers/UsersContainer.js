@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {addUser, changeSearch} from "../actions/opUsers";
 import UsersComponent from "../components/UsersComponent";
+import {getInfosGroup} from "../actions/opGroups";
 
 
 class UsersContainer extends Component {

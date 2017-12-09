@@ -52,10 +52,10 @@ class GroupsComponent extends Component {
             return group.idgroup === parseInt(event.target.id, 10);
         });
         if(usersToDisplay.length === 0) {
-            this.props.addUser([], event.target.id);
+            this.props.addUser([], event.target.id, this.props.idUser);
         }
         else {
-            this.props.addUser(usersToDisplay[0].membres, event.target.id);
+            this.props.addUser(usersToDisplay[0].membres, event.target.id, this.props.idUser);
         }
     }
 

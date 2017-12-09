@@ -8,8 +8,9 @@ import {
 } from "../actions/opMap";
 import {
     changeAddress, changeAddressEntry, changeAddressFormatted, changeNewPinPoint, changePinPoints,
-    changeRdvModalVisibility,
-    changeSendingMode, createPinPoint
+    changePinPointToRemove,
+    changeRdvModalVisibility, changeRmPpModalVisibility,
+    changeSendingMode, createPinPoint, deletePinPoint
 } from "../actions/opOptions";
 import GoogleMaps from '@google/maps';
 import Modal from "react-bootstrap/es/Modal";
@@ -48,12 +49,15 @@ class OptionsContainer extends Component {
         this._handleConstantPositionSending = this._handleConstantPositionSending.bind(this);
         this._open = this._open.bind(this);
         this._close = this._close.bind(this);
+        this._openPp = this._openPp.bind(this);
+        this._closePp = this._closePp.bind(this);
         this._displayPinPoint = this._displayPinPoint.bind(this);
         this._reverseGeocodeAddress = this._reverseGeocodeAddress.bind(this);
         this._handlePinPointDescChange = this._handlePinPointDescChange.bind(this);
         this._handlePinPointDateChange = this._handlePinPointDateChange.bind(this);
         this._getValidationPinPoint = this._getValidationPinPoint.bind(this);
         this._getUserUrlPhoto = this._getUserUrlPhoto.bind(this);
+        this._deletePinPoint = this._deletePinPoint.bind(this);
     }
 
     _open() {
@@ -63,6 +67,15 @@ class OptionsContainer extends Component {
 
     _close() {
         this.props.changeRdvModalVisibility();
+    }
+
+    _openPp(pinPoint) {
+        this.props.changePinPointToRemove(pinPoint);
+        this.props.changeRmPpModalVisibility();
+    }
+
+    _closePp() {
+        this.props.changeRmPpModalVisibility();
     }
 
     _displayPinPoint(lat, lng, event) {
@@ -154,7 +167,9 @@ class OptionsContainer extends Component {
         this.props.changeAddress(event.target.value);
     }
 
-    _deletePinPoint(idPinPoint) {
+    _deletePinPoint() {
+        this._closePp();
+        this.props.deletePinPoint(this.props.opOptions.pinPointToRemove.id, this.props.opLogin.idUser, this.props.opGroups.idGroup);
         console.log("loool");
     }
 
@@ -192,8 +207,6 @@ class OptionsContainer extends Component {
         console.log(idUser);
         let {users} = this.props.opUsers;
         let {friends} = this.props.opUsers;
-        console.log(users);
-        console.log(friends);
         let allUsers = users.concat(friends);
         let user = null;
         user = allUsers.filter((obj) => {
@@ -207,7 +220,6 @@ class OptionsContainer extends Component {
         if(user.length == 0) {
             return fbDefaultImage;
         }
-        console.log(user);
         return user[0].urlPhoto;
     }
 
@@ -285,6 +297,12 @@ class OptionsContainer extends Component {
                                                 </div>
                                             </div>
                                         </a>
+                                        <a href='#' className="menu-icon" onClick={this._openPp.bind(this, pinPoint)}>
+                                            <div className="line top"></div>
+                                            <div className="line right"></div>
+                                            <div className="line bottom"></div>
+                                            <div className="line left"></div>
+                                        </a>
                                     </li>
                                 ))}
                             </ul>
@@ -355,6 +373,17 @@ class OptionsContainer extends Component {
                         </form>
                     </Modal.Body>
                 </Modal>
+                <Modal show={this.props.opOptions.showModalRmPp} onHide={this._closePp} className="moddal">
+                    <Modal.Header closeButton>
+                        <Modal.Title>Voulez-vous supprimer ce rendez-vous ?</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="text-center">
+                            <Button bsStyle="primary" onClick={this._deletePinPoint}>Oui</Button>
+                            <Button bsStyle="danger" onClick={this._closePp}>Annuler</Button>
+                        </div>
+                    </Modal.Body>
+                </Modal>
             </div>
         )
     }
@@ -366,7 +395,8 @@ function mapStateToProps (state) {
         opOptions: state.opOptions,
         opMap : state.opMap,
         opUsers : state.opUsers,
-        opLogin : state.opLogin
+        opLogin : state.opLogin,
+        opGroups: state. opGroups
     }
 }
 
@@ -399,6 +429,15 @@ const  mapDispatchToProps = (dispatch) => {
         },
         createPinPoint: (pinPoint, idUser, idGroup) => {
             dispatch(createPinPoint(pinPoint, idUser, idGroup))
+        },
+        changeRmPpModalVisibility:() => {
+            dispatch(changeRmPpModalVisibility())
+        },
+        changePinPointToRemove:(pinPointToRemove) => {
+            dispatch(changePinPointToRemove(pinPointToRemove))
+        },
+        deletePinPoint: (idPinPoint, idUser, idGroup) => {
+            dispatch(deletePinPoint(idPinPoint, idUser, idGroup))
         }
     }
 };

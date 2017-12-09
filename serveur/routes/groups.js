@@ -36,6 +36,7 @@ let getGroups = (iduser) =>
         .from('public."USER_GROUP"', 'ugr')
         .field('ugr.idgroup')
         .field('gr.nom')
+        .field('ugr.sharesposition')
         .where('ugr.iduser = ?', iduser)
         .left_join('public."GROUP"', 'gr', 'ugr.idgroup = gr.idgroup')
 ;
@@ -45,6 +46,7 @@ let getUsersInGroups = (iduser) =>
         .from(getGroups(iduser), 'listgroups')
         .left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = listgroups.idgroup')
         .left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser')
+        .field('listgroups.sharesposition')
         .field('usr.prenom')
         .field('usr.nom', 'nomuser')
         .field('usr.iduser')
@@ -66,7 +68,7 @@ function buildGroupsObject(queryResult) {
             }
         });
         if (!contains) {
-            groups.push({idgroup: element.idgroup, nomgroup: element.nomgroup, membres: []})
+            groups.push({idgroup: element.idgroup, issharing: element.sharesposition, nomgroup: element.nomgroup, membres: []})
         }
     });
     //une fois le tableau des groupes créé, on push les membres dans groups[idGroupConcerné].membres
@@ -260,7 +262,6 @@ router.get('/drawings/:iduser/:idgroup', function(req,res){
         idgroup: idgroup,
         drawings:[]
     };
-    console.log(query);
 
     db.any(query)
         .then((result) =>{
@@ -312,29 +313,70 @@ let getDrawings = (idgroup) =>
         .where('draw.idgroup = ?', idgroup)
         .toString();
 
+//ca passe en post
+router.post('/creategroup', function (req, res) {
 
-router.get('/creategroup/:group_name/', function (req, res) {
+    let toCreate = {
+        iduser: req.body.iduser,
+        groupname: req.body.groupname
+    };
 
-    let groupName = req.params.group_name;
     let currentTime = new Date();
     let query = squel.insert()
         .into('public."GROUP"')
-        .set('nom', groupName)
+        .set('nom', toCreate.groupname)
         .set('creationdate', currentTime.toISOString())
         .returning('idgroup')
         .toString();
 
     db.one(query)
         .then((row)=>{
-            let response = {
-                idgroup : row.idgroup
-            };
-            sender.sendResponse(sender.SUCCESS_STATUS, response, res)
+            let inUserGroup = squel.insert()
+                .into('public."USER_GROUP"', 'ugr')
+                .set('idgroup', row.idgroup)
+                .set('iduser', toCreate.iduser)
+                .set('iscreator', true)
+                .toString();
+            db.none(inUserGroup)
+                .then(()=>{
+                    let response = {
+                        idgroup : row.idgroup
+                    };
+                    sender.sendResponse(sender.SUCCESS_STATUS, response, res)
+                })
+                .catch(err=>{
+                    sender.sendResponse(sender.NOT_FOUND_STATUS, 'Failed to insert user in USER_GROUP', res);
+                    console.log(err);
+                })
+
         })
         .catch(e => {
             sender.sendResponse(sender.NOT_FOUND_STATUS, 'Failed to create group', res);
             console.log(e);
         })
+});
+
+router.post('/changegroupname', function(req,res){
+    let toChange = {
+        idgroup: req.body.idgroup,
+        groupname:req.body.newgroupname
+    };
+
+    let query = squel.update()
+        .table('public."GROUP"')
+        .set('nom', toChange.groupname)
+        .where('idgroup = ?', toChange.idgroup)
+        .toString();
+    db.none(query)
+        .then(()=>{
+        let response = {status: 'success'};
+            sender.sendResponse(sender.SUCCESS_STATUS, response, res)
+        })
+        .catch(e=>{
+            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Failed to update groupname', res);
+            console.log(e);
+        })
+
 });
 
 module.exports = router;

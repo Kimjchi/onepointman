@@ -1,28 +1,11 @@
-import {ADD_GROUP, CHANGE_GROUP_NAME, CHANGE_GROUPS} from "../actions/opGroups";
+import {ADD_GROUP, CHANGE_GROUP_NAME, CHANGE_GROUPS, SET_PHOTO} from "../actions/opGroups";
 
 //ajouter le reste dans l'import
 
 //pour le register e mail
 let initialState = {
     groupName: '',
-    groups: [
-        {
-            idgroup: 1,
-            nomgroup: 'Heya'
-        },
-        {
-            id: 2,
-            nomgroup: 'BROOOS'
-        },
-        {
-            id: 3,
-            nomgroup: 'Yeee'
-        },
-        {
-            id: 4,
-            nomgroup: 'Groupe 4'
-        }
-    ],
+    groups: [],
     errors: '',
     isLoading: false,
 };
@@ -37,6 +20,17 @@ export default function reducer (state = initialState, action ){
             return {...state ,groups: action.arrayGroups , error:'', groupName: ''};
         case CHANGE_GROUPS:
             return {...state, groups: action.groups, error:''};
+        case SET_PHOTO:
+            let id = action.idUser;
+            let groups = state.groups;
+            groups.forEach(group => {
+                group.membres.forEach(membre => {
+                    if(membre.iduser === id) {
+                        membre.urlPhoto = action.url;
+                    }
+                });
+            });
+            return {...state, groups: groups, error: ''};
         default:
             return state
 

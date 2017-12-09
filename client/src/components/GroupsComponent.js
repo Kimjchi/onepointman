@@ -59,6 +59,23 @@ class GroupsComponent extends Component {
         }
     }
 
+    _checkLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(this._processLocation);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    _processLocation (location) {
+        let point = {
+            lat : location.coords.latitude,
+            lng : location.coords.longitude
+        };
+        let pointArray = [point];
+        this.props.updateMarkersGeolocation(pointArray);
+    }
+
     render() {
         return (
             <div id="menuToggle">
@@ -71,6 +88,7 @@ class GroupsComponent extends Component {
                 <span/>
 
                 <ul id="menu">
+                    <img src={this.props.photoUser} alt="photo de profil" className="photoUser" height="50" width="50"/>
                     {
                         this.props.groups.map((group, index) => {
                             return <a key={index}><li onClick={this._displayUsers} id={group.idgroup}>{group.nomgroup}</li></a>

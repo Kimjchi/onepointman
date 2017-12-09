@@ -1,7 +1,8 @@
 import {take, fork} from 'redux-saga/effects';
 import axios from 'axios';
 import {store} from '../store';
-import {ADD_GROUP_TEST, changeGroups, GET_GROUPS, getGroups} from "../actions/opGroups";
+import {ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_PHOTO, getGroups, getPhoto, setPhoto} from "../actions/opGroups";
+import {changeUsers} from "../actions/opUsers";
 
 export function * requestGroups() {
     while (true) {
@@ -13,8 +14,28 @@ export function * requestGroups() {
         axios.get(server)
             .then(function (response) {
                 if (!!response.data.status && response.data.status === 'success') {
-                    console.log(response.data.message);
-                    store.dispatch(changeGroups(response.data.message));
+                    let groups = response.data.message;
+                    store.dispatch(changeGroups(groups));
+                    let users = [];
+                    groups.forEach(group => {
+                        group.membres.forEach(membre => {
+                            let duplicate = false;
+                            users.forEach(user => {
+                                if(user.iduser === membre.iduser) {
+                                    duplicate = true;
+                                }
+                            });
+                            if(!duplicate) {
+                                users.push(membre);
+                            }
+                        })
+                    });
+                    store.dispatch(changeUsers(users));
+                    groups.forEach(group => {
+                        group.membres.forEach(membre => {
+                            store.dispatch(getPhoto(membre.iduser))
+                        })
+                    })
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);
@@ -59,8 +80,27 @@ export function * requestAddGroup() {
     }
 }
 
+export function * requestPhoto() {
+    while (true) {
+        let user = yield take(GET_PHOTO);
+        let id = user.idUser;
+
+        let server = "https://graph.facebook.com/"+id+"/picture?redirect=false&type=normal";
+
+        axios.get(server)
+            .then(function (response) {
+                if(!!response.status && response.status === 200) {
+                    store.dispatch(setPhoto(id, response.data.data.url));
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+}
 
 export function * GroupsFlow() {
     yield fork(requestGroups);
     yield fork(requestAddGroup);
+    yield fork(requestPhoto);
 }

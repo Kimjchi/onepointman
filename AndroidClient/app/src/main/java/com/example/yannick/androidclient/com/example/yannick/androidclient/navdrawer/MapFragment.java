@@ -1,9 +1,11 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -16,7 +18,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.Marker;
@@ -25,7 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.yannick.androidclient.LocationService.getLocationService;
+import static com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.LocationService.getLocationService;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
     //call this method in your onCreateMethod
@@ -38,6 +43,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public static MapFragment instance = null;
     public VolleyRequester restRequester = null;
     private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>() {
+    };
+    private Map<String, MarkerOptions> pinPoints = new HashMap<String, MarkerOptions>() {
     };
     Location myLocation;
 
@@ -65,6 +72,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                popupBuilder(marker).show();
+                //Toast.makeText(getActivity().getApplicationContext(), "Description: " + marker.getSnippet(), Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
     }
 
     @Override
@@ -162,11 +177,35 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void addMarker(String name, MarkerOptions marker){
         markers.put(name, marker);
     }
+    public void addPinPoint(String name, MarkerOptions marker){
+        pinPoints.put(name, marker);
+    }
+
 
     public void updateDisplayMarkers(){
         mMap.clear();
         for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
             mMap.addMarker(marker.getValue());
         }
+        for (Map.Entry<String, MarkerOptions> pinPoint : pinPoints.entrySet()) {
+            mMap.addMarker(pinPoint.getValue());
+        }
     }
+
+    public AlertDialog popupBuilder(Marker marker){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(marker.getSnippet())
+                .setTitle(marker.getTitle());
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        // 3. Get the AlertDialog from create()
+        return builder.create();
+    }
+
+
+
 }

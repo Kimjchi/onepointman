@@ -1,4 +1,4 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.login;
 
 /**
  * Created by yannick on 05/12/17.

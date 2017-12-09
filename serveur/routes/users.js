@@ -61,7 +61,8 @@ router.post(('/updateposition'), function (req, res) {
                                     res.send({
                                         status: 'fail',
                                         message: 'failing to update userposition in a group'
-                                    })
+                                    });
+                                    console.log('failed at updating position in group');
                                 })
                         }
 
@@ -110,33 +111,26 @@ router.post(('/updatepositionsharing'), function(req, res){
 router.post('/createuser/', function (req, res) {
 
     let toCreate = {
-        usersToAdd: req.body.usersToAdd,
+        iduser: req.body.iduser,
         idgroup: req.body.idgroup,
     };
-    let query = "";
-    let response = "";
-    toCreate.usersToAdd.forEach((users) => {
-        query = squel.insert()
-            .into('public."USER_GROUP"')
-            .set('iduser', users.iduser)
-            .set('idgroup', toCreate.idgroup)
-            .toString();
+    let query = squel.insert()
+        .into('public."USER_GROUP"')
+        .set('iduser', toCreate.iduser)
+        .set('idgroup', toCreate.idgroup)
+        .toString();
 
-        db.query(query)
-            .then((row)=>{
-                response = "";
-                sender.sendResponse(sender.SUCCESS_STATUS, 'User ' + users.iduser + ' added to group ' + toCreate.idgroup + ' successfully', res)
-            })
-            .catch(e => {
-                sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while adding user ' + users.iduser + ' to group', res);
-                console.log(e);
-            })
-    })
-
-
+    db.none(query)
+        .then(()=>{
+            sender.sendResponse(sender.SUCCESS_STATUS, 'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully', res)
+        })
+        .catch(e => {
+            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while adding user ' + toCreate.iduser + ' to group', res);
+            console.log(e);
+        })
 });
 
-router.delete(('/deleteuser'), function(req, res){
+router.delete('/deleteuser', function(req, res){
 
     let toUpdate = {
         iduser : req.body.iduser,
@@ -163,11 +157,13 @@ router.get('/userFriends/:user_id/', function (req, res) {
     console.log("GET /userFriends/:user_id/");
 
     let user_id = req.params.user_id;
-    let userFriendList;
+    let userFriendList = {
+        friendlist : []
+    };
 
     _getUserFriendList(user_id)
         .then(response => {
-            userFriendList = response.data.data;
+            userFriendList.friendlist = response.data.data;
 
             console.log('userFriendList : ' + userFriendList);
 

@@ -1,7 +1,7 @@
 import {take, fork} from 'redux-saga/effects';
 import axios from 'axios';
 import {store} from '../store';
-import {idUser, LOGIN_REQUEST} from "../actions/opLogin";
+import {GET_PHOTO_USER, getPhotoUser, idUser, LOGIN_REQUEST, setPhotoUser} from "../actions/opLogin";
 import {push} from "react-router-redux";
 
 export function* requestLoginBack() {
@@ -28,6 +28,26 @@ export function* requestLoginBack() {
     }
 }
 
+export function * requestPhotoUser() {
+    while (true) {
+        let user = yield take(GET_PHOTO_USER);
+        let id = user.idUser;
+
+        let server = "http://graph.facebook.com/"+id+"/picture?redirect=false&type=normal";
+
+        axios.get(server)
+            .then(function (response) {
+                if(!!response.status && response.status === 200) {
+                    store.dispatch(setPhotoUser(response.data.data.url));
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+}
+
 export function* LoginFlow() {
     yield fork(requestLoginBack);
+    yield fork(requestPhotoUser);
 }

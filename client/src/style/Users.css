@@ -3,16 +3,6 @@
     display: inline-block;
     list-style-type: none;
     margin-right: 34px;
-    border:2px solid #212735;
-}
-
-li.first{
-    border-top-left-radius:15px;
-    border-bottom-left-radius:15px;
-}
-li.last{
-    border-top-right-radius:15px;
-    border-bottom-right-radius:15px;
 }
 
 #navlist {
@@ -25,7 +15,7 @@ li.last{
     height: 60px;
     width: 700px;
     overflow-x: auto;
-    margin-left: 114px;
+    margin-left: 115px;
 }
 
 #navlist li a {
@@ -33,6 +23,11 @@ li.last{
     color: #212735;
     padding: 10px;
     border-radius: 15px;
+}
+
+#navlist li img {
+    border-radius: 50%;
+    padding: 10px;
 }
 
 .text-centerUser {
@@ -47,5 +42,5 @@ li.last{
 }
 
 .addButton {
-    margin-top: 22px;
+    margin-top: 28px;
 }

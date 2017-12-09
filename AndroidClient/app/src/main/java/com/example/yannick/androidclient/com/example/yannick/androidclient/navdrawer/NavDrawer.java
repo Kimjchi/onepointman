@@ -1,10 +1,13 @@
-package com.example.yannick.androidclient;
+package com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,7 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +25,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
+import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
@@ -31,6 +38,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
     private Menu menu;
     private Activity thisActivity;
     private int selectedGroup = -1;
+    private String newGroupName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +162,29 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 System.out.println("Groupe 4");
                 break;
             case R.id.add_group:
-                System.out.println("Settings");
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Choisir le nom du groupe");
+
+                final EditText input = new EditText(this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setMessage("Rentrer le nouveau nom du groupe");
+
+                builder.setPositiveButton("Changer", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        newGroupName = input.getText().toString();
+                        VolleyRequester.getInstance(getApplicationContext()).createNewGroup(newGroupName);
+                    }
+                });
+                builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
                 break;
             case R.id.nav_logout:
                 System.out.println("Logout");

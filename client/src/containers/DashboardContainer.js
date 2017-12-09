@@ -12,10 +12,10 @@ class DashboardContainer extends Component {
     render() {
         return (
             <div>
-            <OptionsContainer/>
+                <OptionsContainer/>
                 <UsersContainer/>
-            <MapContainer/>
-            <GroupsContainer/>
+                <MapContainer/>
+                <GroupsContainer/>
             </div>
         )
     }

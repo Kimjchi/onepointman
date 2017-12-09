@@ -18,7 +18,7 @@
     <string name="descriptionApp">Il est temps de retrouver vos amis, en avant (Guingamp)!</string>
     <string name="title_activity_nav_drawer">NavDrawer</string>
     <string name="title_activity_settings_group">SettingsGroup</string>
-
+    <string name="title_activity_add_user_to_group">AddUserToGroup</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

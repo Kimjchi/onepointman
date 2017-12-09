@@ -5,6 +5,8 @@ export const CHANGE_GROUPS = 'CHANGE_GROUPS';
 export const GET_PHOTO = 'GET_PHOTO';
 export const SET_PHOTO = 'SET_PHOTO';
 export const GET_INFOS_GROUP = 'GET_INFOS_GROUP';
+export const SEND_CHANGE_NAME = 'SEND_CHANGE_NAME';
+export const CHANGE_GROUP_ID = 'CHANGE_GROUP_ID';
 
 export function changeGroupName (groupName){
     return {type: CHANGE_GROUP_NAME, groupName}
@@ -32,4 +34,12 @@ export function setPhoto(idUser, url) {
 
 export function getInfosGroup(idUser, idGroup) {
     return {type: GET_INFOS_GROUP, idUser, idGroup}
+}
+
+export function sendChangeName(idGroup, groupName, idUser) {
+    return {type: SEND_CHANGE_NAME, idUser, idGroup, groupName}
+}
+
+export function changeGroupId(id) {
+    return {type: CHANGE_GROUP_ID, id}
 }

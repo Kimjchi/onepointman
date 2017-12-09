@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import {addGroup, changeGroupName, getGroups, getInfosGroup} from "../actions/opGroups";
+import {addGroup, changeGroupId, changeGroupName, getGroups, getInfosGroup, sendChangeName} from "../actions/opGroups";
 import GroupsComponent from "../components/GroupsComponent";
 import {addUser} from "../actions/opUsers";
 
@@ -12,7 +12,7 @@ class GroupsContainer extends Component {
     }
 
     render() {
-        let {groups, groupName} = this.props.opGroups;
+        let {groups, groupName, idGroup} = this.props.opGroups;
         let {groupsUsers} = this.props.opUsers;
         let {urlPhoto, idUser} = this.props.opLogin;
         return (
@@ -24,7 +24,10 @@ class GroupsContainer extends Component {
                              addGroup={this.props.addGroup}
                              addUser={this.props.addUser}
                              idUser={idUser}
+                             idGroup={idGroup}
                              photoUser={urlPhoto}
+                             sendChangeName={this.props.sendChangeName}
+                             changeGroupId={this.props.changeGroupId}
             />
         )
     }
@@ -54,6 +57,12 @@ const  mapDispatchToProps = (dispatch) => {
         },
         getGroups: (idUser) => {
             dispatch(getGroups(idUser));
+        },
+        sendChangeName: (idGroup, groupName, idUser) => {
+            dispatch(sendChangeName(idGroup, groupName, idUser));
+        },
+        changeGroupId: (id) => {
+            dispatch(changeGroupId(id));
         }
     }
 };

@@ -83,7 +83,7 @@ router.post(('/updateposition'), function (req, res) {
         });
 });
 
-router.post(('/updatepositionsharing'), function(req, res){
+router.post(('/updatepositionsharing/'), function(req, res){
 
     let toUpdate = {
         iduser : req.body.iduser,
@@ -130,7 +130,7 @@ router.post('/createuser/', function (req, res) {
         })
 });
 
-router.delete('/deleteuser', function(req, res){
+router.delete('/deleteuser/', function(req, res){
 
     let toUpdate = {
         iduser : req.body.iduser,

@@ -321,15 +321,17 @@ public class VolleyRequester
                 JSONObject pinPoint =  json.getJSONArray("pinpoints").getJSONObject(i);
                 int idPinPoint = pinPoint.getInt("idpinpoint");
                 int idCreator = pinPoint.getInt("idcreator");
+                String userName = pinPoint.getString("prenomcreator") + " " + pinPoint.getString("nomcreator");
                 double lt = Double.parseDouble(pinPoint.getString("pinlt"));
                 double lg = Double.parseDouble(pinPoint.getString("pinlg"));
+                String daterdv = pinPoint.getString("daterdv");
                 String desc = pinPoint.getString("description");
 
-                String pinPointTitle = "Point de rdv n°" + idPinPoint
-                        + "Point de rdv n°" + idPinPoint + "\r\n";
+                String pinPointTitle = "Point de rdv n°" + idPinPoint;
 
 
-                String pinPointSnippet = "Createur:" + idCreator +"\r\n"
+                String pinPointSnippet = "Date: " + daterdv + "\r\n"
+                        + "Createur: " + userName + "\r\n"
                         + "Description: " + desc;
 
                 MarkerOptions marker = new MarkerOptions()
@@ -342,19 +344,22 @@ public class VolleyRequester
                 MapFragment activity = MapFragment.instance;
                 activity.addMarker("Pinpoint" + idPinPoint, marker);
             }
-
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
             for(int i=0; i< json.getJSONArray("userpositions").length(); i++) {
-                JSONObject usersPosition =  json.getJSONArray("userpositions").getJSONObject(i);
-
+                JSONObject usersPosition = json.getJSONArray("userpositions").getJSONObject(i);
                 int iduser = usersPosition.getInt("iduser");
+                String userName = usersPosition.getString("prenom") + " " +usersPosition.getString("nom");
                 double userlt = Double.parseDouble(usersPosition.getString("userlt"));
                 double userlg = Double.parseDouble(usersPosition.getString("userlg"));
                 String dateposition = usersPosition.getString("dateposition");
 
-                String usersPositionTitle = "IdUser" + iduser;
+                String usersPositionTitle = userName;
                 String usersPositionSnippet = "Date dernière position:" + dateposition;
                 float color;
-                if (usersPosition.getBoolean("current")){
+                if (usersPosition.getBoolean("current")) {
                     color = BitmapDescriptorFactory.HUE_GREEN;
                 } else {
                     color = BitmapDescriptorFactory.HUE_RED;
@@ -369,6 +374,7 @@ public class VolleyRequester
 
                 MapFragment activity = MapFragment.instance;
                 activity.addMarker(Integer.toString(iduser), marker);
+
             }
         } catch (JSONException e) {
             e.printStackTrace();

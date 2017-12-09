@@ -194,8 +194,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public AlertDialog popupBuilder(Marker marker){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // 2. Chain together various setter methods to set the dialog characteristics
-        builder.setMessage("Info Marker:\r\n" + marker.getSnippet())
+        builder.setMessage(marker.getSnippet())
                 .setTitle(marker.getTitle());
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

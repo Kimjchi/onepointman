@@ -29,7 +29,7 @@ public class AddUserToGroup extends AppCompatActivity
         setContentView(R.layout.activity_add_user_to_group);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.addUserToGroupToolbar);
-        toolbar.setTitle(getIntent().getExtras().get("groupName").toString());
+        toolbar.setTitle("Ajouter à " + getIntent().getExtras().get("groupName").toString());
 
         setSupportActionBar(toolbar);
 

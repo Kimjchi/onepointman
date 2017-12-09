@@ -12,6 +12,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -377,7 +379,7 @@ public class VolleyRequester
     public void deleteUserFromGroup(final long itemId, final int groupId)
     {
         String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
-
+        System.out.println(json);
         try
         {
             JSONObject bodyJson = new JSONObject(json);
@@ -391,7 +393,7 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.v("DELETE_USER", "Fail to delete user "+itemId + "from group "+groupId);
+                    Log.v("DELETE_USER", "Fail to delete user "+itemId + " from group "+groupId + " : "+error.getMessage());
                 }
             });
             this.addToRequestQueue(deleteRequest);
@@ -441,6 +443,7 @@ public class VolleyRequester
                     {
                         try
                         {
+                            System.out.println(response.toString());
                             final JSONArray array = (JSONArray) response.get("friendlist");
                             for(int i=0; i<array.length(); i++)
                             {
@@ -449,20 +452,21 @@ public class VolleyRequester
                                 final int id = user.getInt("id");
                                 final String name = user.getString("name");
 
-                                for(UserModelSettings tmpUser : users)
+                                if(users != null)
                                 {
-                                    if(id == tmpUser.getId())
+                                    for(UserModelSettings tmpUser : users)
                                     {
-                                        notFound = false;
-                                        toFill.add(new UserModelAdd(name, id, tmpUser.getGroupId(), true));
-                                        break;
+                                        if(id == tmpUser.getId())
+                                        {
+                                            notFound = false;
+                                            toFill.add(new UserModelAdd(name, id, tmpUser.getGroupId(), true));
+                                            break;
+                                        }
                                     }
                                 }
-                                if (notFound)
-                                {
-                                    toFill.add(new UserModelAdd(name, id, idGroup, false));
-                                }
                             }
+
+                            Log.v("FRIENDS_LIST", "Done, friends list bien retrieve");
                         }
                         catch(Exception ex)
                         {
@@ -476,5 +480,38 @@ public class VolleyRequester
             }
         });
         this.addToRequestQueue(grpRequest);
+    }
+
+    public void createNewGroup(final String newGroupName)
+    {
+        JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.GET,
+                URL_SERVEUR + "groups/create/"+newGroupName, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        Log.v("CREATE_GROUP", "Groupe "+newGroupName+ " bien cree");
+                        Intent addUserToGroupIntent = new Intent(context, AddUserToGroup.class);
+                        addUserToGroupIntent.putExtra("groupName", newGroupName);
+                        addUserToGroupIntent.putExtra("groupId", 2789);
+                        addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                        context.startActivity(addUserToGroupIntent);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Erreur lors de la création de groupe")
+                        .setMessage(error.getMessage())
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        }).show();
+                Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
+            }
+        });
+        this.addToRequestQueue(deleteRequest);
     }
 }

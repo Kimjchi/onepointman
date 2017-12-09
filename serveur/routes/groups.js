@@ -110,6 +110,13 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
             result.forEach(element => {
 
                 // CHECK SI LA DATE est supérieure de 1 jour de plus de la date de RDV. sinon ne
+                let currentTime = new Date();
+                let diff = currentTime - element.daterdv;// donne la diff en millisecondes
+                let dontPush = false;
+                if(diff > 8.64e+7){// le nombre de millisecs en 1 jour hehe
+                    dontPush = true;
+                }
+                console.log(diff);
                 //pas renvoyer
                 let pinpoint = {
                     idpinpoint: element.idpinpoint,
@@ -122,11 +129,13 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
                     daterdv:element.daterdv
                 };
                 //si la date est ok on le push dans l'array
-                JSONToReturn.pinpoints.push(pinpoint);
+                if(!dontPush){
+                    JSONToReturn.pinpoints.push(pinpoint);
+
+                }
             });
             db.any(getUsersPositions(idgroup))
                 .then((userpositions) => {
-                console.log(getUsersPositions(idgroup));
 
                     let currentDate = new Date();
                     let userCorrectRequest = false;
@@ -190,7 +199,6 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
                 message: e.toString()
             })
         });
-    console.log(requete);
 
 
 });
@@ -288,7 +296,6 @@ router.get('/drawings/:iduser/:idgroup', function(req,res){
 });
 
 
-
 let getDrawings = (idgroup) =>
     squel.select()
         .from('public."DRAWING"', 'draw')
@@ -305,6 +312,7 @@ let getDrawings = (idgroup) =>
         .where('draw.idgroup = ?', idgroup)
         .toString();
 
+
 router.get('/creategroup/:group_name/', function (req, res) {
 
     let groupName = req.params.group_name;
@@ -320,7 +328,7 @@ router.get('/creategroup/:group_name/', function (req, res) {
         .then((row)=>{
             let response = {
                 idgroup : row.idgroup
-            }
+            };
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e => {

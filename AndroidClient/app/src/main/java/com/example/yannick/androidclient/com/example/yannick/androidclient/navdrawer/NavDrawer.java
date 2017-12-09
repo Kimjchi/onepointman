@@ -25,7 +25,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;

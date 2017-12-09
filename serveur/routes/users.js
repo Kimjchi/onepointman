@@ -83,7 +83,7 @@ router.post(('/updateposition'), function (req, res) {
         });
 });
 
-router.post(('/updatepositionsharing'), function(req, res){
+router.post(('/updatepositionsharing/'), function(req, res){
 
     let toUpdate = {
         iduser : req.body.iduser,
@@ -108,8 +108,30 @@ router.post(('/updatepositionsharing'), function(req, res){
         })
 });
 
-router.delete(('/deleteuser'), function(req, res){
+router.post('/createuser/', function (req, res) {
 
+    let toCreate = {
+        iduser: req.body.iduser,
+        idgroup: req.body.idgroup,
+    };
+    let query = squel.insert()
+        .into('public."USER_GROUP"')
+        .set('iduser', parseInt(toCreate.iduser))
+        .set('idgroup', parseInt(toCreate.idgroup))
+        .toString();
+
+    db.none(query)
+        .then(()=>{
+            sender.sendResponse(sender.SUCCESS_STATUS, 'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully', res)
+        })
+        .catch(e => {
+            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while adding user ' + toCreate.iduser + ' to group', res);
+            console.log(e);
+        })
+});
+
+router.delete('/deleteuser/', function(req, res){
+    console.log(req.body);
     let toUpdate = {
         iduser : req.body.iduser,
         idgroup : req.body.idgroup,
@@ -117,10 +139,10 @@ router.delete(('/deleteuser'), function(req, res){
 
     let query = squel.delete()
         .from('public."USER_GROUP"')
-        .where('iduser = ?', toUpdate.iduser)
-        .where('idgroup = ?', toUpdate.idgroup)
+        .where('iduser = ?', parseInt(toUpdate.iduser))
+        .where('idgroup = ?', parseInt(toUpdate.idgroup))
         .toString();
-
+    console.log(query);
     db.query(query)
         .then(()=>{
             sender.sendResponse(sender.SUCCESS_STATUS, 'User deleted from group successfully', res)

@@ -12,6 +12,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -21,6 +22,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.UserAdapterAdd;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -35,7 +37,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by yannick on 05/12/17.
@@ -46,8 +51,8 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    //private final String URL_SERVEUR = "http://10.42.0.1:3001";
-    private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    private final String URL_SERVEUR = "http://192.168.0.108:3001";
+    //private final String URL_SERVEUR = "http://192.168.137.1:3001";
 
     private VolleyRequester(Context context)
     {
@@ -159,7 +164,7 @@ public class VolleyRequester
 
     public void groupsRequest(){
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
-                URL_SERVEUR + "/groups/2", null,
+                URL_SERVEUR + "/groups/"+FacebookInfosRetrieval.user_id, null,
                 new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -181,7 +186,7 @@ public class VolleyRequester
     public void displayGroupForNavDrawer(final Menu menuNavDrawer)
     {
         JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET,
-                URL_SERVEUR + "/groups/2", null,
+                URL_SERVEUR + "/groups/"+FacebookInfosRetrieval.user_id, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response)
@@ -201,11 +206,12 @@ public class VolleyRequester
                                 {
                                     final JSONObject user = (JSONObject) membres.get(j);
                                     users.add(new UserModelSettings(user.getString("prenom") + user.getString("nomuser"),
-                                            user.getInt("iduser"), id));
+                                            user.get("iduser").toString(), id));
                                 }
                                 MenuItem mi = menuNavDrawer.findItem(R.id.groups)
                                         .getSubMenu().add(0, id, i, name);
                                 mi.setIcon(R.drawable.group);
+
                                 ImageButton settingsButton = new ImageButton(context);
                                 settingsButton.setImageResource(R.drawable.bouton_style);
                                 settingsButton.setBackgroundResource(0);
@@ -326,11 +332,14 @@ public class VolleyRequester
                 double lg = Double.parseDouble(pinPoint.getString("pinlg"));
                 String daterdv = pinPoint.getString("daterdv");
                 String desc = pinPoint.getString("description");
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                Date date = format.parse(daterdv);
+                String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
 
                 String pinPointTitle = "Point de rdv n°" + idPinPoint;
 
 
-                String pinPointSnippet = "Date: " + daterdv + "\r\n"
+                String pinPointSnippet = "Date: " + dateDisplayed + "\r\n"
                         + "Createur: " + userName + "\r\n"
                         + "Description: " + desc;
 
@@ -346,6 +355,8 @@ public class VolleyRequester
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
         try {
             for(int i=0; i< json.getJSONArray("userpositions").length(); i++) {
@@ -355,9 +366,13 @@ public class VolleyRequester
                 double userlt = Double.parseDouble(usersPosition.getString("userlt"));
                 double userlg = Double.parseDouble(usersPosition.getString("userlg"));
                 String dateposition = usersPosition.getString("dateposition");
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                Date date = format.parse(dateposition);
+                String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
+
 
                 String usersPositionTitle = userName;
-                String usersPositionSnippet = "Date dernière position:" + dateposition;
+                String usersPositionSnippet = "Date dernière position:\r\n" + dateDisplayed;
                 float color;
                 if (usersPosition.getBoolean("current")) {
                     color = BitmapDescriptorFactory.HUE_GREEN;
@@ -378,10 +393,12 @@ public class VolleyRequester
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 
-    public void deleteUserFromGroup(final long itemId, final int groupId)
+    public void deleteUserFromGroup(final String itemId, final int groupId)
     {
         String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
         System.out.println(json);
@@ -409,7 +426,7 @@ public class VolleyRequester
         }
     }
 
-    public void addUserToGroup(long itemId, int groupId)
+    public void addUserToGroup(String itemId, int groupId)
     {
         String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
 
@@ -438,7 +455,7 @@ public class VolleyRequester
         }
     }
 
-    public void retreiveUserFriendList(final ArrayList<UserModelSettings> users, final ArrayList<UserModelAdd> toFill, final int idGroup)
+    public void retreiveUserFriendList(final ArrayList<UserModelSettings> users, final ArrayList<UserModelAdd> toFill, final int idGroup, final ListView listView)
     {
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
                 URL_SERVEUR + "/users/userFriends/"+FacebookInfosRetrieval.user_id, null,
@@ -448,28 +465,34 @@ public class VolleyRequester
                     {
                         try
                         {
-                            System.out.println(response.toString());
-                            final JSONArray array = (JSONArray) response.get("friendlist");
+                            JSONArray array = (JSONArray) response.get("friendlist");
                             for(int i=0; i<array.length(); i++)
                             {
                                 boolean notFound = true;
-                                final JSONObject user = (JSONObject) array.get(i);
-                                final int id = user.getInt("id");
-                                final String name = user.getString("name");
+                                JSONObject user = (JSONObject) array.get(i);
+                                String id = user.getString("id");
+                                String name = user.getString("name");
 
                                 if(users != null)
                                 {
                                     for(UserModelSettings tmpUser : users)
                                     {
-                                        if(id == tmpUser.getId())
+                                        if(id.equals(tmpUser.getId()))
                                         {
                                             notFound = false;
-                                            toFill.add(new UserModelAdd(name, id, tmpUser.getGroupId(), true));
                                             break;
                                         }
                                     }
                                 }
+
+                                if(notFound)
+                                {
+                                    toFill.add(new UserModelAdd(name, id, idGroup, false));
+                                }
                             }
+
+                            UserAdapterAdd userAdapter = new UserAdapterAdd(toFill, context);
+                            listView.setAdapter(userAdapter);
 
                             Log.v("FRIENDS_LIST", "Done, friends list bien retrieve");
                         }
@@ -490,7 +513,7 @@ public class VolleyRequester
     public void createNewGroup(final String newGroupName)
     {
         JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.GET,
-                URL_SERVEUR + "groups/create/"+newGroupName, null,
+                URL_SERVEUR + "/groups/create/"+newGroupName, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response)

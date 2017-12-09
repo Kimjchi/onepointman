@@ -16,8 +16,6 @@ export default function reducer (state = initialState, action ){
 
         case CHANGE_GROUP_NAME:
             return {...state ,groupName: action.groupName , error:''};
-        case ADD_GROUP:
-            return {...state ,groups: action.arrayGroups , error:'', groupName: ''};
         case CHANGE_GROUPS:
             return {...state, groups: action.groups, error:''};
         case SET_PHOTO:

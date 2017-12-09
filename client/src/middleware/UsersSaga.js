@@ -2,9 +2,12 @@ import {take, fork} from 'redux-saga/effects';
 import axios from 'axios';
 import {store} from '../store';
 import {
-    ADD_USER_TEST, changeFriends, changeUsers, DELETE_USER_TEST, GET_FRIENDS, GET_USERS,
-    getUsers
+    ADD_USER_GROUP,
+    changeFriends, changeUsers, DELETE_USER_TEST, GET_FRIENDS, GET_PHOTO_FRIENDS, GET_USERS,
+    getPhotoFriends,
+    getUsers, SEND_DELETE_USER, setFriends, setPhotoFriends
 } from "../actions/opUsers";
+import {getGroups} from "../actions/opGroups";
 
 export function * requestUsersGroup() {
     while (true) {
@@ -34,21 +37,20 @@ export function * requestUsersGroup() {
 
 export function * requestAddUsers() {
     while (true) {
-        let user = yield take(ADD_USER_TEST);
-        let id = user.idUser;
-        let idusers = user.users;
+        let user = yield take(ADD_USER_GROUP);
+        let idUser = user.idUser;
+        let id = user.idToAdd;
         let idGroup = user.idGroup;
 
-        let server = "http://localhost:3001/groups/addUser";
+        let server = "http://localhost:3001/users/createuser";
 
         axios.post(server, {
-            users: idusers,
-            idGroup: idGroup
+            iduser: id,
+            idgroup: idGroup
         })
             .then(function (response) {
-                if (!!response.data.status && response.data.status === 'success') {
-                    alert('L\'ajout d\'un membre au groupe est un succès !');
-                    store.dispatch(getUsers(idGroup, id));
+                if (!!response.status && response.status === 200) {
+                    store.dispatch(getGroups(idUser));
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);
@@ -65,17 +67,25 @@ export function * requestAddUsers() {
 
 export function * requestDeleteUser() {
     while (true) {
-        let user = yield take(DELETE_USER_TEST);
-        let id = user.idUser;
+        let user = yield take(SEND_DELETE_USER);
+        let idUser = user.idUser;
+        let id = user.user.iduser;
         let idGroup = user.idGroup;
 
-        let server = "http://localhost:3001/"+idGroup+"/"+id;
-
-        axios.delete(server)
+        let server = "http://localhost:3001/users/deleteuser";
+        let config = {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {
+                iduser: id,
+                idgroup: idGroup,
+            }
+        };
+        axios.delete(server, config)
             .then(function (response) {
-                if (!!response.data.status && response.data.status === 'success') {
-                    alert('La suppression d\'un membre du groupe est un succès !');
-                    store.dispatch(getUsers(idGroup, id));
+                if (!!response.status && response.status === 200) {
+                    store.dispatch(getGroups(idUser));
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);
@@ -95,15 +105,17 @@ export function * requestFriends() {
         let user = yield take(GET_FRIENDS);
         let id = user.idUser;
 
-        let server = "http://localhost:3001/friends/"+id;
-
+        let server = "http://localhost:3001/users/userFriends/"+id;
         axios.get(server)
             .then(function (response) {
-                if (!!response.data.status && response.data.status === 'success') {
-                    alert('La récupération des amis est un succès !');
-                    store.dispatch(changeFriends(response.data.message));
+                if (!!response.status && response.status === 200) {
+                    let friends = response.data.friendlist;
+                    store.dispatch(setFriends(friends));
+                    friends.forEach(friend => {
+                        store.dispatch(getPhotoFriends(friend.id));
+                    })
                 }
-                else if(response.data.status === 'fail') {
+                else if(response.status === 'fail') {
                     alert(response.data.message);
                 }
                 else {
@@ -116,10 +128,29 @@ export function * requestFriends() {
     }
 }
 
+export function * requestPhoto() {
+    while (true) {
+        let user = yield take(GET_PHOTO_FRIENDS);
+        let id = user.idFriend;
+
+        let server = "https://graph.facebook.com/"+id+"/picture?redirect=false&type=normal";
+
+        axios.get(server)
+            .then(function (response) {
+                if(!!response.status && response.status === 200) {
+                    store.dispatch(setPhotoFriends(id, response.data.data.url));
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+}
 
 export function * UsersFlow() {
     yield fork(requestUsersGroup);
     yield fork(requestAddUsers);
     yield fork(requestDeleteUser);
     yield fork(requestFriends);
+    yield fork(requestPhoto);
 }

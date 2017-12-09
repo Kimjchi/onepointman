@@ -10,12 +10,12 @@ public class UserModelAdd extends UserModelSettings
 {
     private boolean isInGroup;
 
-    public UserModelAdd(String name, int id, int groupId) {
+    public UserModelAdd(String name, String id, int groupId) {
         super(name, id, groupId);
         isInGroup = true;
     }
 
-    public UserModelAdd(String name, int id, int groupId, boolean isInGroup)
+    public UserModelAdd(String name, String id, int groupId, boolean isInGroup)
     {
         super(name, id, groupId);
         this.isInGroup = isInGroup;

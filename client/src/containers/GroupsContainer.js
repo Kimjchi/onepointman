@@ -45,8 +45,8 @@ const  mapDispatchToProps = (dispatch) => {
         changeGroupName: (groupName) => {
             dispatch(changeGroupName(groupName));
         },
-        addGroup: (arrayGroups) => {
-            dispatch(addGroup(arrayGroups));
+        addGroup: (groupName, idUser) => {
+            dispatch(addGroup(groupName, idUser));
         },
         addUser: (arrayUsers, idGroup, idUser) => {
             dispatch(addUser(arrayUsers, idGroup));

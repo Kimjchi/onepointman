@@ -17,9 +17,7 @@ class GroupsComponent extends Component {
     }
 
     _addGroup() {
-        let array = this.props.groups;
-        array.push({nom: this.props.groupName});
-        this.props.addGroup(array);
+        this.props.addGroup(this.props.groupName, this.props.idUser);
     }
 
     _open() {

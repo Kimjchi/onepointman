@@ -4,6 +4,8 @@ const db = require('../connection');
 const squelb = require('squel');
 const squel = squelb.useFlavour('postgres');
 
+const sender = require('../sender');
+
 //donne les groupes auxquels appartient un utilisateur + les membres du groupe
 router.get('/:iduser/', function (req, res) {
     let iduser = req.params.iduser;
@@ -238,5 +240,29 @@ function compareTimes(currentTime, lastLocationTime){
 
 
 }
+
+router.get('/creategroup/:group_name/', function (req, res) {
+
+    let groupName = req.params.group_name;
+    let currentTime = new Date();
+    let query = squel.insert()
+        .into('public."GROUP"')
+        .set('nom', groupName)
+        .set('creationdate', currentTime.toISOString())
+        .returning('idgroup')
+        .toString();
+
+    db.one(query)
+        .then((row)=>{
+            let response = {
+                idgroup : row.idgroup
+            }
+            sender.sendResponse(sender.SUCCESS_STATUS, response, res)
+        })
+        .catch(e => {
+            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Failed to create group', res);
+            console.log(e);
+        })
+});
 
 module.exports = router;

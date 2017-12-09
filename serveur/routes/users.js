@@ -143,6 +143,8 @@ router.get('/userFriends/:user_id/', function (req, res) {
         .then(response => {
             userFriendList.friendlist = response.data.data;
 
+            console.log('userAccessToken : ' + facebookdata.userAccessToken);
+            
             console.log('userFriendList : ' + userFriendList);
 
             sender.sendResponse(sender.SUCCESS_STATUS, userFriendList, res)

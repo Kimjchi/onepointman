@@ -43,6 +43,7 @@ router.post('/updateposition', function (req, res) {
                             status: 'fail',
                             message: 'failing to update userposition in a group'
                         });
+                        console.log('failed at updating position in group');
                     });
                 }
             });
@@ -106,6 +107,8 @@ router.get('/userFriends/:user_id/', function (req, res) {
 
     _getUserFriendList(user_id).then(function (response) {
         userFriendList.friendlist = response.data.data;
+
+        console.log('userAccessToken : ' + facebookdata.userAccessToken);
 
         console.log('userFriendList : ' + userFriendList);
 

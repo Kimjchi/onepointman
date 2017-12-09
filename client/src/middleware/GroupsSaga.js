@@ -1,7 +1,10 @@
 import {take, fork} from 'redux-saga/effects';
 import axios from 'axios';
 import {store} from '../store';
-import {ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_PHOTO, getGroups, getPhoto, setPhoto} from "../actions/opGroups";
+import {
+    ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_PHOTO, getGroups, getPhoto,
+    setPhoto
+} from "../actions/opGroups";
 import {changeUsers} from "../actions/opUsers";
 
 export function * requestGroups() {
@@ -99,8 +102,29 @@ export function * requestPhoto() {
     }
 }
 
+export function * requestInfosGroup() {
+    while (true) {
+        let user = yield take(GET_INFOS_GROUP);
+        let idUser = user.idUser;
+        let idGroup = user.idGroup;
+
+        let server = "http://localhost:3001/groups/positions/"+idUser+"/"+idGroup;
+
+        axios.get(server)
+            .then(function (response) {
+                if(!!response.data.status && response.data.status === 'success') {
+                    console.log(response.data.message);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+}
+
 export function * GroupsFlow() {
     yield fork(requestGroups);
     yield fork(requestAddGroup);
     yield fork(requestPhoto);
+    yield fork(requestInfosGroup);
 }

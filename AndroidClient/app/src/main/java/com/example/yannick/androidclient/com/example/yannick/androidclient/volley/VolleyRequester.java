@@ -4,14 +4,23 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.location.Location;
+import android.support.v4.widget.CompoundButtonCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -208,7 +217,7 @@ public class VolleyRequester
                                 }
                                 MenuItem mi = menuNavDrawer.findItem(R.id.groups)
                                         .getSubMenu().add(0, id, i, name);
-                                mi.setIcon(R.drawable.group);
+                                //mi.setIcon(R.drawable.group);
                                 ImageButton settingsButton = new ImageButton(context);
                                 settingsButton.setImageResource(R.drawable.bouton_style);
                                 settingsButton.setBackgroundResource(0);
@@ -223,7 +232,30 @@ public class VolleyRequester
                                         context.startActivity(settings);
                                     }
                                 });
-                                mi.setActionView(settingsButton);
+
+                                CheckBox sharingPositionBox = new CheckBox(context);
+                                int states[][] = {{android.R.attr.state_checked}, {}};
+
+                                int colors[] = {Color.BLACK, Color.BLACK};
+                                CompoundButtonCompat.setButtonTintList(sharingPositionBox, new ColorStateList(states, colors));
+                                sharingPositionBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                    @Override
+                                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                        if (b){
+                                            Log.v("CHECKBOX","Checked");
+                                        }else{
+                                            Log.v("CHECKBOX","Unchecked");
+                                        }
+                                    }
+                                });
+
+                                LinearLayout test = new LinearLayout(context);
+                                test.addView(sharingPositionBox);
+                                test.addView(settingsButton);
+                                test.setGravity(Gravity.CENTER_VERTICAL);
+                                test.setBaselineAligned(true);
+
+                                mi.setActionView(test);
                                 mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                                     @Override
                                     public boolean onMenuItemClick(MenuItem menuItem) {

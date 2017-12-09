@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
@@ -70,7 +71,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_map, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+        Button upButton = (Button) view.findViewById(R.id.center_position);
+        upButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.v("BOUTTON", "Clic");
+                if ((mMap != null)&& (markers.get("_MY_SELF_")!= null)){
+                    LatLng ltLg = markers.get("_MY_SELF_").getPosition();
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ltLg, 15));
+                } else{
+                    Toast.makeText(getActivity().getApplicationContext(), "Impossible de trouver votre position...:", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        return view;
     }
 
     @Override
@@ -94,7 +110,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                popupBuilder(marker).show();
+                popupBuilderInfoMarker(marker).show();
                 //Toast.makeText(getActivity().getApplicationContext(), "Description: " + marker.getSnippet(), Toast.LENGTH_LONG).show();
                 return false;
             }
@@ -315,16 +331,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
     public void updateDisplayMarkers(){
-        mMap.clear();
-        for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
-            mMap.addMarker(marker.getValue());
-        }
-        for (Map.Entry<String, MarkerOptions> pinPoint : pinPoints.entrySet()) {
-            mMap.addMarker(pinPoint.getValue());
+        if (mMap != null) {
+            mMap.clear();
+            for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
+                mMap.addMarker(marker.getValue());
+            }
+            for (Map.Entry<String, MarkerOptions> pinPoint : pinPoints.entrySet()) {
+                mMap.addMarker(pinPoint.getValue());
+            }
         }
     }
 
-    public AlertDialog popupBuilder(Marker marker){
+    public AlertDialog popupBuilderInfoMarker(Marker marker){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(marker.getSnippet())
                 .setTitle(marker.getTitle());
@@ -337,7 +355,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // 3. Get the AlertDialog from create()
         return builder.create();
     }
-
 
     private void updateLabel(EditText datePickerPlaceholder) {
         String myFormat = "dd/MM/yyyy"; //In which you need put here

@@ -56,7 +56,7 @@ class UsersComponent extends Component {
         this.setState({ showModal: false });
     }
 
-    _open2(user, event) {
+    _open2(user) {
         this.props.changeDeleteUser(user);
         this.setState({ showModal2: true });
     }
@@ -118,7 +118,13 @@ class UsersComponent extends Component {
                         <ul className="navlist">
                             {
                                 this.props.friends.map((friend, index) => {
-                                    if(friend.urlPhoto) {
+                                    let duplicate = false;
+                                    this.props.users.forEach((user) => {
+                                        if(user.iduser === friend.id) {
+                                            duplicate = true;
+                                        }
+                                    });
+                                    if(!duplicate) {
                                         return <li key={index} id={"listFriend"+friend.id} onClick={this._friendsToAdd.bind(this, friend)}><img src={friend.urlPhoto} alt="photo de profil" height="70" width="70"/>{friend.name}</li>
                                     }
                                 })

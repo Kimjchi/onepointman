@@ -4,15 +4,24 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.location.Location;
+import android.support.v4.widget.CompoundButtonCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -21,6 +30,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.UserAdapterAdd;
@@ -164,8 +174,9 @@ public class VolleyRequester
     }
 
     public void groupsRequest(){
+        String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
-                URL_SERVEUR + "/groups/"+FacebookInfosRetrieval.user_id, null,
+                URL_SERVEUR + "/groups/"+ idUser, null,
                 new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -186,8 +197,9 @@ public class VolleyRequester
 
     public void displayGroupForNavDrawer(final Menu menuNavDrawer)
     {
+        String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET,
-                URL_SERVEUR + "/groups/"+FacebookInfosRetrieval.user_id, null,
+                URL_SERVEUR + "/groups/" + idUser, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response)
@@ -201,6 +213,7 @@ public class VolleyRequester
                                 final JSONObject groupe = (JSONObject) array.get(i);
                                 final int id = groupe.getInt("idgroup");
                                 final String name = groupe.getString("nomgroup");
+                                //final boolean isSharing = groupe.getBoolean("issharing");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
                                 final ArrayList<UserModelSettings> users = new ArrayList<>();
                                 for(int j=0; j<membres.length(); j++)
@@ -211,8 +224,7 @@ public class VolleyRequester
                                 }
                                 MenuItem mi = menuNavDrawer.findItem(R.id.groups)
                                         .getSubMenu().add(0, id, i, name);
-                                mi.setIcon(R.drawable.group);
-
+                                //mi.setIcon(R.drawable.group);
                                 ImageButton settingsButton = new ImageButton(context);
                                 settingsButton.setImageResource(R.drawable.bouton_style);
                                 settingsButton.setBackgroundResource(0);
@@ -227,11 +239,36 @@ public class VolleyRequester
                                         context.startActivity(settings);
                                     }
                                 });
-                                mi.setActionView(settingsButton);
+
+                                CheckBox sharingPositionBox = new CheckBox(context);
+                                int states[][] = {{android.R.attr.state_checked}, {}};
+
+                                int colors[] = {Color.BLACK, Color.BLACK};
+                                CompoundButtonCompat.setButtonTintList(sharingPositionBox, new ColorStateList(states, colors));
+                                sharingPositionBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                    @Override
+                                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                        if (b){
+                                            Log.v("CHECKBOX","Checked");
+                                            updateLocationSharing(true, id);
+                                        }else{
+                                            Log.v("CHECKBOX","Unchecked");
+                                            updateLocationSharing(false, id);
+                                        }
+                                    }
+                                });
+
+                                LinearLayout test = new LinearLayout(context);
+                                test.addView(sharingPositionBox);
+                                test.addView(settingsButton);
+                                test.setGravity(Gravity.CENTER_VERTICAL);
+                                test.setBaselineAligned(true);
+
+                                mi.setActionView(test);
                                 mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                                     @Override
                                     public boolean onMenuItemClick(MenuItem menuItem) {
-                                        System.out.println("Clicked on "+menuItem.getItemId());
+                                        System.out.println("Clicked on " + menuItem.getItemId());
                                         return false;
                                     }
                                 });
@@ -248,6 +285,37 @@ public class VolleyRequester
         });
         VolleyRequester.getInstance(context).addToRequestQueue(setGroups);
     }
+
+
+    public void updateLocationSharing(boolean share, int idGroup){
+        String idUser = FacebookInfosRetrieval.user_id;
+        String json = "{\"iduser\":"+ idUser + ",\"idgroup\":"
+                + idGroup + ",\"positionSharing\":" + share +"}";
+
+        try {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest postMyPosition = new JsonObjectRequest (Request.Method.POST,
+                    URL_SERVEUR + "/users/updatepositionsharing/", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                        Log.v("SHARING POSITION", "Partage de position mis à jour!");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // TODO Auto-generated method stub
+                    //MDR LÉ EREUR C POUR LÉ FèBLe
+                    Toast.makeText(context,"Serveur indisponible, partage de position mis à jour!", Toast.LENGTH_SHORT);
+                }
+            });
+            this.addToRequestQueue(postMyPosition);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     /*Pour request du JSON:
         https://developer.android.com/training/volley/request.html
@@ -293,7 +361,6 @@ public class VolleyRequester
     public void groupPositionUpdate(int group){
 
         String idUser = FacebookInfosRetrieval.user_id;
-        //String idUser = "3";
         JsonObjectRequest grpInfoRequest = new JsonObjectRequest (Request.Method.GET,
                 URL_SERVEUR + "/groups/positions/" + idUser + "/" + group, null,
                 new Response.Listener<JSONObject>() {
@@ -333,7 +400,7 @@ public class VolleyRequester
                 double lg = Double.parseDouble(pinPoint.getString("pinlg"));
                 String daterdv = pinPoint.getString("daterdv");
                 String desc = pinPoint.getString("description");
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
                 Date date = format.parse(daterdv);
                 String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
 

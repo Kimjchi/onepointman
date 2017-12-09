@@ -28,6 +28,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -170,8 +171,9 @@ public class VolleyRequester
     }
 
     public void groupsRequest(){
+        String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
-                URL_SERVEUR + "/groups/2", null,
+                URL_SERVEUR + "/groups/"+ idUser, null,
                 new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -192,8 +194,9 @@ public class VolleyRequester
 
     public void displayGroupForNavDrawer(final Menu menuNavDrawer)
     {
+        String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET,
-                URL_SERVEUR + "/groups/2", null,
+                URL_SERVEUR + "/groups/" + idUser, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response)
@@ -207,6 +210,7 @@ public class VolleyRequester
                                 final JSONObject groupe = (JSONObject) array.get(i);
                                 final int id = groupe.getInt("idgroup");
                                 final String name = groupe.getString("nomgroup");
+                                //final boolean isSharing = groupe.getBoolean("issharing");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
                                 final ArrayList<UserModelSettings> users = new ArrayList<>();
                                 for(int j=0; j<membres.length(); j++)
@@ -243,8 +247,10 @@ public class VolleyRequester
                                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                                         if (b){
                                             Log.v("CHECKBOX","Checked");
+                                            updateLocationSharing(true, id);
                                         }else{
                                             Log.v("CHECKBOX","Unchecked");
+                                            updateLocationSharing(false, id);
                                         }
                                     }
                                 });
@@ -259,7 +265,7 @@ public class VolleyRequester
                                 mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                                     @Override
                                     public boolean onMenuItemClick(MenuItem menuItem) {
-                                        System.out.println("Clicked on "+menuItem.getItemId());
+                                        System.out.println("Clicked on " + menuItem.getItemId());
                                         return false;
                                     }
                                 });
@@ -276,6 +282,37 @@ public class VolleyRequester
         });
         VolleyRequester.getInstance(context).addToRequestQueue(setGroups);
     }
+
+
+    public void updateLocationSharing(boolean share, int idGroup){
+        String idUser = FacebookInfosRetrieval.user_id;
+        String json = "{\"iduser\":"+ idUser + ",\"idgroup\":"
+                + idGroup + ",\"positionSharing\":" + share +"}";
+
+        try {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest postMyPosition = new JsonObjectRequest (Request.Method.POST,
+                    URL_SERVEUR + "/users/updatepositionsharing/", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                        Log.v("SHARING POSITION", "Partage de position mis à jour!");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // TODO Auto-generated method stub
+                    //MDR LÉ EREUR C POUR LÉ FèBLe
+                    Toast.makeText(context,"Serveur indisponible, partage de position mis à jour!", Toast.LENGTH_SHORT);
+                }
+            });
+            this.addToRequestQueue(postMyPosition);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     /*Pour request du JSON:
         https://developer.android.com/training/volley/request.html
@@ -321,7 +358,6 @@ public class VolleyRequester
     public void groupPositionUpdate(int group){
 
         String idUser = FacebookInfosRetrieval.user_id;
-        //String idUser = "3";
         JsonObjectRequest grpInfoRequest = new JsonObjectRequest (Request.Method.GET,
                 URL_SERVEUR + "/groups/positions/" + idUser + "/" + group, null,
                 new Response.Listener<JSONObject>() {

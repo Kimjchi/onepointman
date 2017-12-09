@@ -24,6 +24,7 @@ import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -75,9 +76,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                popupBuilder(marker).show();
+                popupBuilderInfoMarker(marker).show();
                 //Toast.makeText(getActivity().getApplicationContext(), "Description: " + marker.getSnippet(), Toast.LENGTH_LONG).show();
                 return false;
+            }
+        });
+
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                //Ouvrir un popup
+                //Groupe
+                //Date RDV
+                //Description
+                popupBuilderPinPointMaker(latLng).show();
             }
         });
     }
@@ -194,7 +206,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public AlertDialog popupBuilder(Marker marker){
+    public AlertDialog popupBuilderInfoMarker(Marker marker){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(marker.getSnippet())
                 .setTitle(marker.getTitle());
@@ -208,6 +220,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return builder.create();
     }
 
+    public AlertDialog popupBuilderPinPointMaker(LatLng markerPosition){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Créer Rendez-Vous");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //Envoyer les infos au serveur
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //Quitter le dialog
+                dialog.dismiss();
+            }
+        });
+
+        return builder.create();
+    }
 
 
 }

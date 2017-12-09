@@ -52,12 +52,13 @@ public class DisplayThread implements Runnable {
                                 activity.addMarker("_MY_SELF_", marker);
                             }
                             //Toast.makeText(activity.getActivity().getApplicationContext(), "Longitude(" + myLocation.getLongitude() + ")\nLatitude(" + myLocation.getLatitude()+")", Toast.LENGTH_LONG).show();
-                            Log.v("LOCATION", "Update displayed!");
+
                             Log.v("POSITION", "Longitude: " + myLocation.getLongitude() + " Latitude: " + myLocation.getLatitude());
                         }
                     }));
                     requester.sendMyPosition(myLocation);
                 }
+                Log.v("LOCATION", "Update displayed!");
                 activity.updateDisplayMarkers();
                 requester.groupPositionUpdate(4);
                 handler.postDelayed(this, MY_POSITION_UPDATE_TIME);

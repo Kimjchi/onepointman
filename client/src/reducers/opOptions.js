@@ -10,6 +10,7 @@ import {CHANGE_RDV_MODAL_VISIBILITY} from "../actions/opOptions";
 import {CHANGE_NEW_PINPOINT} from "../actions/opOptions";
 import {CHANGE_RM_PP_MODAL_VISIBILITY} from "../actions/opOptions";
 import {CHANGE_RM_PINPOINT} from "../actions/opOptions";
+import {CHANGE_SHARING} from "../actions/opOptions";
 
 //ajouter le reste dans l'import
 
@@ -24,7 +25,8 @@ let initialState = {
     pinPoint : {
         date : "",
         desc : ""
-    }
+    },
+    isSharing : false
 };
 
 export default function reducer (state = initialState, action ){
@@ -42,7 +44,8 @@ export default function reducer (state = initialState, action ){
             return {...state, pinPoint : action.pinPoint};
         case CHANGE_RM_PINPOINT:
             return {...state, pinPointToRemove : action.pinPointToRemove};
-
+        case CHANGE_SHARING:
+            return {...state, isSharing : action.isSharing};
         default:
             return state
 

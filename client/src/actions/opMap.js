@@ -18,8 +18,8 @@ export function updateMarkerMembers (markers){
     return {type: CHANGE_MARKER_MEMBERS, markers}
 }
 
-export function updateMarkerGeoLocation (markers){
-    return {type: CHANGE_MARKER_GEOLOCATION, markers}
+export function updateMarkerGeoLocation (markers, idUser){
+    return {type: CHANGE_MARKER_GEOLOCATION, markers, idUser}
 }
 
 export function changePinPoints (pinPoints) {

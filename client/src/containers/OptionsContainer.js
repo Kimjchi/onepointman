@@ -10,7 +10,7 @@ import {
     changeAddress, changeAddressEntry, changeAddressFormatted, changeNewPinPoint, changePinPoints,
     changePinPointToRemove,
     changeRdvModalVisibility, changeRmPpModalVisibility,
-    changeSendingMode, createPinPoint, deletePinPoint
+    changeSendingMode, changeSharing, createPinPoint, deletePinPoint, transmitSharingMode
 } from "../actions/opOptions";
 import GoogleMaps from '@google/maps';
 import Modal from "react-bootstrap/es/Modal";
@@ -28,7 +28,7 @@ var ATLANTIC_OCEAN = {
     longitude: -55.491477
 };
 
-const INTERVAL = 1000;
+const INTERVAL = 5000;
 
 var googleMapsClient = GoogleMaps.createClient({
     key: 'AIzaSyAz09vuKBf8P3_7nXx_DNSKwzY0toXGxYw'
@@ -58,6 +58,8 @@ class OptionsContainer extends Component {
         this._getValidationPinPoint = this._getValidationPinPoint.bind(this);
         this._getUserUrlPhoto = this._getUserUrlPhoto.bind(this);
         this._deletePinPoint = this._deletePinPoint.bind(this);
+        this._handleChangeSharing = this._handleChangeSharing.bind(this);
+        setInterval(this._checkLocation, INTERVAL);
     }
 
     _open() {
@@ -145,6 +147,16 @@ class OptionsContainer extends Component {
         this.props.changeSendingMode();
     }
 
+    _handleChangeSharing(event){
+        let {isSharing} = this.props.opOptions;
+        let idUser = this.props.opLogin.idUser;
+        let idGroup = this.props.opUsers.groupToDisplay;
+        if(!!idGroup && idGroup !== "") {
+            this.props.changeSharing(!isSharing);
+            this.props.transmitSharingMode(!isSharing, idUser, idGroup)
+        }
+    }
+
     _checkLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(this._processLocation);
@@ -159,7 +171,8 @@ class OptionsContainer extends Component {
             lng : location.coords.longitude
         };
         let pointArray = [point];
-        this.props.updateMarkerGeoLocation(pointArray);
+        let idUser = this.props.opLogin.idUser;
+        this.props.updateMarkerGeoLocation(pointArray, idUser);
     }
 
     _handleAddressSearch(event) {
@@ -251,6 +264,7 @@ class OptionsContainer extends Component {
         let {pinPoints} = this.props.opMap;
         let {markersMembers} = this.props.opMap;
         let {locationSelect} = this.props.opMap;
+        let {isSharing} = this.props.opOptions;
         return (
 
             <div className='wrapper'>
@@ -266,10 +280,10 @@ class OptionsContainer extends Component {
                         <div className='content'>
                             <ul>
                                 <li>
-                                    <a href='#' onClick = {this._handleConstantPositionSending} className='sharePosition'>
-                                    Continu
+                                    <a href='#' onClick = {this._handleChangeSharing} className='sharePosition'>
+                                        {isSharing? 'Partage activé' : 'Partage désactivé'}
                                     <i id= "markerBound" className="material-icons markerG"
-                                       style={{visibility : (isSharingPosition? "visible" : "hidden")}}>place</i>
+                                       style={{visibility : (isSharing? "visible" : "hidden")}}>place</i>
                                     </a>
                                 </li>
                                 {markersMembers.map((marker) => (
@@ -428,8 +442,8 @@ const  mapDispatchToProps = (dispatch) => {
         updateMarkerSelect: (newMarker) => {
             dispatch(updateMarkerSelect(newMarker))
         },
-        updateMarkerGeoLocation: (markers) => {
-            dispatch(updateMarkerGeoLocation(markers))
+        updateMarkerGeoLocation: (markers, idUser) => {
+            dispatch(updateMarkerGeoLocation(markers, idUser))
         },
         changeSendingMode: () => {
             dispatch(changeSendingMode())
@@ -454,6 +468,12 @@ const  mapDispatchToProps = (dispatch) => {
         },
         deletePinPoint: (idPinPoint, idUser, idGroup) => {
             dispatch(deletePinPoint(idPinPoint, idUser, idGroup))
+        },
+        changeSharing: (isSharing) => {
+            dispatch(changeSharing(isSharing))
+        },
+        transmitSharingMode: (isSharing, idUser, idGroup) => {
+            dispatch(transmitSharingMode(isSharing, idUser, idGroup))
         }
     }
 };

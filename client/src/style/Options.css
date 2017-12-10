@@ -231,7 +231,7 @@ body .wrapper li a.sharePosition {
 }
 
 @keyframes bounce {
-    from { transform: translate3d(0, -0.4em, 0);     }
+    from { transform: translate3d(0, -0.2em, 0);     }
     to   { transform: translate3d(0, 0.5em, 0); }
 }
 

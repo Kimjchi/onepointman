@@ -18,12 +18,6 @@ body .wrapper li a.aPinPoint {
     margin-right:0px;
 }
 
-.liPinPoint {
-}
-.imagePinPoint {
-
-}
-
 .infoPinPoint {
     position: absolute;
     top: 50%; /* poussé de la moitié de hauteur du référent */
@@ -31,6 +25,29 @@ body .wrapper li a.aPinPoint {
 }
 
 .infoPinPoint div {
+    font-size: 10px;
+    clear:both; float:left
+}
+
+.liMarkersMembers div {
+    display:inline-block;
+}
+
+body .wrapper li a.aMarkersMembers {
+    padding: 0px 0px;
+    text-indent: 10px;
+    position: relative;
+    width:100%;
+    margin-right:0px;
+}
+
+.infoMarkersMembers {
+    position: absolute;
+    top: 50%; /* poussé de la moitié de hauteur du référent */
+    transform: translateY(-50%); /* tiré de la moitié de sa propre hauteur */
+}
+
+.infoMarkersMembers div {
     font-size: 10px;
     clear:both; float:left
 }
@@ -73,6 +90,7 @@ body .wrapper ul {
     padding: 0;
 }
 body .wrapper li {
+    height:60px;
     color: #ffffff;
     list-style-type: none;
 }
@@ -108,7 +126,6 @@ body .wrapper span {
 body .wrapper .content {
     background: #212735;
     position: relative;
-    height:180px;
     top: 10px;
     display:block;
 }
@@ -203,15 +220,18 @@ input[type="text"]:hover {
 /* Marker CSS */
 
 .markerG {
-
     animation: bounce 1s;
     animation-direction: alternate;
     animation-timing-function: cubic-bezier(.5,0.05,1,.5);
     animation-iteration-count: infinite;
 }
 
+body .wrapper li a.sharePosition {
+    padding: 10px 0px 20px 0px;
+}
+
 @keyframes bounce {
-    from { transform: translate3d(0, -0.4em, 0);     }
+    from { transform: translate3d(0, -0.2em, 0);     }
     to   { transform: translate3d(0, 0.5em, 0); }
 }
 

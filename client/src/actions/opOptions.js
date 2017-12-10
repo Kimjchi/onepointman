@@ -6,13 +6,23 @@ export const CHANGE_NEW_PINPOINT = 'CHANGE_NEW_PINPOINT';
 export const CHANGE_RM_PP_MODAL_VISIBILITY = 'CHANGE_RM_PP_MODAL_VISIBILITY';
 export const CHANGE_RM_PINPOINT = 'CHANGE_RM_PINPOINT';
 export const DELETE_PINPOINT = 'DELETE_PINPOINT';
+export const CHANGE_SHARING = 'CHANGE_SHARING';
+export const SHARING_LOCATION_MODE = 'SHARING_LOCATION_MODE';
 
 export function changeAddress (newAddress, validAddress){
     return {type: CHANGE_ADDRESS, newAddress, validAddress}
 }
 
+export function transmitSharingMode (isSharing, idUser, idGroup){
+    return {type: SHARING_LOCATION_MODE, isSharing, idUser, idGroup}
+}
+
 export function changeSendingMode () {
     return {type : CHANGE_SHARING_MODE}
+}
+
+export function changeSharing (isSharing) {
+    return {type : CHANGE_SHARING, isSharing}
 }
 
 export function changeRdvModalVisibility () {

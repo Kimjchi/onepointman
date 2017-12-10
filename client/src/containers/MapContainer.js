@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import Map from "../components/Map";
 import {
     changeMap,
-    changePinPoints, recenterMap, updateMarkerGeoLocation, updateMarkers, updateMarkerSelect,
+    changePinPoints, recenterMap, updateMarkerGeoLocation, updateMarkerMembers, updateMarkers, updateMarkerSelect,
     updateMarkersSelect
 } from "../actions/opMap";
 
@@ -36,7 +36,9 @@ class MapContainer extends Component {
         let {zoom} = this.props.opMap;
         let {markerSelect} = this.props.opMap;
         let {markersGeoLocation} = this.props.opMap;
+        let {markersMembers} = this.props.opMap;
         let updateMarkerSelect = this.props.updateMarkerSelect;
+        let updateMarkerMembers = this.props.updateMarkerMembers;
         let {pinPoints} = this.props.opMap;
         let changePinPoints = this.props.changePinPoints;
         return (
@@ -44,7 +46,8 @@ class MapContainer extends Component {
                  zoom = {zoom} updateMarkerSelect = {updateMarkerSelect}
                  markerSelect = {markerSelect} markersGeoLocation = {markersGeoLocation}
                  markersPinPoint = {pinPoints} changePinPoints = {changePinPoints}
-                 _onMapMounted = {this._onMapMounted} _onIdleChanged = {this._onIdleChanged} />
+                 _onMapMounted = {this._onMapMounted} _onIdleChanged = {this._onIdleChanged}
+                 markersMembers = {markersMembers} updateMarkerMembers = {updateMarkerMembers}/>
     )
     }
 }
@@ -70,6 +73,9 @@ const  mapDispatchToProps = (dispatch) => {
         },
         recenterMap: (mapCenter, zoom) => {
             dispatch(recenterMap(mapCenter, zoom))
+        },
+        updateMarkerMembers: (markers) => {
+            dispatch(updateMarkerMembers(markers))
         }
     }
 };

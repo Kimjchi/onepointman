@@ -54,7 +54,7 @@ router.post('/deletepinpoint/', function (req, res) {
 
     let query = squel.delete()
         .from('public."PINPOINT"')
-        .where('idcreator = ?', parseInt(toDelete.iduser))
+        //.where('idcreator = ?', parseInt(toDelete.iduser)) C mieux que nimporte qui puisse supprimer
         .where('idgroup = ?', parseInt(toDelete.idgroup))
         .where('idpinpoint = ?', parseInt(toDelete.idpinpoint))
         .toString();

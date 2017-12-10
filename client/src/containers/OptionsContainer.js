@@ -10,7 +10,7 @@ import {
     changeAddress, changeAddressEntry, changeAddressFormatted, changeNewPinPoint, changePinPoints,
     changePinPointToRemove,
     changeRdvModalVisibility, changeRmPpModalVisibility,
-    changeSendingMode, createPinPoint, deletePinPoint
+    changeSendingMode, changeSharing, createPinPoint, deletePinPoint, transmitSharingMode
 } from "../actions/opOptions";
 import GoogleMaps from '@google/maps';
 import Modal from "react-bootstrap/es/Modal";
@@ -29,7 +29,7 @@ var ATLANTIC_OCEAN = {
     longitude: -55.491477
 };
 
-const INTERVAL = 1000;
+const INTERVAL = 5000;
 
 var googleMapsClient = GoogleMaps.createClient({
     key: 'AIzaSyAz09vuKBf8P3_7nXx_DNSKwzY0toXGxYw'
@@ -52,7 +52,7 @@ class OptionsContainer extends Component {
         this._close = this._close.bind(this);
         this._openPp = this._openPp.bind(this);
         this._closePp = this._closePp.bind(this);
-        this._displayPinPoint = this._displayPinPoint.bind(this);
+        this._displayMarker = this._displayMarker.bind(this);
         this._reverseGeocodeAddress = this._reverseGeocodeAddress.bind(this);
         this._handlePinPointDescChange = this._handlePinPointDescChange.bind(this);
         this._handlePinPointDateChange = this._handlePinPointDateChange.bind(this);
@@ -60,11 +60,18 @@ class OptionsContainer extends Component {
         this._getUserUrlPhoto = this._getUserUrlPhoto.bind(this);
         this._deletePinPoint = this._deletePinPoint.bind(this);
         this._handleModeDessin = this._handleModeDessin.bind(this);
+        this._handleChangeSharing = this._handleChangeSharing.bind(this);
+        setInterval(this._checkLocation, INTERVAL);
     }
 
     _open() {
-        this.props.changeRdvModalVisibility();
         this._reverseGeocodeAddress();
+        let {pinPoint} = this.props.opOptions;
+        var date = new Date();
+        date = dateFormat(date, "yyyy-mm-dd hh:MM:ss");
+        pinPoint.date = date;
+        this.props.changeNewPinPoint(pinPoint);
+        this.props.changeRdvModalVisibility();
     }
 
     _close() {
@@ -80,7 +87,7 @@ class OptionsContainer extends Component {
         this.props.changeRmPpModalVisibility();
     }
 
-    _displayPinPoint(lat, lng, event) {
+    _displayMarker(lat, lng, event) {
         console.log(lat);
         console.log(lng);
         let point = {
@@ -120,9 +127,9 @@ class OptionsContainer extends Component {
             description : this.props.opOptions.pinPoint.desc,
             daterdv : this.props.opOptions.pinPoint.date
         }
-        console.log("Lolilol");
         if(Number(this.props.opUsers.groupToDisplay) != 0) {
-            //this.props.createPinPoint(pinPoint, this.props.opLogin.idUser, Number(this.props.opUsers.groupToDisplay));
+            this.props.createPinPoint(pinPoint, this.props.opLogin.idUser, Number(this.props.opUsers.groupToDisplay));
+            this._close();
         }
     }
 
@@ -142,6 +149,16 @@ class OptionsContainer extends Component {
         this.props.changeSendingMode();
     }
 
+    _handleChangeSharing(event){
+        let {isSharing} = this.props.opOptions;
+        let idUser = this.props.opLogin.idUser;
+        let idGroup = this.props.opUsers.groupToDisplay;
+        if(!!idGroup && idGroup !== "") {
+            this.props.changeSharing(!isSharing);
+            this.props.transmitSharingMode(!isSharing, idUser, idGroup)
+        }
+    }
+
     _checkLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(this._processLocation);
@@ -156,7 +173,8 @@ class OptionsContainer extends Component {
             lng : location.coords.longitude
         };
         let pointArray = [point];
-        this.props.updateMarkerGeoLocation(pointArray);
+        let idUser = this.props.opLogin.idUser;
+        this.props.updateMarkerGeoLocation(pointArray, idUser);
     }
 
     _handleAddressSearch(event) {
@@ -171,8 +189,7 @@ class OptionsContainer extends Component {
 
     _deletePinPoint() {
         this._closePp();
-        this.props.deletePinPoint(this.props.opOptions.pinPointToRemove.id, this.props.opLogin.idUser, this.props.opGroups.idGroup);
-        console.log("loool");
+        this.props.deletePinPoint(this.props.opOptions.pinPointToRemove.id, this.props.opLogin.idUser, this.props.opUsers.groupToDisplay);
     }
 
     _geocodeAddress () {
@@ -206,7 +223,6 @@ class OptionsContainer extends Component {
     }
 
     _getUserUrlPhoto(idUser) {
-        console.log(idUser);
         let {users} = this.props.opUsers;
         let {friends} = this.props.opUsers;
         let allUsers = users.concat(friends);
@@ -261,7 +277,9 @@ class OptionsContainer extends Component {
         let {address} = this.props.opOptions;
         let {isSharingPosition} = this.props.opOptions;
         let {pinPoints} = this.props.opMap;
+        let {markersMembers} = this.props.opMap;
         let {locationSelect} = this.props.opMap;
+        let {isSharing} = this.props.opOptions;
         return (
 
             <div className='wrapper'>
@@ -277,15 +295,27 @@ class OptionsContainer extends Component {
                         <div className='content'>
                             <ul>
                                 <li>
-                                    <a href='#' onClick = {this._handlePositionSending}>Evenementiel</a>
-                                </li>
-                                <li>
-                                    <a href='#' onClick = {this._handleConstantPositionSending}>
-                                    Continu
+                                    <a href='#' onClick = {this._handleChangeSharing} className='sharePosition'>
+                                        {isSharing? 'Partage activé' : 'Partage désactivé'}
                                     <i id= "markerBound" className="material-icons markerG"
-                                       style={{fontSize:"48px;color:red", visibility : (isSharingPosition? "visible" : "hidden")}}>place</i>
+                                       style={{visibility : (isSharing? "visible" : "hidden")}}>place</i>
                                     </a>
                                 </li>
+                                {markersMembers.map((marker) => (
+                                    <li key={marker.iduser}>
+                                        <a href='#' className='aMarkersMembers' onClick = {this._displayMarker.bind(this, marker.pos.lt, marker.pos.lg)}>
+                                            <div className='liMarkersMembers'>
+                                                <div className='imageMarkersMembers'>
+                                                    <img className='profilFb' src={(this._getUserUrlPhoto(marker.iduser))} alt="photo de profil" height="60" width="60"/>
+                                                </div>
+                                                <div className='infoMarkersMembers'>
+                                                    <div>{marker.firstname} {marker.lastname}</div>
+                                                    <div>{this._convertDate(marker.date)}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                         <span/>
@@ -301,7 +331,7 @@ class OptionsContainer extends Component {
                                 </li>
                                 {pinPoints.map((pinPoint) => (
                                     <li key={pinPoint.id}>
-                                        <a href='#' className='aPinPoint' onClick = {this._displayPinPoint.bind(this, pinPoint.pos.lt, pinPoint.pos.lg)}>
+                                        <a href='#' className='aPinPoint' onClick = {this._displayMarker.bind(this, pinPoint.pos.lt, pinPoint.pos.lg)}>
                                             <div className='liPinPoint'>
                                                 <div className='imagePinPoint'>
                                                     <img className='profilFb' src={(this._getUserUrlPhoto(pinPoint.idCreator))} alt="photo de profil" height="60" width="60"/>
@@ -428,8 +458,8 @@ const  mapDispatchToProps = (dispatch) => {
         updateMarkerSelect: (newMarker) => {
             dispatch(updateMarkerSelect(newMarker))
         },
-        updateMarkerGeoLocation: (markers) => {
-            dispatch(updateMarkerGeoLocation(markers))
+        updateMarkerGeoLocation: (markers, idUser) => {
+            dispatch(updateMarkerGeoLocation(markers, idUser))
         },
         changeSendingMode: () => {
             dispatch(changeSendingMode())
@@ -457,6 +487,12 @@ const  mapDispatchToProps = (dispatch) => {
         },
         draw: (boolean) => {
             dispatch(draw(boolean));
+        },
+        changeSharing: (isSharing) => {
+            dispatch(changeSharing(isSharing))
+        },
+        transmitSharingMode: (isSharing, idUser, idGroup) => {
+            dispatch(transmitSharingMode(isSharing, idUser, idGroup))
         }
     }
 };

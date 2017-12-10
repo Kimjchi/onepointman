@@ -6,8 +6,9 @@ import {
     ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_PHOTO, getGroups, getPhoto, SEND_CHANGE_NAME,
     setPhoto
 } from "../actions/opGroups";
-import {changePinPoints} from "../actions/opMap";
+import {changePinPoints, updateMarkerMembers} from "../actions/opMap";
 import {changeIdGroup, changeUsers} from "../actions/opUsers";
+import {changeSharing} from "../actions/opOptions";
 
 export function * requestGroups() {
     while (true) {
@@ -119,7 +120,7 @@ export function * requestInfosGroup() {
                     let pinpoints = response.data.message.pinpoints;
                     let newPinpoints = [];
                     pinpoints.map((pinPoint => {
-                        if(pinPoint.idpinpoint) {
+                        if(!!pinPoint.idpinpoint) {
                             let newPinPoint = {
                                 id: pinPoint.idpinpoint,
                                 pos: {lt: Number(pinPoint.pinlt), lg: Number(pinPoint.pinlg)},
@@ -130,8 +131,31 @@ export function * requestInfosGroup() {
                             }
                             newPinpoints.push(newPinPoint);
                         }
-                    }))
+                    }));
                     store.dispatch(changePinPoints(newPinpoints));
+
+
+                    let userpositions = response.data.message.userpositions;
+                    let newPositions = [];
+                    userpositions.map((position => {
+                        if(!!position.iduser) {
+                            let newPosition = {
+                                iduser: position.iduser,
+                                pos: {lt: Number(position.userlt), lg: Number(position.userlg)},
+                                desc: position.description,
+                                current: position.current,
+                                date: position.dateposition,
+                                showInfo: false,
+                                firstname:position.prenom,
+                                lastname:position.nom
+                            };
+                            newPositions.push(newPosition);
+                        }
+                    }));
+                    store.dispatch(updateMarkerMembers(newPositions));
+
+                    let isSharing = response.data.message.issharing;
+                    store.dispatch(changeSharing(isSharing));
                 }
             })
             .catch(function (error) {

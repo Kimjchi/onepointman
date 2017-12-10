@@ -244,8 +244,10 @@ public class VolleyRequester
                                 });
 
                                 CheckBox sharingPositionBox = new CheckBox(context);
+                                if (isSharing){
+                                    sharingPositionBox.setChecked(true);
+                                }
                                 int states[][] = {{android.R.attr.state_checked}, {}};
-
                                 int colors[] = {Color.BLACK, Color.BLACK};
                                 CompoundButtonCompat.setButtonTintList(sharingPositionBox, new ColorStateList(states, colors));
                                 sharingPositionBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -260,9 +262,7 @@ public class VolleyRequester
                                         }
                                     }
                                 });
-                                if (isSharing){
-                                    sharingPositionBox.setChecked(true);
-                                }
+
 
                                 LinearLayout test = new LinearLayout(context);
                                 test.addView(sharingPositionBox);

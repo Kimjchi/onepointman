@@ -37,7 +37,7 @@ router.post('/createdrawing', function(req,res){
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, {status: 'fail',message:'Error while creating drawing'}, res);
+            sender.sendResponse(sender.BAD_REQUEST, {status: 'fail',message:'Error while creating drawing'}, res);
             console.log(e);
         })
 });
@@ -62,7 +62,7 @@ router.post('deletedrawing', function(req,res){
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e=>{
-            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail', message:'Error while deleting drawing'}, res);
+            sender.sendResponse(sender.BAD_REQUEST, {status:'fail', message:'Error while deleting drawing'}, res);
             console.log(e);
         })
 });

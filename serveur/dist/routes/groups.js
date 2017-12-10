@@ -1,12 +1,12 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var express = require('express');
 var router = express.Router();
 var db = require('../connection');
 var squelb = require('squel');
 var squel = squelb.useFlavour('postgres');
+
+var sender = require('../sender');
 
 //donne les groupes auxquels appartient un utilisateur + les membres du groupe
 router.get('/:iduser/', function (req, res) {
@@ -25,16 +25,16 @@ router.get('/:iduser/', function (req, res) {
             status: 'fail',
             message: e.toString()
         });
-        //sender.sendResponse(sender.NOT_FOUND_STATUS, toReturn, res);
+        //sender.sendResponse(sender.BAD_REQUEST, toReturn, res);
     });
 });
 
 var getGroups = function getGroups(iduser) {
-    return squel.select().from('public."USER_GROUP"', 'ugr').field('ugr.idgroup').field('gr.nom').where('ugr.iduser = ?', iduser).left_join('public."GROUP"', 'gr', 'ugr.idgroup = gr.idgroup');
+    return squel.select().from('public."USER_GROUP"', 'ugr').field('ugr.idgroup').field('gr.nom').field('ugr.sharesposition').where('ugr.iduser = ?', iduser).left_join('public."GROUP"', 'gr', 'ugr.idgroup = gr.idgroup');
 };
 
 var getUsersInGroups = function getUsersInGroups(iduser) {
-    return squel.select().from(getGroups(iduser), 'listgroups').left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = listgroups.idgroup').left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser').field('usr.prenom').field('usr.nom', 'nomuser').field('usr.iduser').field('listgroups.nom', 'nomgroup').field('ugr.idgroup').toString();
+    return squel.select().from(getGroups(iduser), 'listgroups').left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = listgroups.idgroup').left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser').field('listgroups.sharesposition').field('usr.prenom').field('usr.nom', 'nomuser').field('usr.iduser').field('listgroups.nom', 'nomgroup').field('ugr.idgroup').toString();
 };
 
 function buildGroupsObject(queryResult) {
@@ -51,7 +51,7 @@ function buildGroupsObject(queryResult) {
             }
         });
         if (!contains) {
-            groups.push({ idgroup: element.idgroup, nomgroup: element.nomgroup, membres: [] });
+            groups.push({ idgroup: element.idgroup, issharing: element.sharesposition, nomgroup: element.nomgroup, membres: [] });
         }
     });
     //une fois le tableau des groupes créé, on push les membres dans groups[idGroupConcerné].membres
@@ -76,6 +76,10 @@ function buildGroupsObject(queryResult) {
 // Pour check les daaaates hehehe
 
 
+//SSSSIIII l'utilisateur partage sa position avec le groupe , ne pas l'envoyer
+// +++ ne pas envoyer les user si leur position est nulle
+
+
 // les infos d'un groupe en particulier (les pinpoints et les positions des utilisateurs du groupe
 router.get('/positions/:iduser/:idgroup', function (req, res) {
     //vérifier si l'utilisateur est bien dans le groupe avant de faire le traitement
@@ -85,37 +89,63 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
     // les positions des gens SSI ils décident de la partager avec ce groupe
     var requete = getGroupPinpoints(idgroup);
     db.any(requete).then(function (result) {
-        var JSONToReturn = { idgroup: idgroup, pinpoints: [], userpositions: [] };
+        var JSONToReturn = { idgroup: idgroup, issharing: false, pinpoints: [], userpositions: [] };
         result.forEach(function (element) {
+
             // CHECK SI LA DATE est supérieure de 1 jour de plus de la date de RDV. sinon ne
+            var currentTime = new Date();
+            var diff = currentTime - element.daterdv; // donne la diff en millisecondes
+            var dontPush = false;
+            if (diff > 8.64e+7) {
+                // le nombre de millisecs en 1 jour hehe
+                dontPush = true;
+            }
+            console.log(diff);
             //pas renvoyer
             var pinpoint = {
                 idpinpoint: element.idpinpoint,
                 idcreator: element.idcreator,
+                nomcreator: element.nom,
+                prenomcreator: element.prenom,
                 pinlt: element.pinlt,
                 pinlg: element.pinlg,
                 description: element.description,
                 daterdv: element.daterdv
             };
             //si la date est ok on le push dans l'array
-            JSONToReturn.pinpoints.push(pinpoint);
+            if (!dontPush) {
+                JSONToReturn.pinpoints.push(pinpoint);
+            }
         });
         db.any(getUsersPositions(idgroup)).then(function (userpositions) {
+
+            var currentDate = new Date();
             var userCorrectRequest = false;
             userpositions.forEach(function (element) {
-                console.log(_typeof(element.iduser));
-                console.log(typeof iduser === 'undefined' ? 'undefined' : _typeof(iduser));
-                if (element.iduser === iduser) {
+
+                if (parseInt(element.iduser, 10) === iduser) {
                     userCorrectRequest = true; // on vérifie ici si le gars qui demande est bien dans le groupe
+                    JSONToReturn.issharing = element.sharesposition;
                 }
+                var isCurrent = false;
+                if (element.dateposition !== null) {
+                    isCurrent = compareTimes(currentDate, element.dateposition);
+                }
+
                 var userposition = {
                     iduser: element.iduser,
+                    prenom: element.prenom,
+                    nom: element.nom,
                     userlt: element.userglt,
                     userlg: element.userglg,
-                    current: true, // A CHANGER CO LO APRES LE TRAITEMENT LO
+                    current: isCurrent,
                     dateposition: element.dateposition
                 };
-                JSONToReturn.userpositions.push(userposition);
+                if (element.dateposition !== null) {
+                    if (!(parseInt(element.iduser, 10) === iduser && element.sharesposition)) {
+                        JSONToReturn.userpositions.push(userposition);
+                    }
+                }
             });
 
             if (userCorrectRequest) {
@@ -144,16 +174,117 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
             message: e.toString()
         });
     });
-    console.log(requete);
 });
 
 var getGroupPinpoints = function getGroupPinpoints(idgroup) {
-    return squel.select().from('public."GROUP"', 'gr').field('gr.nom', 'nomgroup').field('gr.idgroup').field('pin.idcreator').field('pin.idpinpoint').field('pin.pinlt').field('pin.pinlg').field('pin.description').field('pin.daterdv').left_join('public."PINPOINT"', 'pin', 'pin.idgroup = gr.idgroup').where('gr.idgroup = ?', idgroup).toString();
+    return squel.select().from('public."GROUP"', 'gr').field('gr.nom', 'nomgroup').field('gr.idgroup').field('pin.idcreator').field('pin.idpinpoint').field('pin.pinlt').field('pin.pinlg').field('pin.description').field('pin.daterdv').field('usr.prenom').field('usr.nom').left_join('public."PINPOINT"', 'pin', 'pin.idgroup = gr.idgroup').left_join('public."USER"', 'usr', 'usr.iduser = pin.idcreator').where('gr.idgroup = ?', idgroup).toString();
 };
 
 var getUsersPositions = function getUsersPositions(idgroup) {
-    return squel.select().from('public."GROUP"', 'gr').field('ugr.iduser').field('ugr.sharesposition').field('ugr.userglt').field('ugr.userglg').field('ugr.dateposition').left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = gr.idgroup').where('gr.idgroup = ?', idgroup).toString();
+    return squel.select().from('public."GROUP"', 'gr').field('ugr.iduser').field('ugr.sharesposition').field('ugr.userglt').field('ugr.userglg').field("ugr.dateposition").field('usr.nom').field('usr.prenom').left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = gr.idgroup').left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser').where('gr.idgroup = ?', idgroup).toString();
 };
+
+//Si la dernière position stockée est > 15min, l'utilisateur est considéré comme inactif
+function compareTimes(currentTime, lastLocationTime) {
+    var toReturn = false;
+    if (currentTime.getMonth() === lastLocationTime.getMonth()) {
+        if (currentTime.getDay() === lastLocationTime.getDay()) {
+            if (currentTime.getHours() === lastLocationTime.getHours()) {
+                if (currentTime.getMinutes() - lastLocationTime.getMinutes() < 15) {
+                    toReturn = true;
+                }
+            }
+        }
+    }
+    return toReturn;
+}
+
+router.get('/drawings/:iduser/:idgroup', function (req, res) {
+    var iduser = req.params.iduser;
+    var idgroup = req.params.idgroup;
+    var query = getDrawings(idgroup);
+    var JSONToReturn = {
+        idgroup: idgroup,
+        drawings: []
+    };
+
+    db.any(query).then(function (result) {
+        result.forEach(function (element) {
+            var objectToPush = {
+                iddrawing: element.iddrawing,
+                idcreator: element.idcreator,
+                nomcreator: element.nom,
+                prenomcreator: element.prenom,
+                description: element.description,
+                lt: element.lt,
+                lg: element.lg,
+                img: element.img
+            };
+            if (element.actif) {
+                JSONToReturn.drawings.push(objectToPush);
+            }
+        });
+        console.log(JSONToReturn);
+        res.send({
+            status: 'success',
+            message: JSONToReturn
+        });
+    }).catch(function (e) {
+        res.status(400);
+        res.send({
+            status: 'fail',
+            message: e.toString()
+        });
+    });
+});
+
+var getDrawings = function getDrawings(idgroup) {
+    return squel.select().from('public."DRAWING"', 'draw').field('draw.iddrawing').field('draw.idcreator').field('draw.actif').field('draw.img').field('draw.drawinglg', 'lg').field('draw.drawinglt', 'lt').field('description').field('usr.nom').field('usr.prenom').left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator').where('draw.idgroup = ?', idgroup).toString();
+};
+
+//ca passe en post
+router.post('/creategroup', function (req, res) {
+
+    var toCreate = {
+        iduser: req.body.iduser,
+        groupname: req.body.groupname
+    };
+
+    var currentTime = new Date();
+    var query = squel.insert().into('public."GROUP"').set('nom', toCreate.groupname).set('creationdate', currentTime.toISOString()).returning('idgroup').toString();
+
+    db.one(query).then(function (row) {
+        var inUserGroup = squel.insert().into('public."USER_GROUP"', 'ugr').set('idgroup', row.idgroup).set('iduser', toCreate.iduser).set('iscreator', true).toString();
+        db.none(inUserGroup).then(function () {
+            var response = {
+                idgroup: row.idgroup
+            };
+            sender.sendResponse(sender.SUCCESS_STATUS, response, res);
+        }).catch(function (err) {
+            sender.sendResponse(sender.BAD_REQUEST, 'Failed to insert user in USER_GROUP', res);
+            console.log(err);
+        });
+    }).catch(function (e) {
+        sender.sendResponse(sender.BAD_REQUEST, 'Failed to create group', res);
+        console.log(e);
+    });
+});
+
+router.post('/changegroupname', function (req, res) {
+    var toChange = {
+        idgroup: req.body.idgroup,
+        groupname: req.body.newgroupname
+    };
+
+    var query = squel.update().table('public."GROUP"').set('nom', toChange.groupname).where('idgroup = ?', toChange.idgroup).toString();
+    db.none(query).then(function () {
+        var response = { status: 'success', message: 'groupname updated successfully' };
+        sender.sendResponse(sender.SUCCESS_STATUS, response, res);
+    }).catch(function (e) {
+        sender.sendResponse(sender.BAD_REQUEST, { status: 'fail', message: 'Failed to update groupname' }, res);
+        console.log(e);
+    });
+});
 
 module.exports = router;
 //# sourceMappingURL=groups.js.map

@@ -11,6 +11,11 @@ var router = express.Router(); // setup usage of the Express router engine
 /* PostgreSQL and PostGIS module and connection setup */
 var pg = require("pg"); // require Postgres module
 
+var types = pg.types;
+types.setTypeParser(1114, function (stringValue) {
+    return stringValue;
+});
+
 // Setup connection
 /*var username = "postgres" ;// sandbox username
 var password = "root" ;// read only privileges on our table

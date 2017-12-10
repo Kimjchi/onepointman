@@ -54,22 +54,20 @@ public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
         if(view == null)
         {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.row_item_settings, null);
+            view = inflater.inflate(R.layout.row_item_add, null);
         }
 
-        CircleImageView pic = view.findViewById(R.id.userImageSettings);
+        CircleImageView pic = view.findViewById(R.id.userImageAdd);
 
         Picasso.with(getContext()).load("https://graph.facebook.com/"+getItem(position).getId()+"/picture?type=large")
                 .placeholder(R.drawable.hamburger)
                 .error(R.drawable.ic_menu_camera)
                 .into(pic);
 
-        TextView userName = view.findViewById(R.id.userNameSettings);
+        TextView userName = view.findViewById(R.id.userNameAdd);
         userName.setText(dataSet.get(position).getName());
 
-        final ImageButton deleteBtn = view.findViewById(R.id.deleteSettings);
-
-        switchImageButton(position, deleteBtn);
+        final ImageButton deleteBtn = view.findViewById(R.id.userAddOrRemove);
 
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override

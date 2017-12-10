@@ -103,7 +103,7 @@ router.post(('/updatepositionsharing/'), function(req, res){
             sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'Position sharing updated successfully'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail', message:'Error while updating position sharing'}, res);
+            sender.sendResponse(sender.BAD_REQUEST, {status:'fail', message:'Error while updating position sharing'}, res);
             console.log(e);
         })
 });
@@ -125,7 +125,7 @@ router.post('/createuser/', function (req, res) {
             sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail',message:'Error while adding user ' + toCreate.iduser + ' to group'}, res);
+            sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Error while adding user ' + toCreate.iduser + ' to group'}, res);
             console.log(e);
         })
 });
@@ -182,7 +182,7 @@ router.post('/deleteuser/', function(req, res){
             sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'User deleted from group successfully'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'success',message:'Error while deleting user from group'}, res);
+            sender.sendResponse(sender.BAD_REQUEST, {status:'success',message:'Error while deleting user from group'}, res);
             console.log(e);
         })
 });
@@ -199,6 +199,8 @@ router.get('/userFriends/:user_id/', function (req, res) {
         .then(response => {
             userFriendList.friendlist = response.data.data;
 
+            console.log('userAccessToken : ' + facebookdata.userAccessToken);
+            
             console.log('userFriendList : ' + userFriendList);
 
             sender.sendResponse(sender.SUCCESS_STATUS, userFriendList, res)

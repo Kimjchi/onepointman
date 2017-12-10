@@ -43,6 +43,7 @@ router.post('/updateposition', function (req, res) {
                             status: 'fail',
                             message: 'failing to update userposition in a group'
                         });
+                        console.log('failed at updating position in group');
                     });
                 }
             });
@@ -61,7 +62,7 @@ router.post('/updateposition', function (req, res) {
     });
 });
 
-router.post('/updatepositionsharing', function (req, res) {
+router.post('/updatepositionsharing/', function (req, res) {
 
     var toUpdate = {
         iduser: req.body.iduser,
@@ -72,26 +73,61 @@ router.post('/updatepositionsharing', function (req, res) {
     var query = squel.update().table('public."USER_GROUP"').set('sharesposition', toUpdate.positionSharing).where('iduser = ?', toUpdate.iduser).where('idgroup = ?', toUpdate.idgroup).toString();
 
     db.query(query).then(function () {
-        sender.sendResponse(sender.SUCCESS_STATUS, 'Position sharing updated successfully', res);
+        sender.sendResponse(sender.SUCCESS_STATUS, { status: 'success', message: 'Position sharing updated successfully' }, res);
     }).catch(function (e) {
-        sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while updating position sharing', res);
+        sender.sendResponse(sender.BAD_REQUEST, { status: 'fail', message: 'Error while updating position sharing' }, res);
         console.log(e);
     });
 });
 
-router.delete('/deleteuser', function (req, res) {
+router.post('/createuser/', function (req, res) {
 
+    var toCreate = {
+        iduser: req.body.iduser,
+        idgroup: req.body.idgroup
+    };
+    var query = squel.insert().into('public."USER_GROUP"').set('iduser', parseInt(toCreate.iduser)).set('idgroup', parseInt(toCreate.idgroup)).toString();
+
+    db.none(query).then(function () {
+        sender.sendResponse(sender.SUCCESS_STATUS, { status: 'success', message: 'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully' }, res);
+    }).catch(function (e) {
+        sender.sendResponse(sender.BAD_REQUEST, { status: 'fail', message: 'Error while adding user ' + toCreate.iduser + ' to group' }, res);
+        console.log(e);
+    });
+});
+
+router.post('/deleteuser/', function (req, res) {
+    console.log(req.body);
     var toUpdate = {
         iduser: req.body.iduser,
         idgroup: req.body.idgroup
     };
-
-    var query = squel.delete().from('public."USER_GROUP"').where('iduser = ?', toUpdate.iduser).where('idgroup = ?', toUpdate.idgroup).toString();
-
+    // check si ya 1 personne dans le groupe
+    var query = squel.delete().from('public."USER_GROUP"').where('iduser = ?', parseInt(toUpdate.iduser)).where('idgroup = ?', parseInt(toUpdate.idgroup)).toString();
     db.query(query).then(function () {
-        sender.sendResponse(sender.SUCCESS_STATUS, 'User deleted from group successfully', res);
+        var query2 = squel.select().from('public."USER_GROUP"').where('idgroup = ? ', parseInt(toUpdate.idgroup)).toString();
+        db.any(query2).then(function (result) {
+            if (result.length === 1) {
+                //supprimer la derniere personne du groupe
+                var deleteLastUser = squel.delete().from('public."USER_GROUP"').where('idgroup = ?', parseInt(toUpdate.idgroup)).toString();
+                db.query(deleteLastUser).then(function () {
+                    console.log('deleted last user from group successfully');
+                    var deleteGroup = squel.delete().from('public."GROUP"').where('idgroup = ?', toUpdate.idgroup).toString();
+                    db.query(deleteGroup).then(function () {
+                        console.log("group deleted bc no more users");
+                    }).catch(function (err) {
+                        console.log("failed at deleting empty group" + err);
+                    });
+                }).catch(function (error) {
+                    console.log('failed at deleting last user' + error);
+                });
+            }
+        }).catch(function (e) {
+            console.log('Failed at deleting group' + e);
+        });
+        sender.sendResponse(sender.SUCCESS_STATUS, { status: 'success', message: 'User deleted from group successfully' }, res);
     }).catch(function (e) {
-        sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while deleting user from group', res);
+        sender.sendResponse(sender.BAD_REQUEST, { status: 'success', message: 'Error while deleting user from group' }, res);
         console.log(e);
     });
 });
@@ -106,6 +142,8 @@ router.get('/userFriends/:user_id/', function (req, res) {
 
     _getUserFriendList(user_id).then(function (response) {
         userFriendList.friendlist = response.data.data;
+
+        console.log('userAccessToken : ' + facebookdata.userAccessToken);
 
         console.log('userFriendList : ' + userFriendList);
 

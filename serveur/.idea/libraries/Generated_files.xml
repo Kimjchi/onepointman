@@ -9,6 +9,7 @@
         <item url="file://$PROJECT_DIR$/dist/routes/fblogin.js" />
         <item url="file://$PROJECT_DIR$/dist/routes/users.js" />
         <item url="file://$PROJECT_DIR$/dist/app.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/drawing.js" />
         <item url="file://$PROJECT_DIR$/dist/routes/pinpoint.js" />
       </sourceFilesUrls>
     </properties>
@@ -20,6 +21,7 @@
       <root url="file://$PROJECT_DIR$/dist/routes/fblogin.js" />
       <root url="file://$PROJECT_DIR$/dist/routes/users.js" />
       <root url="file://$PROJECT_DIR$/dist/app.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/drawing.js" />
       <root url="file://$PROJECT_DIR$/dist/routes/pinpoint.js" />
     </CLASSES>
     <SOURCES />

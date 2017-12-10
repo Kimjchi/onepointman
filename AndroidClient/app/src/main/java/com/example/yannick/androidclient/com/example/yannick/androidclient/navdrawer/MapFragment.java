@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -121,7 +122,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
-            public void onMapLongClick(LatLng latLng) {
+            public void onMapLongClick(final LatLng latLng) {
                 //Ouvrir un popup
                 //Groupe
                 //Date RDV
@@ -200,7 +201,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         mTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                                hourPickerText.setText( selectedHour + ":" + selectedMinute);
+                                boolean condition = false;
+                                if(selectedMinute<10){
+                                    condition = true;
+                                }
+
+                                hourPickerText.setText( selectedHour + ":"+ (condition?"0":"") + selectedMinute + ":00");
                                 hourRdvSet = true;
                                 checkIfDialogButtonCanBeClickable();
                             }
@@ -216,6 +222,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onClick(View view) {
                         //TODO Placer le point de RDV sur la carte + envoyer au backend
+
+
+                        String dateString = datePickerText.getText().toString() + " " + hourPickerText.getText().toString();
+                        restRequester.sendNewPinPoint(currentGroup, latLng, descriptionRdv.getText().toString(), dateString);
                         rdvDialog.dismiss();
                     }
                 });
@@ -362,7 +372,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void updateLabel(EditText datePickerPlaceholder) {
-        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.CANADA_FRENCH);
 
         datePickerPlaceholder.setText(sdf.format(myCalendar.getTime()));

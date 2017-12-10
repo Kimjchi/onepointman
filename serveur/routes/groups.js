@@ -26,7 +26,7 @@ router.get('/:iduser/', function (req, res) {
                 status: 'fail',
                 message: e.toString()
             });
-            //sender.sendResponse(sender.NOT_FOUND_STATUS, toReturn, res);
+            //sender.sendResponse(sender.BAD_REQUEST, toReturn, res);
         });
 
 });
@@ -345,13 +345,13 @@ router.post('/creategroup', function (req, res) {
                     sender.sendResponse(sender.SUCCESS_STATUS, response, res)
                 })
                 .catch(err=>{
-                    sender.sendResponse(sender.NOT_FOUND_STATUS, 'Failed to insert user in USER_GROUP', res);
+                    sender.sendResponse(sender.BAD_REQUEST, 'Failed to insert user in USER_GROUP', res);
                     console.log(err);
                 })
 
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Failed to create group', res);
+            sender.sendResponse(sender.BAD_REQUEST, 'Failed to create group', res);
             console.log(e);
         })
 });
@@ -373,7 +373,7 @@ router.post('/changegroupname', function(req,res){
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e=>{
-            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail',message:'Failed to update groupname'}, res);
+            sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Failed to update groupname'}, res);
             console.log(e);
         })
 

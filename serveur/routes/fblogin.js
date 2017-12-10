@@ -85,6 +85,11 @@ const _bindLoggedUserData = (responseFromfb) => {
     loggedUser.iduser = facebookdata.userFbId
 }
 
+const _updateDataAfterAuth = () => {
+    //TODO: update last connection
+    //TODO: set is logged = true
+};
+
 let loggedUser = {
     nom: '',
     prenom: '',
@@ -202,19 +207,19 @@ router.post('/authAndroid', function (req, res) {
                         .catch(error => {
                             console.log(error);
 
-                            _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting existing user', res);
+                            _sendResponse(sender.BAD_REQUEST, 'error while getting existing user', res);
                         });
                 })
                 .catch(error => {
                     console.log(error);
 
-                    _sendResponse(sender.NOT_FOUND_STATUS, 'error while binding user data', res);
+                    _sendResponse(sender.BAD_REQUEST, 'error while binding user data', res);
                 });
         })
         .catch(e => {
             console.log('Android auth error ' + e);
 
-            _sendResponse(sender.NOT_FOUND_STATUS, 'error while getting app token', res);
+            _sendResponse(sender.BAD_REQUEST, 'error while getting app token', res);
         })
 });
 

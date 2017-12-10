@@ -38,7 +38,10 @@
     <string name="s_lectionnez_l_heure_du_rdv">Sélectionnez l\'heure du RDV...</string>
     <string name="ajouter_un_point_de_rendez_vous">Ajouter un point de rendez-vous</string>
 
+    <string name="startDrawing">Dessiner sur l\'écran</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="options">Options</string>
 
 </resources>

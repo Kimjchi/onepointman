@@ -10,6 +10,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/createdrawing', function(req,res){
+    console.log("YOOOOOOOOOOOO");
     let toCreate = {
         idcreator: req.body.iduser,
         idgroup: req.body.idgroup,

@@ -6,6 +6,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.Manifest;
+import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -66,10 +67,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private LocationService locationService;
     private DisplayThread updateMyPosition;
     private int currentGroup = 0;
+    private int currentTag = 0;
     public static MapFragment instance = null;
     public VolleyRequester restRequester = null;
     private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>() {
     };
+    private Bitmap snapshot;
 
     public int getCurrentGroup(){return currentGroup;}
     public void setCurrentGroup(int group){currentGroup = group;}
@@ -350,7 +353,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mMap.clear();
             synchronized(markers) {
                 for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
-                    mMap.addMarker(marker.getValue());
+                    if (marker.getKey().length() > 8) {
+                        if (marker.getKey().substring(0, 8).equals("Pinpoint")) {
+                            Log.v("IDPINPOINT", marker.getKey().substring(8));
+                            Marker pinpoint = mMap.addMarker(marker.getValue());
+                            pinpoint.setTag(Integer.parseInt(marker.getKey().substring(8)));
+                        } else {
+                            Marker classicMarker = mMap.addMarker(marker.getValue());
+                            classicMarker.setTag(0);
+                        }
+                    } else {
+                        Marker classicMarker = mMap.addMarker(marker.getValue());
+                        classicMarker.setTag(0);
+                    }
                 }
             }
         }
@@ -361,7 +376,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public AlertDialog popupBuilderInfoMarker(Marker marker){
+    public AlertDialog popupBuilderInfoMarker(final Marker marker){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setMessage(marker.getSnippet())
@@ -372,7 +387,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 dialog.dismiss();
             }
         });
-        // 3. Get the AlertDialog from create()
+
+
+        Log.v("DIALOG", marker.getTag().toString());
+        currentTag = (int)marker.getTag();
+        if (currentTag>0) {
+            builder.setNeutralButton("Supprimer", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    restRequester.deletePinPoint(currentGroup, currentTag);
+                    markers.remove("Pinpoint"+currentTag);
+                }
+            });
+        }
+
+
         return builder.create();
     }
 
@@ -395,12 +424,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public Bitmap getBitmapCurrentOfCurrentMap() {
-        View view = this.getView();
-        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
-        return bitmap;
+    public void takeSnapshotAndLauchDrawFragment(final FragmentManager fm) {
+        GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
+            @Override
+            public void onSnapshotReady(Bitmap snapshot) {
+                setSnapshot(snapshot);
+                Log.v("SNAPSHOT", "SNAPSHOT TOOK");
+                DrawFragment drawFragment = new DrawFragment();
+                drawFragment.setBackground(snapshot);
+                fm.beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
+            }
+        };
+        mMap.snapshot(callback);
+    }
+
+    public void setSnapshot(Bitmap snap)
+    {
+        this.snapshot = snap;
     }
 
 }

@@ -8,6 +8,7 @@ import {
 } from "../actions/opGroups";
 import {changePinPoints, updateMarkerMembers} from "../actions/opMap";
 import {changeIdGroup, changeUsers} from "../actions/opUsers";
+import {changeSharing} from "../actions/opOptions";
 
 export function * requestGroups() {
     while (true) {
@@ -152,6 +153,9 @@ export function * requestInfosGroup() {
                         }
                     }));
                     store.dispatch(updateMarkerMembers(newPositions));
+
+                    let isSharing = response.data.message.issharing;
+                    store.dispatch(changeSharing(isSharing));
                 }
             })
             .catch(function (error) {

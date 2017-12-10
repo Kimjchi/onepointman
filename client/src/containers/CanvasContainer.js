@@ -4,7 +4,8 @@ import {addGroup, changeGroupName, getGroups, getInfosGroup} from "../actions/op
 import GroupsComponent from "../components/GroupsComponent";
 import {addUser} from "../actions/opUsers";
 import CanvasComponent from "../components/CanvasComponent";
-
+import {changeDescription, sendDrawing, setDrawings} from "../actions/opCanvas";
+import {push} from "react-router-redux";
 
 class CanvasContainer extends Component {
     constructor(props) {
@@ -12,9 +13,21 @@ class CanvasContainer extends Component {
     }
 
     render() {
-
+        let {drawings, description} = this.props.opCanvas;
+        let {idUser} = this.props.opLogin;
+        let {groupToDisplay} = this.props.opUsers;
+        let {mapCenter, zoom} = this.props.opMap;
         return (
-            <CanvasComponent/>
+            <CanvasComponent setDrawings={this.props.setDrawings}
+                             drawing={drawings}
+                             description={description}
+                             idUser={idUser}
+                             groupToDisplay={groupToDisplay}
+                             mapCenter={mapCenter}
+                             zoom={zoom}
+                             sendDrawing={this.props.sendDrawing}
+                             changeDescription={this.props.changeDescription}
+            />
         )
     }
 }
@@ -23,13 +36,26 @@ function mapStateToProps (state) {
 
     return{
 
-        opLogin: state.opLogin
+        opLogin: state.opLogin,
+        opCanvas: state.opCanvas,
+        opUsers: state.opUsers,
+        opMap: state.opMap
     }
 }
 
 //fonctions
 const  mapDispatchToProps = (dispatch) => {
     return{
+        setDrawings: (drawings) => {
+            dispatch(setDrawings(drawings));
+            //dispatch(push("/drawings"))
+        },
+        changeDescription: (description) => {
+            dispatch(changeDescription(description))
+        },
+        sendDrawing:(drawing, idUser, idGroup, description, zoom, center) => {
+            dispatch(sendDrawing(drawing, idUser, idGroup, description, zoom, center))
+        }
     }
 };
 

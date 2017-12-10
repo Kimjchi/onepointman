@@ -146,22 +146,34 @@ router.post('/deleteuser/', function(req, res){
         .then(()=>{
         let query2 = squel.select()
             .from('public."USER_GROUP"')
-            .where('idgroup = ? ', toUpdate.idgroup)
+            .where('idgroup = ? ', parseInt(toUpdate.idgroup))
             .toString();
         db.any(query2)
             .then((result)=>{
                 if(result.length === 1){
-                    let deleteGroup=squel.delete()
-                        .from('public."GROUP"')
-                        .where('idgroup = ?', toUpdate.idgroup)
+                    //supprimer la derniere personne du groupe
+                    let deleteLastUser = squel.delete()
+                        .from('public."USER_GROUP"')
+                        .where('idgroup = ?', parseInt(toUpdate.idgroup))
                         .toString();
-                    db.query(deleteGroup)
+                    db.query(deleteLastUser)
                         .then(()=>{
-                            console.log("group deleted bc no more users");
+                            console.log('deleted last user from group successfully')
+                            let deleteGroup=squel.delete()
+                                .from('public."GROUP"')
+                                .where('idgroup = ?', toUpdate.idgroup)
+                                .toString();
+                            db.query(deleteGroup)
+                                .then(()=>{
+                                    console.log("group deleted bc no more users");
+                                })
+                                .catch(err=>{
+                                    console.log("failed at deleting empty group" + err);
+                                })
                         })
-                        .catch(err=>{
-                            console.log("failed at deleting empty group" + err);
-                        })
+                        .catch(error=>{
+                            console.log('failed at deleting last user' + error)
+                        });
                 }
             })
             .catch(e=>{

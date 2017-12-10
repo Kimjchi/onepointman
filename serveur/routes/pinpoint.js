@@ -44,7 +44,7 @@ router.post('/createpinpoint/', function (req, res) {
         })
 });
 
-router.delete('/deletepinpoint/', function (req, res) {
+router.post('/deletepinpoint/', function (req, res) {
 
     let toDelete = {
         iduser: req.body.iduser,
@@ -54,9 +54,9 @@ router.delete('/deletepinpoint/', function (req, res) {
 
     let query = squel.delete()
         .from('public."PINPOINT"')
-        .where('idcreator = ?', toDelete.iduser)
-        .where('idgroup = ?', toDelete.idgroup)
-        .where('idpinpoint = ?', toDelete.idpinpoint)
+        .where('idcreator = ?', parseInt(toDelete.iduser))
+        .where('idgroup = ?', parseInt(toDelete.idgroup))
+        .where('idpinpoint = ?', parseInt(toDelete.idpinpoint))
         .toString();
 
     db.query(query)

@@ -215,7 +215,7 @@ public class VolleyRequester
                             {
                                 final JSONObject groupe = (JSONObject) array.get(i);
                                 final int id = groupe.getInt("idgroup");
-=                                final String name = groupe.getString("nomgroup");
+                                final String name = groupe.getString("nomgroup");
                                 final boolean isSharing = groupe.getBoolean("issharing");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
                                 final ArrayList<UserModelSettings> users = new ArrayList<>();

@@ -2,11 +2,8 @@ package com.example.yannick.androidclient.com.example.yannick.androidclient.navd
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -19,8 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,39 +31,40 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
-
 public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Menu menu;
-    private Activity thisActivity;
+    private Menu navigationMenu;
+    private Menu settingsMenu;
     private int selectedGroup = -1;
-    private String newGroupName;
+    private boolean isDrawing;
+    private MapFragment mapFragment;
+
+    private static final int DESSINER = 1;
+    private static final int STOP_DESSINER = 2;
+    private static final int ENVOYER_DESSIN = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        thisActivity = this;
         setTitle("OnePointMan");
         setContentView(R.layout.activity_nav_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().replace(R.id.content_frame, new MapFragment(), "MAP_FRAGMENT").commit();
+        mapFragment = new MapFragment();
+        fm.beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        menu = navigationView.getMenu();
+        navigationMenu = navigationView.getMenu();
 
         View hView =  navigationView.getHeaderView(0);
         ImageView profilePic = hView.findViewById(R.id.profilePicture);
@@ -82,8 +78,9 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                     .into(profilePic);
         }
 
+        isDrawing = false;
 
-        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(menu);
+        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu);
 
         final Handler updateGroupInfos = new Handler();
         final String url = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";
@@ -113,12 +110,40 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             }
         }, 1000);
 
+        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                if(isDrawing)
+                {
+                    drawer.closeDrawer(GravityCompat.START);
+                }
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                if(isDrawing)
+                {
+                    drawer.closeDrawer(GravityCompat.START);
+                }
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(menu);
+        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu);
     }
 
     @Override
@@ -131,24 +156,42 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         }
     }
 
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.nav_drawer_settings, menu);
+        settingsMenu = menu;
+        settingsMenu.clear();
+        settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        System.out.println("OptionsItemSelected");
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id)
+        {
+            case DESSINER:
+                settingsMenu.clear();
+                settingsMenu.add(Menu.NONE, ENVOYER_DESSIN, Menu.NONE, "Envoyer le dessin");
+                settingsMenu.add(Menu.NONE, STOP_DESSINER, Menu.NONE, "Annuler le dessin");
+                mapFragment.takeSnapshotAndLauchDrawFragment(getFragmentManager());
+                isDrawing = true;
+                break;
+            case STOP_DESSINER:
+                settingsMenu.clear();
+                settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
+                isDrawing = false;
+                break;
+            case ENVOYER_DESSIN:
+                //TODO REQUETE ENVOI DU DESSIN
+                settingsMenu.clear();
+                settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
+                isDrawing = false;
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -163,36 +206,37 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         switch(id)
         {
             case R.id.add_group:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Choisir le nom du groupe");
+                if(!isDrawing)
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Choisir le nom du groupe");
 
-                final EditText input = new EditText(this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
-                builder.setMessage("Rentrer le nouveau nom du groupe");
+                    final EditText input = new EditText(this);
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    builder.setView(input);
+                    builder.setMessage("Rentrer le nouveau nom du groupe");
 
-                builder.setPositiveButton("Créer", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        newGroupName = input.getText().toString();
-                        VolleyRequester.getInstance(getApplicationContext()).createNewGroup(newGroupName);
-                    }
-                });
-                builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                    builder.setPositiveButton("Créer", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            VolleyRequester.getInstance(getApplicationContext()).createNewGroup(input.getText().toString());
+                        }
+                    });
+                    builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
 
-                builder.show();
+                    builder.show();
+                }
                 break;
             case R.id.nav_logout:
-                MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentByTag("MAP_FRAGMENT");
-                DrawFragment drawFragment = new DrawFragment();
-                drawFragment.setBackground(mapFragment.getBitmapCurrentOfCurrentMap());
+                if(!isDrawing)
+                {
 
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
+                }
                 break;
             default:
                 break;
@@ -203,7 +247,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         return true;
     }
 
-    public Menu getMenu(){
-        return menu;
+    public Menu getNavigationMenu(){
+        return navigationMenu;
     }
 }

@@ -6,6 +6,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.Manifest;
+import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -70,6 +71,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public VolleyRequester restRequester = null;
     private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>() {
     };
+    private Bitmap snapshot;
 
     public int getCurrentGroup(){return currentGroup;}
     public void setCurrentGroup(int group){currentGroup = group;}
@@ -395,12 +397,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public Bitmap getBitmapCurrentOfCurrentMap() {
-        View view = this.getView();
-        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
-        return bitmap;
+    public void takeSnapshotAndLauchDrawFragment(final FragmentManager fm) {
+        GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
+            @Override
+            public void onSnapshotReady(Bitmap snapshot) {
+                setSnapshot(snapshot);
+                Log.v("SNAPSHOT", "SNAPSHOT TOOK");
+                DrawFragment drawFragment = new DrawFragment();
+                drawFragment.setBackground(snapshot);
+                fm.beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
+            }
+        };
+        mMap.snapshot(callback);
+    }
+
+    public void setSnapshot(Bitmap snap)
+    {
+        this.snapshot = snap;
     }
 
 }

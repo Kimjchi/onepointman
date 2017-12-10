@@ -69,8 +69,6 @@ public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
 
         final ImageButton deleteBtn = view.findViewById(R.id.deleteSettings);
 
-        switchImageButton(position, deleteBtn);
-
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {

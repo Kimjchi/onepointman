@@ -207,7 +207,6 @@ public class VolleyRequester
                     @Override
                     public void onResponse(JSONObject response)
                     {
-                        System.out.println(response.toString());
                         try {
                             JSONArray array = (JSONArray) response.get("message");
                             menuNavDrawer.findItem(R.id.groups).getSubMenu().clear();
@@ -216,8 +215,7 @@ public class VolleyRequester
                             {
                                 final JSONObject groupe = (JSONObject) array.get(i);
                                 final int id = groupe.getInt("idgroup");
-                                System.out.println("L'id est corrompu "+id);
-                                final String name = groupe.getString("nomgroup");
+=                                final String name = groupe.getString("nomgroup");
                                 final boolean isSharing = groupe.getBoolean("issharing");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
                                 final ArrayList<UserModelSettings> users = new ArrayList<>();
@@ -619,7 +617,7 @@ public class VolleyRequester
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            //addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                            addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                             context.startActivity(addUserToGroupIntent);
                         }
                     }, new Response.ErrorListener() {

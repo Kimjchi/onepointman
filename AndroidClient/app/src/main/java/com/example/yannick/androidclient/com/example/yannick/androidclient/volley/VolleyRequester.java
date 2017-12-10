@@ -665,4 +665,41 @@ public class VolleyRequester
             Log.v("CHANGE_GROUP_NAME", "GROUPE "+groupId+": Erreur changement de nom du groupe");
         }
     }
+
+    public void sendNewPinPoint(int groupId, LatLng lglt, String desc, String date)
+    {
+
+        String idUser = FacebookInfosRetrieval.user_id;
+        String json = "{\"iduser\":"+idUser+",\"idgroup\":" + groupId
+            + ",\"pinlg\":"+ lglt.longitude +",\"pinlt\":" + lglt.latitude
+            + ",\"description\":\""+ desc +"\",\"daterdv\":\"" + date +"\"}";
+
+        Log.v("PINPOINT",json);
+
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest addRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/pinpoint/createpinpoint", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("PINPOINT", "Add succesfully");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("PINPOINT", "Error:" + error.getMessage());
+                }
+            });
+            this.addToRequestQueue(addRequest);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+
+
 }

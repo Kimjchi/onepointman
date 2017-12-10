@@ -60,8 +60,10 @@ public class DisplayThread implements Runnable {
                 }
                 Log.v("LOCATION", "Update displayed!");
                 activity.updateDisplayMarkers();
-                requester.groupPositionUpdate(activity.getCurrentGroup());
-                requester.displayGroupForNavDrawer(((NavDrawer)activity.getActivity()).getMenu());
+                if(activity.getCurrentGroup() != 0)
+                {
+                    requester.groupPositionUpdate(activity.getCurrentGroup());
+                }
                 handler.postDelayed(this, MY_POSITION_UPDATE_TIME);
             }
         }

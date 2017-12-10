@@ -77,8 +77,8 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         if(profilePic != null)
         {
             Picasso.with(this).load("https://graph.facebook.com/"+FacebookInfosRetrieval.user_id+"/picture?type=large")
-                    .placeholder(R.drawable.hamburger)
-                    .error(R.drawable.ic_menu_camera)
+                    .placeholder(R.drawable.loading_image)
+                    .error(R.drawable.not_found_image)
                     .into(profilePic);
         }
 
@@ -113,6 +113,12 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             }
         }, 1000);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(menu);
     }
 
     @Override

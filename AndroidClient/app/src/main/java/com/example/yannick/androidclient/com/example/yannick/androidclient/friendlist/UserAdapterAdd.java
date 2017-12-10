@@ -60,8 +60,8 @@ public class UserAdapterAdd extends ArrayAdapter<UserModelAdd>
         CircleImageView pic = view.findViewById(R.id.userImageAdd);
 
         Picasso.with(getContext()).load("https://graph.facebook.com/"+getItem(position).getId()+"/picture?type=large")
-                .placeholder(R.drawable.hamburger)
-                .error(R.drawable.ic_menu_camera)
+                .placeholder(R.drawable.loading_image)
+                .error(R.drawable.not_found_image)
                 .into(pic);
 
         TextView userName = view.findViewById(R.id.userNameAdd);

@@ -66,9 +66,10 @@ function buildGroupsObject(queryResult) {
                 contains = true;
                 idPosition = index;
             }
+
         });
         if (!contains) {
-            groups.push({idgroup: parseInt(element.idgroup), issharing: element.sharesposition, nomgroup: element.nomgroup, membres: []})
+            groups.push({idgroup: element.idgroup, issharing: element.sharesposition, nomgroup: element.nomgroup, membres: []})
         }
     });
     //une fois le tableau des groupes créé, on push les membres dans groups[idGroupConcerné].membres

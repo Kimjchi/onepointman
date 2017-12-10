@@ -4,23 +4,37 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.location.Location;
+import android.support.v4.widget.CompoundButtonCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.UserAdapterAdd;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -39,6 +53,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by yannick on 05/12/17.
@@ -49,7 +65,7 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    //private final String URL_SERVEUR = "http://10.42.0.1:3001";
+    //private final String URL_SERVEUR = "http://192.168.0.108:3001";
     private final String URL_SERVEUR = "http://192.168.137.1:3001";
 
     private VolleyRequester(Context context)
@@ -161,8 +177,9 @@ public class VolleyRequester
     }
 
     public void groupsRequest(){
+        String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
-                URL_SERVEUR + "/groups/2", null,
+                URL_SERVEUR + "/groups/"+ idUser, null,
                 new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -183,8 +200,9 @@ public class VolleyRequester
 
     public void displayGroupForNavDrawer(final Menu menuNavDrawer)
     {
+        String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET,
-                URL_SERVEUR + "/groups/2", null,
+                URL_SERVEUR + "/groups/" + idUser, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response)
@@ -192,23 +210,26 @@ public class VolleyRequester
                         System.out.println(response.toString());
                         try {
                             JSONArray array = (JSONArray) response.get("message");
+                            menuNavDrawer.findItem(R.id.groups).getSubMenu().clear();
 
                             for(int i=0; i < array.length(); i++)
                             {
                                 final JSONObject groupe = (JSONObject) array.get(i);
                                 final int id = groupe.getInt("idgroup");
+                                System.out.println("L'id est corrompu "+id);
                                 final String name = groupe.getString("nomgroup");
+                                final boolean isSharing = groupe.getBoolean("issharing");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
                                 final ArrayList<UserModelSettings> users = new ArrayList<>();
                                 for(int j=0; j<membres.length(); j++)
                                 {
                                     final JSONObject user = (JSONObject) membres.get(j);
                                     users.add(new UserModelSettings(user.getString("prenom") + user.getString("nomuser"),
-                                            user.getInt("iduser"), id));
+                                            user.get("iduser").toString(), id));
                                 }
                                 MenuItem mi = menuNavDrawer.findItem(R.id.groups)
                                         .getSubMenu().add(0, id, i, name);
-                                mi.setIcon(R.drawable.group);
+                                //mi.setIcon(R.drawable.group);
                                 ImageButton settingsButton = new ImageButton(context);
                                 settingsButton.setImageResource(R.drawable.bouton_style);
                                 settingsButton.setBackgroundResource(0);
@@ -218,16 +239,47 @@ public class VolleyRequester
                                         Intent settings = new Intent(context, SettingsGroup.class);
                                         settings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                                         settings.putExtra("groupName", name);
-                                        settings.putExtra("groupdId", id);
+                                        settings.putExtra("groupId", id);
                                         settings.putExtra("usersList", users);
                                         context.startActivity(settings);
                                     }
                                 });
-                                mi.setActionView(settingsButton);
+
+                                CheckBox sharingPositionBox = new CheckBox(context);
+                                int states[][] = {{android.R.attr.state_checked}, {}};
+
+                                int colors[] = {Color.BLACK, Color.BLACK};
+                                CompoundButtonCompat.setButtonTintList(sharingPositionBox, new ColorStateList(states, colors));
+                                sharingPositionBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                    @Override
+                                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                        if (b){
+                                            Log.v("CHECKBOX","Checked");
+                                            updateLocationSharing(true, id);
+                                        }else{
+                                            Log.v("CHECKBOX","Unchecked");
+                                            updateLocationSharing(false, id);
+                                        }
+                                    }
+                                });
+                                if (isSharing){
+                                    sharingPositionBox.setChecked(true);
+                                }
+
+                                LinearLayout test = new LinearLayout(context);
+                                test.addView(sharingPositionBox);
+                                test.addView(settingsButton);
+                                test.setGravity(Gravity.CENTER_VERTICAL);
+                                test.setBaselineAligned(true);
+
+                                mi.setActionView(test);
                                 mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                                     @Override
                                     public boolean onMenuItemClick(MenuItem menuItem) {
-                                        System.out.println("Clicked on "+menuItem.getItemId());
+                                        System.out.println("Clicked on " + menuItem.getItemId());
+                                        MapFragment activity = MapFragment.instance;
+                                        activity.setCurrentGroup(id);
+                                        activity.clearMarkers();
                                         return false;
                                     }
                                 });
@@ -244,6 +296,37 @@ public class VolleyRequester
         });
         VolleyRequester.getInstance(context).addToRequestQueue(setGroups);
     }
+
+
+    public void updateLocationSharing(boolean share, int idGroup){
+        String idUser = FacebookInfosRetrieval.user_id;
+        String json = "{\"iduser\":"+ idUser + ",\"idgroup\":"
+                + idGroup + ",\"positionSharing\":" + share +"}";
+
+        try {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest postMyPosition = new JsonObjectRequest (Request.Method.POST,
+                    URL_SERVEUR + "/users/updatepositionsharing/", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                        Log.v("SHARING POSITION", "Partage de position mis à jour!");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // TODO Auto-generated method stub
+                    //MDR LÉ EREUR C POUR LÉ FèBLe
+                    Toast.makeText(context,"Serveur indisponible, partage de position mis à jour!", Toast.LENGTH_SHORT);
+                }
+            });
+            this.addToRequestQueue(postMyPosition);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     /*Pour request du JSON:
         https://developer.android.com/training/volley/request.html
@@ -289,7 +372,6 @@ public class VolleyRequester
     public void groupPositionUpdate(int group){
 
         String idUser = FacebookInfosRetrieval.user_id;
-        //String idUser = "3";
         JsonObjectRequest grpInfoRequest = new JsonObjectRequest (Request.Method.GET,
                 URL_SERVEUR + "/groups/positions/" + idUser + "/" + group, null,
                 new Response.Listener<JSONObject>() {
@@ -329,7 +411,7 @@ public class VolleyRequester
                 double lg = Double.parseDouble(pinPoint.getString("pinlg"));
                 String daterdv = pinPoint.getString("daterdv");
                 String desc = pinPoint.getString("description");
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
                 Date date = format.parse(daterdv);
                 String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
 
@@ -395,14 +477,15 @@ public class VolleyRequester
         }
     }
 
-    public void deleteUserFromGroup(final long itemId, final int groupId)
+    public void deleteUserFromGroup(final String itemId, final int groupId)
     {
-        String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
-        System.out.println(json);
         try
         {
-            JSONObject bodyJson = new JSONObject(json);
-            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
+            JSONObject bodyJson = new JSONObject();
+            bodyJson.put("iduser", itemId);
+            bodyJson.put("idgroup", groupId);
+            System.out.println(bodyJson.toString());
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.POST,
                     URL_SERVEUR + "/users/deleteuser", bodyJson,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -414,7 +497,17 @@ public class VolleyRequester
                 public void onErrorResponse(VolleyError error) {
                     Log.v("DELETE_USER", "Fail to delete user "+itemId + " from group "+groupId + " : "+error.getMessage());
                 }
-            });
+
+            }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError
+                {
+                    Map<String, String>  headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    return headers;
+                }
+            };
+
             this.addToRequestQueue(deleteRequest);
         }
         catch(Exception ex)
@@ -423,28 +516,27 @@ public class VolleyRequester
         }
     }
 
-    public void addUserToGroup(long itemId, int groupId)
+    public void addUserToGroup(final String itemId, final int groupId)
     {
         String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
 
         try
         {
-            /*
             JSONObject bodyJson = new JSONObject(json);
-            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
-                    URL_SERVEUR + "users/deleteuser", bodyJson,
+            JsonObjectRequest addRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/users/createuser", bodyJson,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.v("DELETE_USER", "User " + itemId + " bien delete du groupe " + groupId);
+                            Log.v("ADD_USER", "User " + itemId + " bien add du groupe " + groupId);
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.v("DELETE_USER", "Fail to delete user "+itemId + "from group "+groupId);
+                    Log.v("ADD_USER", "Fail to add user "+itemId + "from group "+groupId);
                 }
             });
-            this.addToRequestQueue(deleteRequest);*/
+            this.addToRequestQueue(addRequest);
         }
         catch(Exception ex)
         {
@@ -452,7 +544,7 @@ public class VolleyRequester
         }
     }
 
-    public void retreiveUserFriendList(final ArrayList<UserModelSettings> users, final ArrayList<UserModelAdd> toFill, final int idGroup)
+    public void retreiveUserFriendList(final ArrayList<UserModelSettings> users, final ArrayList<UserModelAdd> toFill, final int idGroup, final ListView listView)
     {
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
                 URL_SERVEUR + "/users/userFriends/"+FacebookInfosRetrieval.user_id, null,
@@ -462,29 +554,34 @@ public class VolleyRequester
                     {
                         try
                         {
-                            System.out.println(response.toString());
-                            final JSONArray array = (JSONArray) response.get("friendlist");
+                            JSONArray array = (JSONArray) response.get("friendlist");
                             for(int i=0; i<array.length(); i++)
                             {
                                 boolean notFound = true;
-                                final JSONObject user = (JSONObject) array.get(i);
-                                final int id = user.getInt("id");
-                                final String name = user.getString("name");
+                                JSONObject user = (JSONObject) array.get(i);
+                                String id = user.getString("id");
+                                String name = user.getString("name");
 
                                 if(users != null)
                                 {
                                     for(UserModelSettings tmpUser : users)
                                     {
-                                        if(id == tmpUser.getId())
+                                        if(id.equals(tmpUser.getId()))
                                         {
                                             notFound = false;
-                                            toFill.add(new UserModelAdd(name, id, tmpUser.getGroupId(), true));
                                             break;
                                         }
                                     }
                                 }
+
+                                if(notFound)
+                                {
+                                    toFill.add(new UserModelAdd(name, id, idGroup, false));
+                                }
                             }
 
+                            UserAdapterAdd userAdapter = new UserAdapterAdd(toFill, context);
+                            listView.setAdapter(userAdapter);
                             Log.v("FRIENDS_LIST", "Done, friends list bien retrieve");
                         }
                         catch(Exception ex)
@@ -503,34 +600,71 @@ public class VolleyRequester
 
     public void createNewGroup(final String newGroupName)
     {
-        JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.GET,
-                URL_SERVEUR + "groups/create/"+newGroupName, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response)
-                    {
-                        Log.v("CREATE_GROUP", "Groupe "+newGroupName+ " bien cree");
-                        Intent addUserToGroupIntent = new Intent(context, AddUserToGroup.class);
-                        addUserToGroupIntent.putExtra("groupName", newGroupName);
-                        addUserToGroupIntent.putExtra("groupId", 2789);
-                        addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                        context.startActivity(addUserToGroupIntent);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                new AlertDialog.Builder(context)
-                        .setTitle("Erreur lors de la création de groupe")
-                        .setMessage(error.getMessage())
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+        String json = "{\"iduser\":"+FacebookInfosRetrieval.user_id+", \"groupname\":\""+newGroupName+"\"}";
+
+        try
+        {
+            JSONObject objetJSON = new JSONObject(json);
+            JsonObjectRequest createGroupRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/groups/creategroup", objetJSON,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response)
+                        {
+                            Log.v("CREATE_GROUP", "Groupe "+newGroupName+ " bien cree");
+                            Intent addUserToGroupIntent = new Intent(context, AddUserToGroup.class);
+                            addUserToGroupIntent.putExtra("groupName", newGroupName);
+                            try {
+                                addUserToGroupIntent.putExtra("groupId", response.getInt("idgroup"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        }).show();
-                Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
-            }
-        });
-        this.addToRequestQueue(deleteRequest);
+                            //addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                            context.startActivity(addUserToGroupIntent);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(context, "Erreur lors de la création du groupe", Toast.LENGTH_LONG).show();
+                    Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
+                }
+            });
+            this.addToRequestQueue(createGroupRequest);
+        }
+        catch(Exception ex)
+        {
+            Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName+" "+ex.getMessage());
+        }
+    }
+
+    public void changeGroupName(String groupName, final int groupId)
+    {
+        String json = "{\"idgroup\":"+groupId+", \"newgroupname\":\""+groupName+"\"}";
+
+        System.out.println(json);
+
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/groups/changegroupname/", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response)
+                        {
+                            Log.v("CHANGE_GROUP_NAME", "GROUPE "+groupId+": Nom du groupe bien changé");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("CHANGE_GROUP_NAME", "GROUPE "+groupId+": Erreur changement de nom du groupe");
+                }
+            });
+            this.addToRequestQueue(deleteRequest);
+        }
+        catch(Exception ex)
+        {
+            Log.v("CHANGE_GROUP_NAME", "GROUPE "+groupId+": Erreur changement de nom du groupe");
+        }
     }
 }

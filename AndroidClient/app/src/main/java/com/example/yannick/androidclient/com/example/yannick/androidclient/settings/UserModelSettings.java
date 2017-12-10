@@ -11,10 +11,10 @@ import java.io.Serializable;
 public class UserModelSettings implements Serializable {
 
     private String name;
-    private int id;
+    private String id;
     private int groupId;
 
-    public UserModelSettings(String name, int id, int groupId) {
+    public UserModelSettings(String name, String id, int groupId) {
         this.name=name;
         this.id = id;
         this.groupId = groupId;
@@ -24,7 +24,7 @@ public class UserModelSettings implements Serializable {
         return name;
     }
 
-    public int getId(){return this.id;}
+    public String getId(){return this.id;}
 
     public int getGroupId(){return this.groupId;}
 }

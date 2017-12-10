@@ -2,10 +2,12 @@ import {take, fork} from 'redux-saga/effects';
 import axios from 'axios';
 import {store} from '../store';
 import {
-    ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_PHOTO, getGroups, getPhoto,
+    ADD_GROUP,
+    ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_PHOTO, getGroups, getPhoto, SEND_CHANGE_NAME,
     setPhoto
 } from "../actions/opGroups";
-import {changeUsers} from "../actions/opUsers";
+import {changePinPoints} from "../actions/opMap";
+import {changeIdGroup, changeUsers} from "../actions/opUsers";
 
 export function * requestGroups() {
     while (true) {
@@ -38,7 +40,8 @@ export function * requestGroups() {
                         group.membres.forEach(membre => {
                             store.dispatch(getPhoto(membre.iduser))
                         })
-                    })
+                    });
+                    store.dispatch(changeIdGroup(''));
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);
@@ -55,19 +58,18 @@ export function * requestGroups() {
 
 export function * requestAddGroup() {
     while (true) {
-        let user = yield take(ADD_GROUP_TEST);
+        let user = yield take(ADD_GROUP);
         let id = user.idUser;
         let groupName = user.groupName;
 
-        let server = "http://localhost:3001/groups/create";
+        let server = "http://localhost:3001/groups/creategroup/";
 
         axios.post(server, {
-            id: id,
-            groupName: groupName
+            groupname: groupName,
+            iduser: id,
         })
             .then(function (response) {
-                if (!!response.data.status && response.data.status === 'success') {
-                    alert('La création du groupe est un succès !');
+                if (!!response.status && response.status === 200) {
                     store.dispatch(getGroups(id));
                 }
                 else if(response.data.status === 'fail') {
@@ -114,6 +116,22 @@ export function * requestInfosGroup() {
             .then(function (response) {
                 if(!!response.data.status && response.data.status === 'success') {
                     console.log(response.data.message);
+                    let pinpoints = response.data.message.pinpoints;
+                    let newPinpoints = [];
+                    pinpoints.map((pinPoint => {
+                        if(pinPoint.idpinpoint) {
+                            let newPinPoint = {
+                                id: pinPoint.idpinpoint,
+                                pos: {lt: Number(pinPoint.pinlt), lg: Number(pinPoint.pinlg)},
+                                desc: pinPoint.description,
+                                idCreator: pinPoint.idcreator,
+                                date: pinPoint.daterdv,
+                                showInfo: false
+                            }
+                            newPinpoints.push(newPinPoint);
+                        }
+                    }))
+                    store.dispatch(changePinPoints(newPinpoints));
                 }
             })
             .catch(function (error) {
@@ -122,9 +140,40 @@ export function * requestInfosGroup() {
     }
 }
 
+export function * requestChangeNameGroup() {
+    while (true) {
+        let user = yield take(SEND_CHANGE_NAME);
+        let id = user.idUser;
+        let groupName = user.groupName;
+        let idGroup = user.idGroup;
+
+        let server = "http://localhost:3001/groups/changegroupname";
+
+        axios.post(server, {
+            newgroupname: groupName,
+            idgroup: idGroup,
+        })
+            .then(function (response) {
+                if (!!response.status && response.status === 200) {
+                    store.dispatch(getGroups(id));
+                }
+                else if(response.data.status === 'fail') {
+                    alert(response.data.message);
+                }
+                else {
+                    alert('Erreur lors de la création d\'un groupe');
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+}
+
 export function * GroupsFlow() {
     yield fork(requestGroups);
     yield fork(requestAddGroup);
     yield fork(requestPhoto);
     yield fork(requestInfosGroup);
+    yield fork(requestChangeNameGroup);
 }

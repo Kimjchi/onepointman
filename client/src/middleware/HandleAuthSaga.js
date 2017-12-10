@@ -19,7 +19,6 @@ export function* HandleAuth() {
             .then(function (response) {
                 if (!!response.status && response.status === 200) {
                     alert('Welcome ' + JSON.stringify(response.data.prenom).replace(/\"/g, ""));
-                    console.log(response.data);
                     store.dispatch(setAuthState(true));
                     store.dispatch(idUser(response.data.iduser));
                     store.dispatch(getPhotoUser(response.data.iduser));

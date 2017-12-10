@@ -22,16 +22,15 @@ router.post('/createpinpoint/', function (req, res) {
 
     let query = squel.insert()
         .into('public."PINPOINT"')
-        .set('idcreator', toCreate.iduser)
-        .set('idgroup', toCreate.idgroup)
-        .set('pinlt', toCreate.pinlt)
-        .set('pinlg', toCreate.pinlg)
+        .set('idcreator', parseInt(toCreate.iduser,10))
+        .set('idgroup', parseInt(toCreate.idgroup,10))
+        .set('pinlt', parseInt(toCreate.pinlt,10))
+        .set('pinlg', parseInt(toCreate.pinlg,10))
         .set('description', toCreate.description)
         .set('daterdv', toCreate.daterdv)
-        .set('dateexpiration', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString())
+        .set('dateexp', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString())
         .returning('idpinpoint')
         .toString();
-
     db.one(query)
         .then((row)=>{
             let response = {
@@ -40,7 +39,7 @@ router.post('/createpinpoint/', function (req, res) {
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while creating pinpoint', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail',message:'Error while creating pinpoint'}, res);
             console.log(e);
         })
 });
@@ -62,10 +61,10 @@ router.delete('/deletepinpoint/', function (req, res) {
 
     db.query(query)
         .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, 'Pinpoint deleted', res)
+            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'Pinpoint deleted'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while deleting pinpoint', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail',message:'Error while deleting pinpoint'}, res);
             console.log(e);
         })
 

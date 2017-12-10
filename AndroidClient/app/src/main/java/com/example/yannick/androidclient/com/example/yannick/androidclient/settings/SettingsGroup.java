@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 
 import java.util.ArrayList;
 
@@ -34,6 +35,7 @@ public class SettingsGroup extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.settingsToolbar);
         groupName = getIntent().getExtras().get("groupName").toString();
         groupId = getIntent().getExtras().getInt("groupId");
+        System.out.println("ON EST DANS SETTINGS EST LID EST "+groupId);
         toolbar.setTitle(groupName);
 
         setSupportActionBar(toolbar);
@@ -47,6 +49,8 @@ public class SettingsGroup extends AppCompatActivity {
 
         userAdapter = new UserAdapterSettings(userModels, getApplicationContext());
         userList.setAdapter(userAdapter);
+
+        userList.setNestedScrollingEnabled(true);
     }
 
     @Override
@@ -86,6 +90,7 @@ public class SettingsGroup extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         groupName = input.getText().toString();
+                        VolleyRequester.getInstance(getApplicationContext()).changeGroupName(groupName, groupId);
                         ((Toolbar)findViewById(R.id.settingsToolbar)).setTitle(groupName);
                     }
                 });

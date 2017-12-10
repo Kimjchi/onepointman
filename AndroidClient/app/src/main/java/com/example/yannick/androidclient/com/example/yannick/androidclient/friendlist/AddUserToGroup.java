@@ -39,13 +39,18 @@ public class AddUserToGroup extends AppCompatActivity
         userList = (ListView) findViewById(R.id.listUserAdd);
 
         userModels = new ArrayList<>();
+        ArrayList<UserModelSettings> userModelSettings = null;
+
+        if(getIntent().getExtras().getSerializable("usersList") != null)
+        {
+            userModelSettings = (ArrayList<UserModelSettings>)getIntent().getExtras().getSerializable("usersList");
+        }
+
+        userList.setNestedScrollingEnabled(true);
 
         VolleyRequester.getInstance(getApplicationContext())
-                .retreiveUserFriendList((ArrayList< UserModelSettings>)getIntent().getExtras().getSerializable("usersList"), userModels,
-                        getIntent().getExtras().getInt("groupId"));
-
-        userAdapter = new UserAdapterAdd(userModels, getApplicationContext());
-        userList.setAdapter(userAdapter);
+                .retreiveUserFriendList(userModelSettings, userModels,
+                        getIntent().getExtras().getInt("groupId"), userList);
     }
 
     @Override

@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -52,6 +53,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by yannick on 05/12/17.
@@ -62,8 +65,8 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    private final String URL_SERVEUR = "http://192.168.0.108:3001";
-    //private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    //private final String URL_SERVEUR = "http://192.168.0.108:3001";
+    private final String URL_SERVEUR = "http://192.168.137.1:3001";
 
     private VolleyRequester(Context context)
     {
@@ -212,6 +215,7 @@ public class VolleyRequester
                             {
                                 final JSONObject groupe = (JSONObject) array.get(i);
                                 final int id = groupe.getInt("idgroup");
+                                System.out.println("L'id est corrompu "+id);
                                 final String name = groupe.getString("nomgroup");
                                 //final boolean isSharing = groupe.getBoolean("issharing");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
@@ -234,7 +238,7 @@ public class VolleyRequester
                                         Intent settings = new Intent(context, SettingsGroup.class);
                                         settings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                                         settings.putExtra("groupName", name);
-                                        settings.putExtra("groupdId", id);
+                                        settings.putExtra("groupId", id);
                                         settings.putExtra("usersList", users);
                                         context.startActivity(settings);
                                     }
@@ -468,12 +472,13 @@ public class VolleyRequester
 
     public void deleteUserFromGroup(final String itemId, final int groupId)
     {
-        String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
-        System.out.println(json);
         try
         {
-            JSONObject bodyJson = new JSONObject(json);
-            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
+            JSONObject bodyJson = new JSONObject();
+            bodyJson.put("iduser", itemId);
+            bodyJson.put("idgroup", groupId);
+            System.out.println(bodyJson.toString());
+            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.POST,
                     URL_SERVEUR + "/users/deleteuser", bodyJson,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -488,10 +493,13 @@ public class VolleyRequester
 
             }){
                 @Override
-                public String getBodyContentType() {
-                    return "application/json";
+                public Map<String, String> getHeaders() throws AuthFailureError
+                {
+                    Map<String, String>  headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    return headers;
                 }
-                };
+            };
 
             this.addToRequestQueue(deleteRequest);
         }
@@ -501,28 +509,27 @@ public class VolleyRequester
         }
     }
 
-    public void addUserToGroup(String itemId, int groupId)
+    public void addUserToGroup(final String itemId, final int groupId)
     {
         String json = "{\"iduser\":"+itemId+",\"idgroup\":" + groupId + "}";
 
         try
         {
-            /*
             JSONObject bodyJson = new JSONObject(json);
-            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.DELETE,
-                    URL_SERVEUR + "users/deleteuser", bodyJson,
+            JsonObjectRequest addRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/users/createuser", bodyJson,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.v("DELETE_USER", "User " + itemId + " bien delete du groupe " + groupId);
+                            Log.v("ADD_USER", "User " + itemId + " bien add du groupe " + groupId);
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.v("DELETE_USER", "Fail to delete user "+itemId + "from group "+groupId);
+                    Log.v("ADD_USER", "Fail to add user "+itemId + "from group "+groupId);
                 }
             });
-            this.addToRequestQueue(deleteRequest);*/
+            this.addToRequestQueue(addRequest);
         }
         catch(Exception ex)
         {
@@ -590,8 +597,9 @@ public class VolleyRequester
 
         try
         {
-            JsonObjectRequest deleteRequest = new JsonObjectRequest(Request.Method.POST,
-                    URL_SERVEUR + "/groups/creategroup"+newGroupName, null,
+            JSONObject objetJSON = new JSONObject(json);
+            JsonObjectRequest createGroupRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/groups/creategroup", objetJSON,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response)
@@ -599,8 +607,12 @@ public class VolleyRequester
                             Log.v("CREATE_GROUP", "Groupe "+newGroupName+ " bien cree");
                             Intent addUserToGroupIntent = new Intent(context, AddUserToGroup.class);
                             addUserToGroupIntent.putExtra("groupName", newGroupName);
-                            addUserToGroupIntent.putExtra("groupId", 2789);
-                            addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                            try {
+                                addUserToGroupIntent.putExtra("groupId", response.getInt("idgroup"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            //addUserToGroupIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                             context.startActivity(addUserToGroupIntent);
                         }
                     }, new Response.ErrorListener() {
@@ -610,17 +622,19 @@ public class VolleyRequester
                     Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
                 }
             });
-            this.addToRequestQueue(deleteRequest);
+            this.addToRequestQueue(createGroupRequest);
         }
         catch(Exception ex)
         {
-            Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
+            Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName+" "+ex.getMessage());
         }
     }
 
     public void changeGroupName(String groupName, final int groupId)
     {
         String json = "{\"idgroup\":"+groupId+", \"newgroupname\":\""+groupName+"\"}";
+
+        System.out.println(json);
 
         try
         {

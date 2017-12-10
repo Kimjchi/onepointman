@@ -73,18 +73,13 @@ export function * requestDeleteUser() {
         let idGroup = user.idGroup;
 
         let server = "http://localhost:3001/users/deleteuser";
-        let config = {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: {
-                iduser: id,
-                idgroup: idGroup,
-            }
-        };
-        axios.delete(server, config)
+
+        axios.post(server, {
+            iduser: id,
+            idgroup: idGroup,
+        })
             .then(function (response) {
-                if (!!response.status && response.status === 200) {
+                if (!!response.data.status && response.data.status === "success") {
                     store.dispatch(getGroups(idUser));
                 }
                 else if(response.data.status === 'fail') {

@@ -156,18 +156,6 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
 
         switch(id)
         {
-            case 0:
-                System.out.println("Groupe 1");
-                break;
-            case 1:
-                System.out.println("Groupe 2");
-                break;
-            case 2:
-                System.out.println("Groupe 3");
-                break;
-            case 3:
-                System.out.println("Groupe 4");
-                break;
             case R.id.add_group:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Choisir le nom du groupe");
@@ -203,5 +191,9 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public Menu getMenu(){
+        return menu;
     }
 }

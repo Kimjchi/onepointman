@@ -7,6 +7,9 @@ import {CHANGE_ADDRESS_FORMATTED} from "../actions/opOptions";
 import {CHANGE_ADDRESS_ENTRY} from "../actions/opOptions";
 import {CHANGE_SHARING_MODE} from "../actions/opOptions";
 import {CHANGE_RDV_MODAL_VISIBILITY} from "../actions/opOptions";
+import {CHANGE_NEW_PINPOINT} from "../actions/opOptions";
+import {CHANGE_RM_PP_MODAL_VISIBILITY} from "../actions/opOptions";
+import {CHANGE_RM_PINPOINT} from "../actions/opOptions";
 
 //ajouter le reste dans l'import
 
@@ -15,7 +18,13 @@ let initialState = {
     address : "",
     validAddress : false,
     isSharingPosition : false,
-    showModalRdv : false
+    showModalRdv : false,
+    showModalRmPp : false,
+    pinPointToRemove : "",
+    pinPoint : {
+        date : "",
+        desc : ""
+    }
 };
 
 export default function reducer (state = initialState, action ){
@@ -27,6 +36,12 @@ export default function reducer (state = initialState, action ){
             return {...state, isSharingPosition : !state.isSharingPosition};
         case CHANGE_RDV_MODAL_VISIBILITY:
             return {...state, showModalRdv : !state.showModalRdv};
+        case CHANGE_RM_PP_MODAL_VISIBILITY:
+            return {...state, showModalRmPp : !state.showModalRmPp};
+        case CHANGE_NEW_PINPOINT:
+            return {...state, pinPoint : action.pinPoint};
+        case CHANGE_RM_PINPOINT:
+            return {...state, pinPointToRemove : action.pinPointToRemove};
 
         default:
             return state

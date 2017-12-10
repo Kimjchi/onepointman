@@ -210,6 +210,7 @@ public class VolleyRequester
                         System.out.println(response.toString());
                         try {
                             JSONArray array = (JSONArray) response.get("message");
+                            menuNavDrawer.findItem(R.id.groups).getSubMenu().clear();
 
                             for(int i=0; i < array.length(); i++)
                             {
@@ -217,7 +218,7 @@ public class VolleyRequester
                                 final int id = groupe.getInt("idgroup");
                                 System.out.println("L'id est corrompu "+id);
                                 final String name = groupe.getString("nomgroup");
-                                //final boolean isSharing = groupe.getBoolean("issharing");
+                                final boolean isSharing = groupe.getBoolean("issharing");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
                                 final ArrayList<UserModelSettings> users = new ArrayList<>();
                                 for(int j=0; j<membres.length(); j++)
@@ -261,6 +262,9 @@ public class VolleyRequester
                                         }
                                     }
                                 });
+                                if (isSharing){
+                                    sharingPositionBox.setChecked(true);
+                                }
 
                                 LinearLayout test = new LinearLayout(context);
                                 test.addView(sharingPositionBox);
@@ -273,6 +277,9 @@ public class VolleyRequester
                                     @Override
                                     public boolean onMenuItemClick(MenuItem menuItem) {
                                         System.out.println("Clicked on " + menuItem.getItemId());
+                                        MapFragment activity = MapFragment.instance;
+                                        activity.setCurrentGroup(id);
+                                        activity.clearMarkers();
                                         return false;
                                     }
                                 });

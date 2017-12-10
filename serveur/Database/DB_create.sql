@@ -54,7 +54,7 @@ CREATE TABLE "FRIENDS"(
 
 CREATE TABLE "USER_GROUP"(
     sharesposition boolean DEFAULT true,
-    iscreator boolean,
+    iscreator boolean DEFAULT false,
     userglt numeric(9,6),
     userglg numeric(9,6),
     dateposition timestamp with time zone,

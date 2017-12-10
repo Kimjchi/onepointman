@@ -26,6 +26,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -75,7 +76,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_map, container, false);
-        Button upButton = (Button) view.findViewById(R.id.center_position);
+        ImageButton upButton = (ImageButton) view.findViewById(R.id.center_position);
         upButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -10,7 +10,7 @@ export function* transmitPosition() {
 
     while (true) {
         let args = yield take(CHANGE_MARKER_GEOLOCATION);
-        let position = args.markers;
+        let position = args.markers[0];
         let idUser = Number(args.idUser);
         let data = {
             iduser: idUser,

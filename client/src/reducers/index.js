@@ -5,6 +5,7 @@ import opGroups from './opGroups';
 import opMap from './opMap';
 import opOptions from "./opOptions";
 import opUsers from './opUsers';
+import opCanvas from './opCanvas';
 
 // TODO les autres reducers a rajouter ici
 
@@ -15,7 +16,8 @@ const appReducer = combineReducers({
     opGroups,
     opMap,
     opOptions,
-    opUsers
+    opUsers,
+    opCanvas
 });
 
 const rootReducer = (state, action) => {

@@ -22,6 +22,7 @@ import Datetime from "react-datetime";
 import dateFormat from "dateformat";
 import {hours} from "moment";
 import fbDefaultImage from "../pictures/SMART_BOY_FB.jpg"
+import {draw} from "../actions/opCanvas";
 
 var ATLANTIC_OCEAN = {
     latitude: 29.532804,
@@ -58,6 +59,7 @@ class OptionsContainer extends Component {
         this._getValidationPinPoint = this._getValidationPinPoint.bind(this);
         this._getUserUrlPhoto = this._getUserUrlPhoto.bind(this);
         this._deletePinPoint = this._deletePinPoint.bind(this);
+        this._handleModeDessin = this._handleModeDessin.bind(this);
     }
 
     _open() {
@@ -242,6 +244,19 @@ class OptionsContainer extends Component {
         }.bind(this));
     }
 
+    _handleModeDessin(event) {
+        event.preventDefault();
+        let boolean = this.props.opCanvas.draw;
+        if(boolean) {
+            boolean = false;
+        }
+        else {
+            boolean = true;
+        }
+        console.log(boolean);
+        this.props.draw(boolean);
+    }
+
     render() {
         let {address} = this.props.opOptions;
         let {isSharingPosition} = this.props.opOptions;
@@ -330,12 +345,12 @@ class OptionsContainer extends Component {
                     </label>
                 <input id='settings' type='checkbox'/>
                     <label htmlFor='settings'>
-                        <p className ="accordion"><span className="ico"/>Autre chose ?</p>
+                        <p className ="accordion"><span className="ico"/>Dessins</p>
                         <div className='lil_arrow'/>
                         <div className='content'>
                         <ul>
                             <li>
-                                <a href='#'>Man's not hot</a>
+                                <a onClick={this._handleModeDessin}>Mode dessin</a>
                             </li>
                         </ul>
                         </div>
@@ -396,7 +411,8 @@ function mapStateToProps (state) {
         opMap : state.opMap,
         opUsers : state.opUsers,
         opLogin : state.opLogin,
-        opGroups: state. opGroups
+        opGroups: state. opGroups,
+        opCanvas: state.opCanvas
     }
 }
 
@@ -438,6 +454,9 @@ const  mapDispatchToProps = (dispatch) => {
         },
         deletePinPoint: (idPinPoint, idUser, idGroup) => {
             dispatch(deletePinPoint(idPinPoint, idUser, idGroup))
+        },
+        draw: (boolean) => {
+            dispatch(draw(boolean));
         }
     }
 };

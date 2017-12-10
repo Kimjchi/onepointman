@@ -67,7 +67,7 @@ class GroupsComponent extends Component {
     _displayUsers(event) {
         let users = this.props.groups;
         let usersToDisplay = users.filter(group => {
-            return group.idgroup === parseInt(event.target.id, 10);
+            return parseInt(group.idgroup, 10) === parseInt(event.target.id, 10);
         });
         if(usersToDisplay.length === 0) {
             this.props.addUser([], event.target.id, this.props.idUser);

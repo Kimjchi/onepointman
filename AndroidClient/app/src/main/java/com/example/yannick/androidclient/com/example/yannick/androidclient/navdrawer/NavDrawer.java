@@ -63,7 +63,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         toggle.syncState();
 
         FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().replace(R.id.content_frame, new MapFragment()).commit();
+        fm.beginTransaction().replace(R.id.content_frame, new MapFragment(), "MAP_FRAGMENT").commit();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -188,7 +188,11 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 builder.show();
                 break;
             case R.id.nav_logout:
+                MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentByTag("MAP_FRAGMENT");
+                DrawFragment drawFragment = new DrawFragment();
+                drawFragment.setBackground(mapFragment.getBitmapCurrentOfCurrentMap());
 
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
                 break;
             default:
                 break;

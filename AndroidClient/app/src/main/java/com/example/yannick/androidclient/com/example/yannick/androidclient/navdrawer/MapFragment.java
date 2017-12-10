@@ -10,6 +10,8 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -39,6 +41,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -360,6 +363,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public AlertDialog popupBuilderInfoMarker(Marker marker){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
         builder.setMessage(marker.getSnippet())
                 .setTitle(marker.getTitle());
 
@@ -389,6 +393,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         {
             rdvOkButton.setEnabled(false);
         }
+    }
+
+    public Bitmap getBitmapCurrentOfCurrentMap() {
+        View view = this.getView();
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
     }
 
 }

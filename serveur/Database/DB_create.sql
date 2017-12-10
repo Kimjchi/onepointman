@@ -12,7 +12,7 @@ CREATE TABLE "USER"(
     isconnected boolean,
     nom varchar(50),
     prenom varchar(50),
-    lastconnexion date,
+    lastconnexion timestamp with time zone,
     lt numeric(9,6),
     lg numeric(9,6),
     dateposition timestamp with time zone
@@ -31,7 +31,7 @@ CREATE TABLE "PINPOINT"(
     pinlg numeric(9,6),
     daterdv timestamp with timezone,
     dateexpiration timestamp with timezone,
-    idcreator integer REFERENCES "USER" (iduser),
+    idcreator bigint REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)
 );
 
@@ -42,13 +42,13 @@ CREATE TABLE "DRAWING"(
     drawinglt numeric(9,6),
     actif boolean DEFAULT true,
     img bytea,
-    idcreator integer REFERENCES "USER" (iduser),
+    idcreator bigint REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)
 );
 
 CREATE TABLE "FRIENDS"(
-    iduser1 integer REFERENCES "USER" (iduser),
-    iduser2 integer REFERENCES "USER" (iduser),
+    iduser1 bigint REFERENCES "USER" (iduser),
+    iduser2 bigint REFERENCES "USER" (iduser),
     CONSTRAINT pk_FRIENDS PRIMARY KEY (iduser1, iduser2)
 );
 
@@ -58,7 +58,7 @@ CREATE TABLE "USER_GROUP"(
     userglt numeric(9,6),
     userglg numeric(9,6),
     dateposition timestamp with time zone,
-    iduser integer REFERENCES "USER" (iduser),
-    idgroup integer REFERENCES "GROUP" (idgroup),
+    iduser bigint REFERENCES "USER" (iduser),
+    idgroup bigint REFERENCES "GROUP" (idgroup),
     CONSTRAINT pk_USER_GROUP PRIMARY KEY (iduser, idgroup)
 );

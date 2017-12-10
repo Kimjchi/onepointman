@@ -21,7 +21,6 @@ public class AddUserToGroup extends AppCompatActivity
 {
     private ArrayList<UserModelAdd> userModels;
     private ListView userList;
-    private UserAdapterAdd userAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -35,6 +35,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.AddUserToGroup;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.UserAdapterAdd;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.UserAdapterSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -65,8 +66,8 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    //private final String URL_SERVEUR = "http://192.168.0.108:3001";
-    private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    private final String URL_SERVEUR = "http://192.168.0.108:3001";
+    //private final String URL_SERVEUR = "http://192.168.137.1:3001";
 
     private VolleyRequester(Context context)
     {
@@ -238,7 +239,7 @@ public class VolleyRequester
                                         settings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                                         settings.putExtra("groupName", name);
                                         settings.putExtra("groupId", id);
-                                        settings.putExtra("usersList", users);
+                                        //settings.putExtra("usersList", users);
                                         context.startActivity(settings);
                                     }
                                 });
@@ -701,5 +702,37 @@ public class VolleyRequester
     }
 
 
+    public void getUserInGroup(final int groupId, final ArrayList<UserModelSettings> userModels, final UserAdapterSettings adapter)
+    {
+        String idUser = FacebookInfosRetrieval.user_id;
+        JsonObjectRequest grpInfoRequest = new JsonObjectRequest (Request.Method.GET,
+                URL_SERVEUR + "/groups/getGroupInfo/"+groupId, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray userArray = (JSONArray)response.get("membres");
 
+                            for(int i=0; i < userArray.length(); i++)
+                            {
+                                JSONObject user = (JSONObject)userArray.get(i);
+                                String id = user.get("id").toString();
+                                String name = user.getString("prenom") + " " + user.getString("nom");
+
+                                userModels.add(new UserModelSettings(id, name, groupId));
+                            }
+
+                            adapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //MDR LÉ EREUR C POUR LÉ FèBLe
+            }
+        });
+        this.addToRequestQueue(grpInfoRequest);
+    }
 }

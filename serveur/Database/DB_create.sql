@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS "USER" CASCADE;
+﻿﻿DROP TABLE IF EXISTS "USER" CASCADE;
 DROP TABLE IF EXISTS "GROUP" CASCADE;
 DROP TABLE IF EXISTS "PINPOINT" CASCADE;
 DROP TABLE IF EXISTS "DRAWING" CASCADE;
@@ -29,8 +29,8 @@ CREATE TABLE "PINPOINT"(
     description varchar(255),
     pinlt numeric(9,6),
     pinlg numeric(9,6),
-    daterdv timestamp with timezone,
-    dateexpiration timestamp with timezone,
+    daterdv timestamp with time zone,
+    dateexpiration timestamp with time zone,
     idcreator bigint REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)
 );
@@ -41,6 +41,7 @@ CREATE TABLE "DRAWING"(
     drawinglg numeric(9,6),
     drawinglt numeric(9,6),
     actif boolean DEFAULT true,
+    zoom integer,
     img bytea,
     idcreator bigint REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)

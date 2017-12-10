@@ -28,7 +28,7 @@ router.post('/createpinpoint/', function (req, res) {
         .set('pinlg', parseInt(toCreate.pinlg, 10))
         .set('description', toCreate.description)
         .set('daterdv', toCreate.daterdv)
-        .set('dateexp', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString())
+        .set('dateexpiration', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString())
         .returning('idpinpoint')
         .toString();
 
@@ -45,7 +45,7 @@ router.post('/createpinpoint/', function (req, res) {
         })
 });
 
-router.delete('/deletepinpoint/', function (req, res) {
+router.post('/deletepinpoint/', function (req, res) {
 
     let toDelete = {
         iduser: req.body.iduser,
@@ -55,9 +55,9 @@ router.delete('/deletepinpoint/', function (req, res) {
 
     let query = squel.delete()
         .from('public."PINPOINT"')
-        .where('idcreator = ?', toDelete.iduser)
-        .where('idgroup = ?', toDelete.idgroup)
-        .where('idpinpoint = ?', toDelete.idpinpoint)
+        //.where('idcreator = ?', parseInt(toDelete.iduser)) C mieux que nimporte qui puisse supprimer
+        .where('idgroup = ?', parseInt(toDelete.idgroup))
+        .where('idpinpoint = ?', parseInt(toDelete.idpinpoint))
         .toString();
 
     db.query(query)

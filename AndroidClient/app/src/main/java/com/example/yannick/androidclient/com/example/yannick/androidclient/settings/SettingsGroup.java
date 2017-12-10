@@ -35,7 +35,6 @@ public class SettingsGroup extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.settingsToolbar);
         groupName = getIntent().getExtras().get("groupName").toString();
         groupId = getIntent().getExtras().getInt("groupId");
-        System.out.println("ON EST DANS SETTINGS EST LID EST "+groupId);
         toolbar.setTitle(groupName);
 
         setSupportActionBar(toolbar);
@@ -44,13 +43,26 @@ public class SettingsGroup extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         userList = (ListView) findViewById(R.id.listUserGroup);
+        userList.setNestedScrollingEnabled(true);
 
+        /*
         userModels = (ArrayList<UserModelSettings>)getIntent().getExtras().getSerializable("usersList");
 
         userAdapter = new UserAdapterSettings(userModels, getApplicationContext());
+        userList.setAdapter(userAdapter);*/
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        userModels = new ArrayList<>();
+        userAdapter = new UserAdapterSettings(userModels, getApplicationContext());
         userList.setAdapter(userAdapter);
 
-        userList.setNestedScrollingEnabled(true);
+        VolleyRequester.getInstance(getApplicationContext()).getUserInGroup(groupId, userModels, userAdapter);
+
+        userAdapter.notifyDataSetChanged();
     }
 
     @Override

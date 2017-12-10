@@ -71,7 +71,7 @@ export function* deletePinPoint() {
         console.log(userId);
         console.log(groupId);
         let server = "http://localhost:3001/pinpoint/deletepinpoint";
-        axios.delete(server, data, {
+        axios.post(server, data, {
             headers: {
                 'Content-Type': 'application/json'
             }})

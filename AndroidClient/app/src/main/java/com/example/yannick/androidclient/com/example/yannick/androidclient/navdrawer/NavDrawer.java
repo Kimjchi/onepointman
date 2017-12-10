@@ -63,7 +63,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         toggle.syncState();
 
         FragmentManager fm = getFragmentManager();
-        fm.beginTransaction().replace(R.id.content_frame, new MapFragment()).commit();
+        fm.beginTransaction().replace(R.id.content_frame, new MapFragment(), "MAP_FRAGMENT").commit();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -77,8 +77,8 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         if(profilePic != null)
         {
             Picasso.with(this).load("https://graph.facebook.com/"+FacebookInfosRetrieval.user_id+"/picture?type=large")
-                    .placeholder(R.drawable.hamburger)
-                    .error(R.drawable.ic_menu_camera)
+                    .placeholder(R.drawable.loading_image)
+                    .error(R.drawable.not_found_image)
                     .into(profilePic);
         }
 
@@ -113,6 +113,12 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             }
         }, 1000);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(menu);
     }
 
     @Override
@@ -182,7 +188,11 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 builder.show();
                 break;
             case R.id.nav_logout:
+                MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentByTag("MAP_FRAGMENT");
+                DrawFragment drawFragment = new DrawFragment();
+                drawFragment.setBackground(mapFragment.getBitmapCurrentOfCurrentMap());
 
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
                 break;
             default:
                 break;

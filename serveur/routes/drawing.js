@@ -14,6 +14,7 @@ router.post('/createdrawing', function(req,res){
         idcreator: req.body.iduser,
         idgroup: req.body.idgroup,
         description: req.body.description,
+        zoom: req.body.zoom,
         lt: req.body.lt,
         lg: req.body.lg,
         img: req.body.img
@@ -23,6 +24,7 @@ router.post('/createdrawing', function(req,res){
         .into('public."DRAWING"')
         .set('idcreator', toCreate.idcreator)
         .set('idgroup', toCreate.idgroup)
+        .set('zoom', toCreate.zoom)
         .set('description', toCreate.description)
         .set('drawinglt', toCreate.lt)
         .set('drawinglg', toCreate.lg)

@@ -112,6 +112,7 @@ function buildGroupsObject(queryResult) {
                 contains = true;
                 idPosition = index;
             }
+
         });
         if (!contains) {
             groups.push({

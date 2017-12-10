@@ -6,7 +6,7 @@ import '../style/Map.css';
 const INTERVAL = 1000;
 const LOCATION_ICON = "http://maps.google.com/mapfiles/ms/micons/blue-dot.png";
 const PINPOINT_ICON = "http://maps.google.com/mapfiles/ms/micons/yellow-dot.png";
-
+const MEMBER_ICON = "http://maps.google.com/mapfiles/kml/paddle/";
 class Map extends Component {
 
     constructor(props) {
@@ -17,12 +17,22 @@ class Map extends Component {
 
     _handleClicMarker (marker) {
         var index = this.props.markersPinPoint.indexOf(marker);
-        let newState =  this.props.markersPinPoint;
-        marker.showInfo = !marker.showInfo;
+        let newState;
         if (index !== -1) {
+            newState =  this.props.markersPinPoint;
+            marker.showInfo = !marker.showInfo;
             newState[index] = marker;
+            this.props.changePinPoints(newState);
+        } else {
+            index = this.props.markersMembers.indexOf(marker);
+            if (index !== -1) {
+                newState = this.props.markersMembers;
+                marker.showInfo = !marker.showInfo;
+                newState[index] = marker;
+                this.props.updateMarkerMembers(newState);
+            }
         }
-        this.props.changePinPoints(newState);
+
     }
 
     _onClickMap (event) {
@@ -79,6 +89,22 @@ class Map extends Component {
                                 </InfoWindow>}
                             </Marker>
                         ))}
+
+                    {this.props.isMarkerShown && this.props.markersMembers.map(marker => (
+                        <Marker
+                            key={id++}
+                            position={{ lat: marker.pos.lt, lng: marker.pos.lg }}
+                            icon = {{url : MEMBER_ICON + marker.firstname.substring(0,1).toUpperCase() + '.png',
+                                    scaledSize: new window.google.maps.Size(43, 43)}}
+                            onClick={this._handleClicMarker.bind(this, marker)}
+                        >
+                            {marker.showInfo && <InfoWindow onCloseClick={this._handleClicMarker.bind(this, marker)}>
+                                <div className='divMarker'>
+                                    Bonjour
+                                </div>
+                            </InfoWindow>}
+                        </Marker>
+                    ))}
 
                     </GoogleMapsWrapper>
             </div>

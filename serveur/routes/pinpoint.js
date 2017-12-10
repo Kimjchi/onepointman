@@ -39,7 +39,7 @@ router.post('/createpinpoint/', function (req, res) {
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while creating pinpoint', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail',message:'Error while creating pinpoint'}, res);
             console.log(e);
         })
 });
@@ -61,10 +61,10 @@ router.delete('/deletepinpoint/', function (req, res) {
 
     db.query(query)
         .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, 'Pinpoint deleted', res)
+            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'Pinpoint deleted'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while deleting pinpoint', res);
+            sender.sendResponse(sender.NOT_FOUND_STATUS, {status:'fail',message:'Error while deleting pinpoint'}, res);
             console.log(e);
         })
 

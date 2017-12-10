@@ -8,6 +8,7 @@ import LoginContainer from "./containers/LoginContainer";
 import DashboardContainer from "./containers/DashboardContainer";
 import HandleAuthContainer from "./containers/HandleAuthContainer";
 import CanvasContainer from "./containers/CanvasContainer";
+import TestImage from "./components/TestImage";
 
 
 class App extends Component {
@@ -32,6 +33,10 @@ class App extends Component {
                         exact
                         path="/Home"
                         component={DashboardContainer}/>
+                    <PrivateRoute
+                        exact
+                        path="/drawings"
+                        component={TestImage}/>
                 </Switch>
             </ConnectedRouter>
         </Provider>

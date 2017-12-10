@@ -11,7 +11,7 @@ var fblogin = require('./routes/fblogin');
 var connection = require('./connection');
 var groups = require('./routes/groups');
 var pinpoint = require('./routes/pinpoint');
-//var drawing = require('./routes/drawing');
+var drawing = require('./routes/drawing');
 
 var app = express();
 
@@ -38,7 +38,7 @@ app.use('/users', users);
 app.use('/fblogin', fblogin);
 app.use('/groups', groups);
 app.use('/pinpoint', pinpoint);
-//app.use('/drawing', drawing);
+app.use('/drawing', drawing);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

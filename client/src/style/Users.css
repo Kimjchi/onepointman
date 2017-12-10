@@ -55,3 +55,21 @@
 .addButton {
     margin-top: 28px;
 }
+
+.toolbar .navlist {
+    font-family: "Trebutchet MS", Helvetica, Tahoma, sans-serif;
+    padding-top:0;
+    margin-left: 600px;
+}
+
+.toolbar {
+    display: inline-block;
+    width: 100%;
+    z-index: 10;
+    position:absolute;
+    margin-left: auto;
+    margin-right: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

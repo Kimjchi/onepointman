@@ -263,11 +263,13 @@ class OptionsContainer extends Component {
     _handleModeDessin(event) {
         event.preventDefault();
         let boolean = this.props.opCanvas.draw;
-        if(boolean) {
-            boolean = false;
+        let idGroup = this.props.opUsers.groupToDisplay;
+        console.log(idGroup);
+        if(!boolean && idGroup !== '') {
+            boolean = true;
         }
         else {
-            boolean = true;
+            boolean = false;
         }
         console.log(boolean);
         this.props.draw(boolean);

@@ -66,8 +66,8 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    private final String URL_SERVEUR = "http://192.168.0.108:3001";
-    //private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    //private final String URL_SERVEUR = "http://192.168.0.108:3001";
+    private final String URL_SERVEUR = "http://192.168.137.1:3001";
 
     private VolleyRequester(Context context)
     {
@@ -404,7 +404,6 @@ public class VolleyRequester
             for(int i=0; i< json.getJSONArray("pinpoints").length(); i++) {
                 JSONObject pinPoint =  json.getJSONArray("pinpoints").getJSONObject(i);
                 int idPinPoint = pinPoint.getInt("idpinpoint");
-                int idCreator = pinPoint.getInt("idcreator");
                 String userName = pinPoint.getString("prenomcreator") + " " + pinPoint.getString("nomcreator");
                 double lt = Double.parseDouble(pinPoint.getString("pinlt"));
                 double lg = Double.parseDouble(pinPoint.getString("pinlg"));
@@ -686,6 +685,7 @@ public class VolleyRequester
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.v("PINPOINT", "Add succesfully");
+
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -735,4 +735,36 @@ public class VolleyRequester
         });
         this.addToRequestQueue(grpInfoRequest);
     }
+
+    public void deletePinPoint(int groupId, int idPinPoint)
+    {
+        String idUser = FacebookInfosRetrieval.user_id;
+        String json = "{\"iduser\":"+idUser+",\"idgroup\":" + groupId
+                + ",\"idpinpoint\":"+ idPinPoint + "}";
+
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deletePinPointRequest = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/pinpoint/deletepinpoint", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("PINPOINT", "Delete succesfully");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("PINPOINT", "Error:" + error.getMessage());
+                }
+            });
+            this.addToRequestQueue(deletePinPointRequest);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+
 }

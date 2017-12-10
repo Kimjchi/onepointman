@@ -1,4 +1,4 @@
-﻿DROP TABLE IF EXISTS "USER" CASCADE;
+﻿﻿DROP TABLE IF EXISTS "USER" CASCADE;
 DROP TABLE IF EXISTS "GROUP" CASCADE;
 DROP TABLE IF EXISTS "PINPOINT" CASCADE;
 DROP TABLE IF EXISTS "DRAWING" CASCADE;
@@ -41,6 +41,7 @@ CREATE TABLE "DRAWING"(
     drawinglg numeric(9,6),
     drawinglt numeric(9,6),
     actif boolean DEFAULT true,
+    zoom integer,
     img bytea,
     idcreator bigint REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup)

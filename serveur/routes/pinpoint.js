@@ -22,25 +22,26 @@ router.post('/createpinpoint/', function (req, res) {
 
     let query = squel.insert()
         .into('public."PINPOINT"')
-        .set('idcreator', parseInt(toCreate.iduser,10))
-        .set('idgroup', parseInt(toCreate.idgroup,10))
-        .set('pinlt', parseInt(toCreate.pinlt,10))
-        .set('pinlg', parseInt(toCreate.pinlg,10))
+        .set('idcreator', parseInt(toCreate.iduser, 10))
+        .set('idgroup', parseInt(toCreate.idgroup, 10))
+        .set('pinlt', parseInt(toCreate.pinlt, 10))
+        .set('pinlg', parseInt(toCreate.pinlg, 10))
         .set('description', toCreate.description)
         .set('daterdv', toCreate.daterdv)
         .set('dateexp', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString())
         .returning('idpinpoint')
         .toString();
+
     db.one(query)
-        .then((row)=>{
+        .then((row) => {
             let response = {
-                idpinpoint : row.idpinpoint
-            }
+                idpinpoint: row.idpinpoint
+            };
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Error while creating pinpoint'}, res);
             console.log(e);
+            sender.sendResponse(sender.BAD_REQUEST, {status: 'fail', message: 'Error while creating pinpoint'}, res);
         })
 });
 
@@ -60,12 +61,12 @@ router.delete('/deletepinpoint/', function (req, res) {
         .toString();
 
     db.query(query)
-        .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'Pinpoint deleted'}, res)
+        .then(() => {
+            sender.sendResponse(sender.SUCCESS_STATUS, {status: 'success', message: 'Pinpoint deleted'}, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Error while deleting pinpoint'}, res);
             console.log(e);
+            sender.sendResponse(sender.BAD_REQUEST, {status: 'fail', message: 'Error while deleting pinpoint'}, res);
         })
 
 });

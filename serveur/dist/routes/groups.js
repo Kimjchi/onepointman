@@ -29,6 +29,43 @@ router.get('/:iduser/', function (req, res) {
     });
 });
 
+router.get('/getGroupInfo/:idgroupe', function (req, res) {
+    console.log('GET getGroupInfo/idgroupe');
+
+    var idgroupe = req.params.idgroupe;
+    var groupData = {
+        listeMembres: []
+    };
+
+    getUserDataFromGroup(idgroupe).then(function (result) {
+
+        result.forEach(function (member) {
+            var groupMember = {
+                nom: '',
+                prenom: '',
+                iduser: ''
+            };
+
+            groupMember.nom = member.nom;
+            groupMember.prenom = member.prenom;
+            groupMember.iduser = member.iduser;
+
+            groupData.listeMembres.push(groupMember);
+        });
+
+        sender.sendResponse(sender.SUCCESS_STATUS, groupData, res);
+    }).catch(function (e) {
+        console.log(e);
+        sender.sendResponse(sender.BAD_REQUEST, e.toString(), res);
+    });
+
+    console.log('END GET getGroupInfo/idgroupe');
+});
+
+var getUserDataFromGroup = function getUserDataFromGroup(idGroup) {
+    return db.query(squel.select().from('"USER_GROUP"', 'ug').field('nom').field('prenom').field('u.iduser').where('idgroup = ? ', idGroup).left_join('"USER"', 'u', 'u.iduser = ug.iduser').toString());
+};
+
 var getGroups = function getGroups(iduser) {
     return squel.select().from('public."USER_GROUP"', 'ugr').field('ugr.idgroup').field('gr.nom').field('ugr.sharesposition').where('ugr.iduser = ?', iduser).left_join('public."GROUP"', 'gr', 'ugr.idgroup = gr.idgroup');
 };
@@ -51,7 +88,12 @@ function buildGroupsObject(queryResult) {
             }
         });
         if (!contains) {
-            groups.push({ idgroup: element.idgroup, issharing: element.sharesposition, nomgroup: element.nomgroup, membres: [] });
+            groups.push({
+                idgroup: element.idgroup,
+                issharing: element.sharesposition,
+                nomgroup: element.nomgroup,
+                membres: []
+            });
         }
     });
     //une fois le tableau des groupes créé, on push les membres dans groups[idGroupConcerné].membres

@@ -31,6 +31,52 @@ router.get('/:iduser/', function (req, res) {
 
 });
 
+router.get('/getGroupInfo/:idgroupe', function (req, res) {
+    console.log('GET getGroupInfo/idgroupe');
+
+    let idgroupe = req.params.idgroupe;
+    let groupData = {
+        listeMembres: []
+    };
+
+    getUserDataFromGroup(idgroupe)
+        .then(result => {
+
+            result.forEach(member => {
+                let groupMember = {
+                    nom: '',
+                    prenom: '',
+                    iduser: ''
+                };
+
+                groupMember.nom = member.nom;
+                groupMember.prenom = member.prenom;
+                groupMember.iduser = member.iduser;
+
+                groupData.listeMembres.push(groupMember);
+            });
+
+            sender.sendResponse(sender.SUCCESS_STATUS, groupData, res)
+        })
+        .catch(e => {
+            console.log(e);
+            sender.sendResponse(sender.BAD_REQUEST, e.toString(), res)
+        });
+
+    console.log('END GET getGroupInfo/idgroupe');
+});
+
+const getUserDataFromGroup = (idGroup) => {
+    return db.query(squel.select()
+        .from('"USER_GROUP"', 'ug')
+        .field('nom')
+        .field('prenom')
+        .field('u.iduser')
+        .where('idgroup = ? ', idGroup)
+        .left_join('"USER"', 'u', 'u.iduser = ug.iduser')
+        .toString())
+};
+
 let getGroups = (iduser) =>
     squel.select()
         .from('public."USER_GROUP"', 'ugr')
@@ -68,7 +114,12 @@ function buildGroupsObject(queryResult) {
             }
         });
         if (!contains) {
-            groups.push({idgroup: element.idgroup, issharing: element.sharesposition, nomgroup: element.nomgroup, membres: []})
+            groups.push({
+                idgroup: element.idgroup,
+                issharing: element.sharesposition,
+                nomgroup: element.nomgroup,
+                membres: []
+            })
         }
     });
     //une fois le tableau des groupes créé, on push les membres dans groups[idGroupConcerné].membres
@@ -99,23 +150,23 @@ function buildGroupsObject(queryResult) {
 
 
 // les infos d'un groupe en particulier (les pinpoints et les positions des utilisateurs du groupe
-router.get('/positions/:iduser/:idgroup', function(req,res){
+router.get('/positions/:iduser/:idgroup', function (req, res) {
     //vérifier si l'utilisateur est bien dans le groupe avant de faire le traitement
-   let iduser = parseInt(req.params.iduser, 10);
-   let idgroup = req.params.idgroup;
+    let iduser = parseInt(req.params.iduser, 10);
+    let idgroup = req.params.idgroup;
 //pour le groupe : renvoyer son nom, les pinpoints qui lui sont associés, les dessins,
 // les positions des gens SSI ils décident de la partager avec ce groupe
     let requete = getGroupPinpoints(idgroup);
     db.any(requete)
-        .then((result) =>{
-            let JSONToReturn = {idgroup: idgroup, issharing: false,  pinpoints:[], userpositions:[]};
+        .then((result) => {
+            let JSONToReturn = {idgroup: idgroup, issharing: false, pinpoints: [], userpositions: []};
             result.forEach(element => {
 
                 // CHECK SI LA DATE est supérieure de 1 jour de plus de la date de RDV. sinon ne
                 let currentTime = new Date();
                 let diff = currentTime - element.daterdv;// donne la diff en millisecondes
                 let dontPush = false;
-                if(diff > 8.64e+7){// le nombre de millisecs en 1 jour hehe
+                if (diff > 8.64e+7) {// le nombre de millisecs en 1 jour hehe
                     dontPush = true;
                 }
                 console.log(diff);
@@ -126,12 +177,12 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
                     nomcreator: element.nom,
                     prenomcreator: element.prenom,
                     pinlt: element.pinlt,
-                    pinlg:element.pinlg,
-                    description:element.description,
-                    daterdv:element.daterdv
+                    pinlg: element.pinlg,
+                    description: element.description,
+                    daterdv: element.daterdv
                 };
                 //si la date est ok on le push dans l'array
-                if(!dontPush){
+                if (!dontPush) {
                     JSONToReturn.pinpoints.push(pinpoint);
 
                 }
@@ -141,46 +192,46 @@ router.get('/positions/:iduser/:idgroup', function(req,res){
 
                     let currentDate = new Date();
                     let userCorrectRequest = false;
-                    userpositions.forEach(element =>{
+                    userpositions.forEach(element => {
 
-                        if(parseInt(element.iduser,10) === iduser) {
+                        if (parseInt(element.iduser, 10) === iduser) {
                             userCorrectRequest = true; // on vérifie ici si le gars qui demande est bien dans le groupe
                             JSONToReturn.issharing = element.sharesposition;
 
 
                         }
                         let isCurrent = false;
-                        if(element.dateposition !== null){
+                        if (element.dateposition !== null) {
                             isCurrent = compareTimes(currentDate, element.dateposition);
                         }
 
 
                         let userposition = {
-                           iduser: element.iduser,
+                            iduser: element.iduser,
                             prenom: element.prenom,
-                            nom:element.nom,
-                           userlt:element.userglt,
-                           userlg:element.userglg,
-                           current:isCurrent,
-                           dateposition:element.dateposition
-                       };
-                        if(element.dateposition !== null){
-                            if(!(parseInt(element.iduser,10) === iduser && element.sharesposition)){
+                            nom: element.nom,
+                            userlt: element.userglt,
+                            userlg: element.userglg,
+                            current: isCurrent,
+                            dateposition: element.dateposition
+                        };
+                        if (element.dateposition !== null) {
+                            if (!(parseInt(element.iduser, 10) === iduser && element.sharesposition)) {
                                 JSONToReturn.userpositions.push(userposition);
                             }
                         }
                     });
 
-                    if(userCorrectRequest){
+                    if (userCorrectRequest) {
                         res.send({
                             status: 'success',
                             message: JSONToReturn
                         });
                     }
-                    else{
+                    else {
                         res.status(400);
                         res.send({
-                            status:'fail',
+                            status: 'fail',
                             message: 'You requested the informations of a group in which you DON\'T belong, bitch'
                         })
                     }
@@ -240,12 +291,12 @@ let getUsersPositions = (idgroup) =>
 
 
 //Si la dernière position stockée est > 15min, l'utilisateur est considéré comme inactif
-function compareTimes(currentTime, lastLocationTime){
+function compareTimes(currentTime, lastLocationTime) {
     let toReturn = false;
-    if(currentTime.getMonth() === lastLocationTime.getMonth()){
-        if(currentTime.getDay() === lastLocationTime.getDay()){
-            if(currentTime.getHours() === lastLocationTime.getHours()){
-                if(currentTime.getMinutes() - lastLocationTime.getMinutes() < 15){
+    if (currentTime.getMonth() === lastLocationTime.getMonth()) {
+        if (currentTime.getDay() === lastLocationTime.getDay()) {
+            if (currentTime.getHours() === lastLocationTime.getHours()) {
+                if (currentTime.getMinutes() - lastLocationTime.getMinutes() < 15) {
                     toReturn = true;
                 }
             }
@@ -254,20 +305,20 @@ function compareTimes(currentTime, lastLocationTime){
     return toReturn;
 }
 
-router.get('/drawings/:iduser/:idgroup', function(req,res){
+router.get('/drawings/:iduser/:idgroup', function (req, res) {
     let iduser = req.params.iduser;
     let idgroup = req.params.idgroup;
     let query = getDrawings(idgroup);
     let JSONToReturn = {
         idgroup: idgroup,
-        drawings:[]
+        drawings: []
     };
 
     db.any(query)
-        .then((result) =>{
-            result.forEach(element =>{
+        .then((result) => {
+            result.forEach(element => {
                 let objectToPush = {
-                    iddrawing : element.iddrawing,
+                    iddrawing: element.iddrawing,
                     idcreator: element.idcreator,
                     nomcreator: element.nom,
                     prenomcreator: element.prenom,
@@ -276,7 +327,7 @@ router.get('/drawings/:iduser/:idgroup', function(req,res){
                     lg: element.lg,
                     img: element.img
                 };
-                if(element.actif){
+                if (element.actif) {
                     JSONToReturn.drawings.push(objectToPush);
                 }
             });
@@ -286,7 +337,7 @@ router.get('/drawings/:iduser/:idgroup', function(req,res){
                 message: JSONToReturn
             });
         })
-        .catch( e => {
+        .catch(e => {
             res.status(400);
             res.send({
                 status: 'fail',
@@ -330,7 +381,7 @@ router.post('/creategroup', function (req, res) {
         .toString();
 
     db.one(query)
-        .then((row)=>{
+        .then((row) => {
             let inUserGroup = squel.insert()
                 .into('public."USER_GROUP"', 'ugr')
                 .set('idgroup', row.idgroup)
@@ -338,13 +389,13 @@ router.post('/creategroup', function (req, res) {
                 .set('iscreator', true)
                 .toString();
             db.none(inUserGroup)
-                .then(()=>{
+                .then(() => {
                     let response = {
-                        idgroup : row.idgroup
+                        idgroup: row.idgroup
                     };
                     sender.sendResponse(sender.SUCCESS_STATUS, response, res)
                 })
-                .catch(err=>{
+                .catch(err => {
                     sender.sendResponse(sender.BAD_REQUEST, 'Failed to insert user in USER_GROUP', res);
                     console.log(err);
                 })
@@ -356,10 +407,10 @@ router.post('/creategroup', function (req, res) {
         })
 });
 
-router.post('/changegroupname', function(req,res){
+router.post('/changegroupname', function (req, res) {
     let toChange = {
         idgroup: req.body.idgroup,
-        groupname:req.body.newgroupname
+        groupname: req.body.newgroupname
     };
 
     let query = squel.update()
@@ -368,12 +419,12 @@ router.post('/changegroupname', function(req,res){
         .where('idgroup = ?', toChange.idgroup)
         .toString();
     db.none(query)
-        .then(()=>{
-        let response = {status: 'success',message:'groupname updated successfully'};
+        .then(() => {
+            let response = {status: 'success', message: 'groupname updated successfully'};
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
-        .catch(e=>{
-            sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Failed to update groupname'}, res);
+        .catch(e => {
+            sender.sendResponse(sender.BAD_REQUEST, {status: 'fail', message: 'Failed to update groupname'}, res);
             console.log(e);
         })
 

@@ -15,15 +15,21 @@ router.post('/createpinpoint/', function (req, res) {
         idgroup: req.body.idgroup,
         pinlg: req.body.pinlg,
         pinlt: req.body.pinlt,
-        description: req.body.description
+        description: req.body.description,
+        daterdv: req.body.daterdv
     };
 
-    var query = squel.insert().into('public."PINPOINT"').set('idcreator', toCreate.iduser).set('idgroup', toCreate.idgroup).set('pinlt', toCreate.pinlt).set('pinlg', toCreate.pinlg).set('description', toCreate.description).toString();
+    var dateexpiration = new Date(toCreate.daterdv);
+    dateexpiration.setDate(dateexpiration.getDate() + 1);
 
-    db.query(query).then(function () {
-        sender.sendResponse(sender.SUCCESS_STATUS, 'Pinpoint created', res);
+    var query = squel.insert().into('public."PINPOINT"').set('idcreator', parseInt(toCreate.iduser, 10)).set('idgroup', parseInt(toCreate.idgroup, 10)).set('pinlt', parseInt(toCreate.pinlt, 10)).set('pinlg', parseInt(toCreate.pinlg, 10)).set('description', toCreate.description).set('daterdv', toCreate.daterdv).set('dateexp', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString()).returning('idpinpoint').toString();
+    db.one(query).then(function (row) {
+        var response = {
+            idpinpoint: row.idpinpoint
+        };
+        sender.sendResponse(sender.SUCCESS_STATUS, response, res);
     }).catch(function (e) {
-        sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while creating pinpoint', res);
+        sender.sendResponse(sender.BAD_REQUEST, { status: 'fail', message: 'Error while creating pinpoint' }, res);
         console.log(e);
     });
 });
@@ -39,9 +45,9 @@ router.delete('/deletepinpoint/', function (req, res) {
     var query = squel.delete().from('public."PINPOINT"').where('idcreator = ?', toDelete.iduser).where('idgroup = ?', toDelete.idgroup).where('idpinpoint = ?', toDelete.idpinpoint).toString();
 
     db.query(query).then(function () {
-        sender.sendResponse(sender.SUCCESS_STATUS, 'Pinpoint deleted', res);
+        sender.sendResponse(sender.SUCCESS_STATUS, { status: 'success', message: 'Pinpoint deleted' }, res);
     }).catch(function (e) {
-        sender.sendResponse(sender.NOT_FOUND_STATUS, 'Error while deleting pinpoint', res);
+        sender.sendResponse(sender.BAD_REQUEST, { status: 'fail', message: 'Error while deleting pinpoint' }, res);
         console.log(e);
     });
 });

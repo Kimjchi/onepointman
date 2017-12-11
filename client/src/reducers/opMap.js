@@ -12,15 +12,18 @@ import {CHANGE_MARKER_SELECT} from "../actions/opMap";
 import {CHANGE_NEW_PINPOINT} from "../actions/opOptions";
 import {CHANGE_MAP} from "../actions/opMap";
 import {CHANGE_MARKER_MEMBERS} from "../actions/opMap";
+import {CHANGE_MARKER_MEMBER_DISPLAY} from "../actions/opMap";
+import {CHANGE_PINPOINTS_DISPLAY} from "../actions/opMap";
 
 //ajouter le reste dans l'import
 
 //pour le register e mail
 let initialState = {
     isMarkerShown : true,
-    mapCenter : { lat: -34.397, lng: 150.644 },
+    isPinPointShown : true,
+    mapCenter : { lat: 45.380002, lng: -71.925438 },
     zoom : 3,
-    markerSelect : { lat: -34.397, lng: 150.644},
+    markerSelect : { lat: 45.380002, lng: -71.925438},
     locationSelect : "",
     pinPoints : [],
     markersGeoLocation : [],
@@ -47,11 +50,17 @@ export default function reducer (state = initialState, action ){
         return {...state, markersMembers : action.markers};
 
         case CHANGE_PINPOINTS:
-            console.log(state.pinPoints);
             return {...state, pinPoints : action.pinPoints};
 
         case CHANGE_MAP:
             return {...state, map : action.map};
+
+        case CHANGE_PINPOINTS_DISPLAY:
+            return {...state, isPinPointShown : !state.isPinPointShown};
+
+        case CHANGE_MARKER_MEMBER_DISPLAY:
+            return {...state, isMarkerShown : !state.isMarkerShown};
+
 
         default:
             return state

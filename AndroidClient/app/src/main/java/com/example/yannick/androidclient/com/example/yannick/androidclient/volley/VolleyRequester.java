@@ -23,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -221,6 +222,7 @@ public class VolleyRequester
                                 final int id = groupe.getInt("idgroup");
                                 final String name = groupe.getString("nomgroup");
                                 final boolean isSharing = groupe.getBoolean("issharing");
+                                final boolean isTracking = groupe.getBoolean("istracking");
                                 final JSONArray membres = (JSONArray) groupe.get("membres");
                                 final ArrayList<UserModelSettings> users = new ArrayList<>();
                                 for(int j=0; j<membres.length(); j++)
@@ -247,12 +249,29 @@ public class VolleyRequester
                                     }
                                 });
 
+                                Switch trackerSwitch = new Switch(context);
+                                //TODO Color!
+                                if (isTracking){
+                                    trackerSwitch.setChecked(true);
+                                }
+                                trackerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                    @Override
+                                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                        if (b){
+                                            updateTracking(true, id);
+                                        }else{
+                                            updateTracking(false, id);
+                                        }
+                                    }
+                                });
+
                                 CheckBox sharingPositionBox = new CheckBox(context);
                                 if (isSharing){
                                     sharingPositionBox.setChecked(true);
                                 }
                                 int states[][] = {{android.R.attr.state_checked}, {}};
                                 int colors[] = {Color.BLACK, Color.BLACK};
+
                                 CompoundButtonCompat.setButtonTintList(sharingPositionBox, new ColorStateList(states, colors));
                                 sharingPositionBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                     @Override
@@ -266,13 +285,14 @@ public class VolleyRequester
                                 });
 
 
-                                LinearLayout test = new LinearLayout(context);
-                                test.addView(sharingPositionBox);
-                                test.addView(settingsButton);
-                                test.setGravity(Gravity.CENTER_VERTICAL);
-                                test.setBaselineAligned(true);
+                                LinearLayout actionLayout = new LinearLayout(context);
+                                actionLayout.addView(trackerSwitch);
+                                actionLayout.addView(sharingPositionBox);
+                                actionLayout.addView(settingsButton);
+                                actionLayout.setGravity(Gravity.CENTER_VERTICAL);
+                                actionLayout.setBaselineAligned(true);
 
-                                mi.setActionView(test);
+                                mi.setActionView(actionLayout);
                                 mi.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                                     @Override
                                     public boolean onMenuItemClick(MenuItem menuItem) {
@@ -307,7 +327,7 @@ public class VolleyRequester
 
         try {
             JSONObject bodyJson = new JSONObject(json);
-            JsonObjectRequest postMyPosition = new JsonObjectRequest (Request.Method.POST,
+            JsonObjectRequest updateSharingPosition = new JsonObjectRequest (Request.Method.POST,
                     URL_SERVEUR + "/users/updatepositionsharing/", bodyJson,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -319,17 +339,69 @@ public class VolleyRequester
                 public void onErrorResponse(VolleyError error) {
                     // TODO Auto-generated method stub
                     //MDR LÉ EREUR C POUR LÉ FèBLe
-                    Toast.makeText(context,"Serveur indisponible, partage de position mis à jour!", Toast.LENGTH_SHORT);
+                    Toast.makeText(context,"Serveur indisponible, partage de position non mis à jour!", Toast.LENGTH_SHORT);
                 }
             });
-            this.addToRequestQueue(postMyPosition);
+            this.addToRequestQueue(updateSharingPosition);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    public void deleteTracking(int idGroup){
+        String idUser = FacebookInfosRetrieval.user_id;
+        String json = "{\"iduser\":"+ idUser + ",\"idgroup\":" + idGroup +"}";
 
+        try {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest deleteTracking = new JsonObjectRequest (Request.Method.POST,
+                    URL_SERVEUR + "/tracking/deletetracking/", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("TRACKING", "Tracking supprimé!");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // TODO Auto-generated method stub
+                    //MDR LÉ EREUR C POUR LÉ FèBLe
+                    Toast.makeText(context,"Serveur indisponible, tracking non supprimé!", Toast.LENGTH_SHORT);
+                }
+            });
+            this.addToRequestQueue(deleteTracking);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void updateTracking(boolean track, int idGroup){
+        String idUser = FacebookInfosRetrieval.user_id;
+        String json = "{\"iduser\":"+ idUser + ",\"idgroup\":"
+                + idGroup + ",\"tracking\":" + track +"}";
+
+        try {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest updateTracking = new JsonObjectRequest (Request.Method.POST,
+                    URL_SERVEUR + "/tracking/settracking/", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("TRACKING", "Tracking mis à jour!");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // TODO Auto-generated method stub
+                    //MDR LÉ EREUR C POUR LÉ FèBLe
+                    Toast.makeText(context,"Serveur indisponible, tracking non mis à jour!", Toast.LENGTH_SHORT);
+                }
+            });
+            this.addToRequestQueue(updateTracking);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     /*Pour request du JSON:
         https://developer.android.com/training/volley/request.html
      */

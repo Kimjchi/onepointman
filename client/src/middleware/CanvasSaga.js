@@ -54,7 +54,7 @@ export function* requestGetDrawings() {
         let idUser = drawing.idUser;
         let idGroup = drawing.idGroup;
         console.log(idUser);
-
+        console.log("YOOOOOO");
         let server = "http://localhost:3001/groups/drawings/"+idUser+"/"+idGroup;
 
         axios.get(server)

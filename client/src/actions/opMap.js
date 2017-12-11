@@ -5,6 +5,9 @@ export const CHANGE_PINPOINTS = 'CHANGE_PINPOINTS';
 export const CHANGE_LOCATION_SELECT = 'CHANGE_LOCATION_SELECT';
 export const CHANGE_MAP = 'CHANGE_MAP';
 export const CHANGE_MARKER_MEMBERS = 'CHANGE_MARKER_MEMBERS';
+export const CHANGE_PINPOINTS_DISPLAY = 'CHANGE_PINPOINTS_DISPLAY';
+export const CHANGE_MARKER_MEMBER_DISPLAY = 'CHANGE_MARKER_MEMBER_DISPLAY';
+
 
 export function recenterMap (mapCenter, zoom){
     return {type: CHANGE_MAP_CENTER, mapCenter, zoom}
@@ -32,4 +35,12 @@ export function changeLocationSelect (locationSelect) {
 
 export function changeMap (map) {
     return {type : CHANGE_MAP, map}
+}
+
+export function changeMarkerMemberDisplay() {
+    return {type : CHANGE_MARKER_MEMBER_DISPLAY}
+}
+
+export function changePinPointDisplay () {
+    return {type : CHANGE_PINPOINTS_DISPLAY}
 }

@@ -25,7 +25,6 @@ export default function reducer (state = initialState, action ){
         case SET_AUTH:
             return {...state, loggedIn: action.newAuthState, error:''};
         case IDUSER:
-            console.log(state.idUser);
             return {...state, idUser: action.id, error:''};
         case SET_PHOTO_USER:
             return {...state, urlPhoto: action.url, error: ''};

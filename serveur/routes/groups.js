@@ -376,7 +376,6 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
                     JSONToReturn.drawings.push(objectToPush);
                 }
             });
-            console.log(JSONToReturn);
             res.send({
                 status: 'success',
                 message: JSONToReturn

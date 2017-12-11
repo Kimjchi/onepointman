@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import {withGoogleMap, GoogleMap, Marker, InfoWindow} from "react-google-maps"
 import GoogleMapsWrapper from "../util/GoogleMapsWrapper";
 import '../style/Map.css';
+import dateFormat from "dateformat";
 
-const INTERVAL = 1000;
 const LOCATION_ICON = "http://maps.google.com/mapfiles/ms/micons/blue-dot.png";
 const PINPOINT_ICON = "http://maps.google.com/mapfiles/ms/micons/yellow-dot.png";
 const MEMBER_ICON = "http://maps.google.com/mapfiles/kml/paddle/";
@@ -13,6 +13,12 @@ class Map extends Component {
         super(props);
         this._onClickMap = this._onClickMap.bind(this);
         this._handleClicMarker = this._handleClicMarker.bind(this);
+    }
+
+    _convertDate(dateString) {
+        var date = new Date(dateString);
+        date = dateFormat(date, "yyyy-mm-dd hh:MM:ss");
+        return date;
     }
 
     _handleClicMarker (marker) {
@@ -62,20 +68,18 @@ class Map extends Component {
                     zoom={this.props.zoom}
                     center={this.props.mapCenter}
                     onClick={this._onClickMap}>
-                        {this.props.isMarkerShown && this.props.markersGeoLocation.map(marker => (
+                        {this.props.markersGeoLocation.map(marker => (
                             <Marker
                                 key={id++}
                                 position={{ lat: marker.lat, lng: marker.lng }}
                                 icon = {LOCATION_ICON}
                             />
                         ))}
-                        {this.props.isMarkerShown &&
-                            <Marker
-                                key={id++}
-                                position={{ lat: markerSelect.lat, lng: markerSelect.lng }}
-                            />
-                        }
-                        {this.props.isMarkerShown && this.props.markersPinPoint.map(marker => (
+                        <Marker
+                            key={id++}
+                            position={{ lat: markerSelect.lat, lng: markerSelect.lng }}
+                        />
+                        {this.props.isPinPointShown && this.props.markersPinPoint.map(marker => (
                             <Marker
                                 key={id++}
                                 position={{ lat: marker.pos.lt, lng: marker.pos.lg }}
@@ -83,9 +87,11 @@ class Map extends Component {
                                 onClick={this._handleClicMarker.bind(this, marker)}
                             >
                                 {marker.showInfo && <InfoWindow onCloseClick={this._handleClicMarker.bind(this, marker)}>
-                                    <div className='divMarker'>
+                                        <div className="divMarker">
                                         {marker.desc}
-                                    </div>
+                                        <br/>
+                                        {this._convertDate(marker.date)}
+                                        </div>
                                 </InfoWindow>}
                             </Marker>
                         ))}

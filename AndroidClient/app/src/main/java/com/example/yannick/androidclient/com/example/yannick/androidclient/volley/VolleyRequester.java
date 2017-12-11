@@ -549,6 +549,14 @@ public class VolleyRequester
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+        try {
+            for(int i=0; i< json.getJSONArray("trackings").length(); i++) {
+                MapFragment.instance.updateTraceFromJson(json.getJSONArray("trackings").getJSONObject(i), i);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteUserFromGroup(final String itemId, final int groupId)

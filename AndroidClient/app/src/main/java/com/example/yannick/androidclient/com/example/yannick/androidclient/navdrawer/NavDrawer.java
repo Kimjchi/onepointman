@@ -35,7 +35,6 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
 
     private Menu navigationMenu;
     private Menu settingsMenu;
-    private int selectedGroup = -1;
     private boolean isDrawing;
     private MapFragment mapFragment;
 
@@ -43,6 +42,8 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
     private static final int STOP_DESSINER = 2;
     private static final int ENVOYER_DESSIN = 3;
     private static final int DELETE_TRACKING = 4;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,35 +82,10 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
 
         isDrawing = false;
 
-        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu);
+        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu, false);
 
         final Handler updateGroupInfos = new Handler();
         final String url = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";
-        updateGroupInfos.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (selectedGroup != -1)
-                {
-                    System.out.println("Récupérer les infos du groupe courrant");
-                    JsonObjectRequest updateGroupRequest =
-                            new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response)
-                                {
-                                    System.out.println("Ici on attends la réponse");
-                                }
-                            }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error)
-                            {
-                                System.out.println("On a pas eu la réponse MORRAY");
-                            }
-                });
-                VolleyRequester.getInstance(getApplicationContext()).addToRequestQueue(updateGroupRequest);
-                }
-                updateGroupInfos.postDelayed(this, 1000);
-            }
-        }, 1000);
 
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -140,11 +116,14 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         });
 
     }
+    public Menu getMenu() {
+        return navigationMenu;
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu);
+        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu, true);
     }
 
     @Override

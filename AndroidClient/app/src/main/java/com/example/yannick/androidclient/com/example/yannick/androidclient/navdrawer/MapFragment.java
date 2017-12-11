@@ -141,7 +141,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 popupBuilderInfoMarker(marker).show();
-                //Toast.makeText(getActivity().getApplicationContext(), "Description: " + marker.getSnippet(), Toast.LENGTH_LONG).show();
                 return false;
             }
         });
@@ -391,9 +390,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
             for (Map.Entry<Integer, PolylineOptions> traceToDisplay : trace.entrySet()) {
-                Polyline polyline = mMap.addPolyline(traceToDisplay.getValue());
-                Log.v("zizi", polyline.getStartCap().toString());
-
+                mMap.addPolyline(traceToDisplay.getValue());
             }
         }
     }

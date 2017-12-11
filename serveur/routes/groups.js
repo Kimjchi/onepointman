@@ -83,6 +83,7 @@ let getGroups = (iduser) =>
         .field('ugr.idgroup')
         .field('gr.nom')
         .field('ugr.sharesposition')
+        .field('ugr.istracking')
         .where('ugr.iduser = ?', iduser)
         .left_join('public."GROUP"', 'gr', 'ugr.idgroup = gr.idgroup')
 ;
@@ -93,6 +94,7 @@ let getUsersInGroups = (iduser) =>
         .left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = listgroups.idgroup')
         .left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser')
         .field('listgroups.sharesposition')
+        .field('listgroups.istracking')
         .field('usr.prenom')
         .field('usr.nom', 'nomuser')
         .field('usr.iduser')
@@ -118,6 +120,7 @@ function buildGroupsObject(queryResult) {
             groups.push({
                 idgroup: element.idgroup,
                 issharing: element.sharesposition,
+                istracking: element.istracking,
                 nomgroup: element.nomgroup,
                 membres: []
             })

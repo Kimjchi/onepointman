@@ -56,10 +56,21 @@ CREATE TABLE "FRIENDS"(
 CREATE TABLE "USER_GROUP"(
     sharesposition boolean DEFAULT true,
     iscreator boolean DEFAULT false,
+    istracking boolean DEFAULT false,
     userglt numeric(9,6),
     userglg numeric(9,6),
     dateposition timestamp with time zone,
     iduser bigint REFERENCES "USER" (iduser),
-    idgroup bigint REFERENCES "GROUP" (idgroup),
+    idgroup integer REFERENCES "GROUP" (idgroup),
     CONSTRAINT pk_USER_GROUP PRIMARY KEY (iduser, idgroup)
 );
+
+CREATE TABLE "TRACK_POS"(
+    lg numeric(9,6),
+    lt numeric(9,6),
+    idgroup integer REFERENCES "GROUP" (idgroup),
+    iduser bigint REFERENCES "USER" (iduser),
+    timepos timestamp with time zone,
+    CONSTRAINT pk_TRACK_POS PRIMARY KEY (iduser, idgroup, timepos)
+
+)

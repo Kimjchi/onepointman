@@ -58,11 +58,7 @@ router.post(('/updateposition'), function (req, res) {
                                     console.log('Updated position of user in group ' + element.idgroup);
                                 })
                                 .catch(e => {
-                                    res.status(400);
-                                    res.send({
-                                        status: 'fail',
-                                        message: 'failing to update userposition in a group'
-                                    });
+
                                     console.log('failed at updating position in group');
                                 })
                         }

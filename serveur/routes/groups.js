@@ -163,7 +163,7 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
     let requete = getGroupPinpoints(idgroup);
     db.any(requete)
         .then((result) => {
-            let JSONToReturn = {idgroup: idgroup, issharing: false, pinpoints: [], userpositions: []};
+            let JSONToReturn = {idgroup: idgroup, issharing: false, pinpoints: [], userpositions: [], trackings:[]};
             result.forEach(element => {
 
                 // CHECK SI LA DATE est supérieure de 1 jour de plus de la date de RDV. sinon ne
@@ -225,6 +225,16 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
                             }
                         }
                     });
+                    //ici on build le tableau des tracking
+                    getTrackings(idgroup)
+                        .then((result) => {
+                        // push dans le json le bordel
+                            console.log(result);
+                            buildTrackingArray(result);
+                        })
+                        .catch(error=>{
+                            console.log('Failed at getting trackings from group '+ idgroup + error);
+                        })
 
                     if (userCorrectRequest) {
                         res.send({
@@ -259,6 +269,37 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
 
 
 });
+const getTrackings = (idgroup) => {
+    return db.query(squel
+        .select()
+        .field('lt')
+        .field('lg')
+        .field('timepos')
+        .field('iduser')
+        .from('public."TRACK_POS"')
+        .where('idgroup = ?', idgroup)
+        .order('iduser')
+        .order('timepos')
+        .toString())
+};
+
+function buildTrackingArray(array){
+    let toReturn = []
+    array.forEach(element => {
+      //  let objToPush = {iduser: , tracking:[]};
+        //Pour chaque element, si l'iduser existe deja ds le tableau on le push pas mais on push sa position dans son tableau
+        toReturn.forEach((newEl, index)=> {
+            if(newEl.iduser === element.iduser){
+
+
+            }
+            else{
+                toReturn.push({iduser: element.iduser, tracking:[{lt: element.lt, lg: element.lg}]})
+            }
+        })
+    })
+}
+
 
 let getGroupPinpoints = (idgroup) =>
     squel.select()

@@ -339,6 +339,7 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
             });
         })
         .catch(e => {
+            console.log(e);
             res.status(400);
             res.send({
                 status: 'fail',
@@ -355,7 +356,7 @@ let getDrawings = (idgroup) =>
         .field('draw.iddrawing')
         .field('draw.idcreator')
         .field('draw.actif')
-        .field('draw.img')
+        .field("encode(draw.img, 'base64')", 'img')
         .field('draw.drawinglg', 'lg')
         .field('draw.drawinglt', 'lt')
         .field('description')

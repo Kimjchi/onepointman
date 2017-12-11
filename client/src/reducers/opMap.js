@@ -47,6 +47,7 @@ export default function reducer (state = initialState, action ){
         return {...state, markersMembers : action.markers};
 
         case CHANGE_PINPOINTS:
+            console.log(state.pinPoints);
             return {...state, pinPoints : action.pinPoints};
 
         case CHANGE_MAP:

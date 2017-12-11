@@ -22,7 +22,8 @@ import Datetime from "react-datetime";
 import dateFormat from "dateformat";
 import {hours} from "moment";
 import fbDefaultImage from "../pictures/SMART_BOY_FB.jpg"
-import {draw} from "../actions/opCanvas";
+import {draw, getDrawingsGroup} from "../actions/opCanvas";
+import {push} from "react-router-redux";
 
 var ATLANTIC_OCEAN = {
     latitude: 29.532804,
@@ -61,6 +62,7 @@ class OptionsContainer extends Component {
         this._deletePinPoint = this._deletePinPoint.bind(this);
         this._handleModeDessin = this._handleModeDessin.bind(this);
         this._handleChangeSharing = this._handleChangeSharing.bind(this);
+        this._showDessins = this._showDessins.bind(this);
         setInterval(this._checkLocation, INTERVAL);
     }
 
@@ -275,6 +277,11 @@ class OptionsContainer extends Component {
         this.props.draw(boolean);
     }
 
+    _showDessins(event) {
+        event.preventDefault();
+        this.props.getDrawingGroups(this.props.opLogin.idUser, this.props.opUsers.groupToDisplay);
+    }
+
     render() {
         let {address} = this.props.opOptions;
         let {isSharingPosition} = this.props.opOptions;
@@ -369,7 +376,7 @@ class OptionsContainer extends Component {
                                 <a href='#'>Rendez-vous</a>
                                 </li>
                                 <li>
-                                    <a href='#'>Dessins</a>
+                                    <a onClick={this._showDessins}>Dessins</a>
                                 </li>
                             </ul>
                         </div>
@@ -495,6 +502,10 @@ const  mapDispatchToProps = (dispatch) => {
         },
         transmitSharingMode: (isSharing, idUser, idGroup) => {
             dispatch(transmitSharingMode(isSharing, idUser, idGroup))
+        },
+        getDrawingGroups: (idUser, idGroup) => {
+            dispatch(getDrawingsGroup(idUser, idGroup));
+            dispatch(push("/drawings"));
         }
     }
 };

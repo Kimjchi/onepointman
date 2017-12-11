@@ -48,7 +48,6 @@ const  mapDispatchToProps = (dispatch) => {
     return{
         setDrawings: (drawings) => {
             dispatch(setDrawings(drawings));
-            //dispatch(push("/drawings"))
         },
         changeDescription: (description) => {
             dispatch(changeDescription(description))

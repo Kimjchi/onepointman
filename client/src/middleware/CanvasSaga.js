@@ -4,7 +4,7 @@ import {HANDLE_AUTH_REQ} from "../actions/opHandleAuth";
 import {store} from '../store';
 import {getPhotoUser, idUser, setAuthState} from "../actions/opLogin";
 import {push} from "react-router-redux";
-import {SEND_DRAWING} from "../actions/opCanvas";
+import {bindDrawingsGroup, GET_DRAWINGS_GROUP, SEND_DRAWING} from "../actions/opCanvas";
 
 export function* requestSendDrawing() {
 
@@ -45,6 +45,36 @@ export function* requestSendDrawing() {
     }
 }
 
+export function* requestGetDrawings() {
+
+    while (true) {
+
+        let drawing = yield take(GET_DRAWINGS_GROUP);
+
+        let idUser = drawing.idUser;
+        let idGroup = drawing.idGroup;
+        console.log(idUser);
+
+        let server = "http://localhost:3001/groups/drawings/"+idUser+"/"+idGroup;
+
+        axios.get(server)
+            .then(function (response) {
+                if(!!response.data.status && response.data.status === 'success') {
+                    if(response.data.message.drawings.length !== 0) {
+                        store.dispatch(bindDrawingsGroup(response.data.message.drawings));
+                    }
+                    else {
+                        store.dispatch(bindDrawingsGroup([]));
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+}
+
 export function* CanvasFlow() {
     yield fork(requestSendDrawing);
+    yield fork(requestGetDrawings);
 }

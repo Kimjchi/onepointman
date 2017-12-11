@@ -2,7 +2,6 @@ import {SketchField, Tools, ContentUndo} from 'react-sketch';
 import React, {Component} from 'react';
 import {Button, Col, ControlLabel, FormControl, FormGroup, Grid, Modal, PageHeader, Row} from 'react-bootstrap';
 
-
 class CanvasComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -53,7 +52,6 @@ class CanvasComponent extends React.Component {
     };
 
     _sendDrawing() {
-
         this.props.sendDrawing(this.props.drawing, this.props.idUser, this.props.groupToDisplay, this.props.description, this.props.zoom, this.props.mapCenter);
         this._close();
     }

@@ -1,4 +1,4 @@
-import {CHANGE_DESCRIPTION, DRAW, SET_DRAWINGS} from "../actions/opCanvas";
+import {BIND_DRAWINGS_GROUP, CHANGE_DESCRIPTION, DRAW, SET_DRAWINGS} from "../actions/opCanvas";
 
 //ajouter le reste dans l'import
 
@@ -8,6 +8,7 @@ let initialState = {
     draw: false,
     drawings: '',
     description: '',
+    drawingsGroup: []
 };
 
 export default function reducer (state = initialState, action ){
@@ -19,6 +20,8 @@ export default function reducer (state = initialState, action ){
             return {...state, drawings: action.drawings, error:''};
         case CHANGE_DESCRIPTION:
             return {...state, description: action.description, error:''};
+        case BIND_DRAWINGS_GROUP:
+            return {...state, drawingsGroup: action.drawings, error:''};
         default:
             return state
     }

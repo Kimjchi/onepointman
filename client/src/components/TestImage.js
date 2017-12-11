@@ -4,12 +4,14 @@ import {connect} from "react-redux";
 
 class TestImage extends React.Component {
     render() {
-        let {drawings} = this.props.opCanvas;
+        let {drawingsGroup} = this.props.opCanvas;
+        console.log(drawingsGroup);
         return (
             <div>
                 {
-                    drawings.map(drawing => {
-                        return <img src={drawing} height={500} width={500} style={{zIndex: 20}}/>
+                    drawingsGroup.map(drawing => {
+                        console.log(drawing.img);
+                        return <img src={"data:image/png;base64,"+drawing.img} height={500} width={500} style={{zIndex: 20}}/>
                     })
                 }
             </div>

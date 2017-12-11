@@ -54,6 +54,28 @@ router.post('/settracking', function(req,res){
 
 });
 
+router.post('/deletetracking', function(req,res){
+   let toDelete = {
+       iduser: req.body.iduser,
+       idgroup: req.body.idgroup
+   }
+
+   let deleting=squel.delete()
+       .from('public."TRACK_POS"')
+       .where('iduser = ?', toDelete.iduser)
+       .where('idgroup = ?', toDelete.idgroup)
+       .toString();
+   db.query(deleting)
+       .then(()=>{
+           sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'Tracking deleted successfully'}, res)
+
+       })
+       .catch(e => {
+           sender.sendResponse(sender.BAD_REQUEST, {status:'fail', message:'Error while updating tracking state'}, res);
+           console.log(e);
+       })
+
+});
 
 
 module.exports = router;

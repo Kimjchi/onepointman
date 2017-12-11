@@ -31,7 +31,7 @@ var ATLANTIC_OCEAN = {
     longitude: -55.491477
 };
 
-const INTERVAL = 5000;
+const INTERVAL = 30000;
 
 var googleMapsClient = GoogleMaps.createClient({
     key: 'AIzaSyAz09vuKBf8P3_7nXx_DNSKwzY0toXGxYw'

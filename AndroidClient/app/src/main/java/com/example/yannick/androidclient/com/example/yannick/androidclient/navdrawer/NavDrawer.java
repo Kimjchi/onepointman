@@ -42,6 +42,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
     private static final int DESSINER = 1;
     private static final int STOP_DESSINER = 2;
     private static final int ENVOYER_DESSIN = 3;
+    private static final int DELETE_TRACKING = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,6 +164,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         settingsMenu = menu;
         settingsMenu.clear();
         settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
+        settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
         return true;
     }
 
@@ -182,6 +184,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             case STOP_DESSINER:
                 settingsMenu.clear();
                 settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
+                settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
                 getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
                 isDrawing = false;
                 break;
@@ -189,8 +192,13 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 //TODO REQUETE ENVOI DU DESSIN
                 settingsMenu.clear();
                 settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
+                settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
                 getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
                 isDrawing = false;
+                break;
+            case DELETE_TRACKING:
+                VolleyRequester.getInstance(getApplicationContext()).updateTracking(false, MapFragment.instance.getCurrentGroup());
+                VolleyRequester.getInstance(getApplicationContext()).deleteTracking(MapFragment.instance.getCurrentGroup());
                 break;
         }
 

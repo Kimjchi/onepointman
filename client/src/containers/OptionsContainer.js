@@ -3,7 +3,8 @@ import {connect} from "react-redux";
 import ReactDOM from 'react-dom';
 import '../style/Options.css';
 import {
-    changeLocationSelect, recenterMap, updateMarkerGeoLocation, updateMarkerSelect,
+    changeLocationSelect, changeMarkerMemberDisplay, changePinPointDisplay, recenterMap, updateMarkerGeoLocation,
+    updateMarkerSelect,
     updateMarkersSelect
 } from "../actions/opMap";
 import {
@@ -63,6 +64,8 @@ class OptionsContainer extends Component {
         this._handleModeDessin = this._handleModeDessin.bind(this);
         this._handleChangeSharing = this._handleChangeSharing.bind(this);
         this._showDessins = this._showDessins.bind(this);
+        this._handlePinPointDisplayChange = this._handlePinPointDisplayChange.bind(this);
+        this._handleMarkerMemberDisplayChange = this._handleMarkerMemberDisplayChange.bind(this);
         setInterval(this._checkLocation, INTERVAL);
     }
 
@@ -116,6 +119,14 @@ class OptionsContainer extends Component {
         let {pinPoint} = this.props.opOptions;
         pinPoint.desc = event.target.value;
         this.props.changeNewPinPoint(pinPoint);
+    }
+
+    _handlePinPointDisplayChange(event) {
+        this.props.changePinPointDisplay();
+    }
+
+    _handleMarkerMemberDisplayChange(event) {
+        this.props.changeMarkerMemberDisplay();
     }
 
     _getValidationPinPoint(event) {
@@ -371,10 +382,10 @@ class OptionsContainer extends Component {
                         <div className='content'>
                             <ul>
                                 <li>
-                                    <a href='#'>Positions</a>
+                                    <a href='#' onClick = {this._handleMarkerMemberDisplayChange}> {(this.props.opMap.isMarkerShown ? "+ Positions" : "- Position")}</a>
                                 </li>
                                 <li>
-                                <a href='#'>Rendez-vous</a>
+                                <a href='#' onClick = {this._handlePinPointDisplayChange}>{(this.props.opMap.isPinPointShown ? "+ Rendez-vous" : "- Rendez-vous")}</a>
                                 </li>
                                 <li>
                                     <a onClick={this._showDessins}>Dessins</a>
@@ -507,6 +518,12 @@ const  mapDispatchToProps = (dispatch) => {
         getDrawingGroups: (idUser, idGroup) => {
             dispatch(getDrawingsGroup(idUser, idGroup));
             dispatch(push("/drawings"));
+        },
+        changeMarkerMemberDisplay: () => {
+            dispatch(changeMarkerMemberDisplay())
+        },
+        changePinPointDisplay: () => {
+            dispatch(changePinPointDisplay())
         }
     }
 };

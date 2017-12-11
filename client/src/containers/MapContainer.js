@@ -32,6 +32,7 @@ class MapContainer extends Component {
 
     render() {
         let {isMarkerShown} = this.props.opMap;
+        let {isPinPointShown} = this.props.opMap;
         let {mapCenter} = this.props.opMap;
         let {zoom} = this.props.opMap;
         let {markerSelect} = this.props.opMap;
@@ -47,7 +48,8 @@ class MapContainer extends Component {
                  markerSelect = {markerSelect} markersGeoLocation = {markersGeoLocation}
                  markersPinPoint = {pinPoints} changePinPoints = {changePinPoints}
                  _onMapMounted = {this._onMapMounted} _onIdleChanged = {this._onIdleChanged}
-                 markersMembers = {markersMembers} updateMarkerMembers = {updateMarkerMembers}/>
+                 markersMembers = {markersMembers} updateMarkerMembers = {updateMarkerMembers}
+                 isPinPointShown = {isPinPointShown}/>
     )
     }
 }

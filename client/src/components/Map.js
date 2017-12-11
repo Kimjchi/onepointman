@@ -3,7 +3,6 @@ import {withGoogleMap, GoogleMap, Marker, InfoWindow} from "react-google-maps"
 import GoogleMapsWrapper from "../util/GoogleMapsWrapper";
 import '../style/Map.css';
 
-const INTERVAL = 1000;
 const LOCATION_ICON = "http://maps.google.com/mapfiles/ms/micons/blue-dot.png";
 const PINPOINT_ICON = "http://maps.google.com/mapfiles/ms/micons/yellow-dot.png";
 const MEMBER_ICON = "http://maps.google.com/mapfiles/kml/paddle/";
@@ -62,20 +61,18 @@ class Map extends Component {
                     zoom={this.props.zoom}
                     center={this.props.mapCenter}
                     onClick={this._onClickMap}>
-                        {this.props.isMarkerShown && this.props.markersGeoLocation.map(marker => (
+                        {this.props.markersGeoLocation.map(marker => (
                             <Marker
                                 key={id++}
                                 position={{ lat: marker.lat, lng: marker.lng }}
                                 icon = {LOCATION_ICON}
                             />
                         ))}
-                        {this.props.isMarkerShown &&
-                            <Marker
-                                key={id++}
-                                position={{ lat: markerSelect.lat, lng: markerSelect.lng }}
-                            />
-                        }
-                        {this.props.isMarkerShown && this.props.markersPinPoint.map(marker => (
+                        <Marker
+                            key={id++}
+                            position={{ lat: markerSelect.lat, lng: markerSelect.lng }}
+                        />
+                        {this.props.isPinPointShown && this.props.markersPinPoint.map(marker => (
                             <Marker
                                 key={id++}
                                 position={{ lat: marker.pos.lt, lng: marker.pos.lg }}

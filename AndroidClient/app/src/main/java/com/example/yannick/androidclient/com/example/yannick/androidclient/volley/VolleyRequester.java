@@ -711,15 +711,15 @@ public class VolleyRequester
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray userArray = (JSONArray)response.get("membres");
+                            JSONArray userArray = (JSONArray)response.get("listeMembres");
 
                             for(int i=0; i < userArray.length(); i++)
                             {
                                 JSONObject user = (JSONObject)userArray.get(i);
-                                String id = user.get("id").toString();
+                                String id = user.get("iduser").toString();
                                 String name = user.getString("prenom") + " " + user.getString("nom");
 
-                                userModels.add(new UserModelSettings(id, name, groupId));
+                                userModels.add(new UserModelSettings(name, id, groupId));
                             }
 
                             adapter.notifyDataSetChanged();

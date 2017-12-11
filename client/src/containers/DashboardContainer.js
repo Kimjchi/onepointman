@@ -11,7 +11,6 @@ class DashboardContainer extends Component {
 
 
     render() {
-        console.log(this.props.opCanvas.draw);
         return (
             <div>
                 <OptionsContainer/>

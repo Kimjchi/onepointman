@@ -23,7 +23,8 @@ router.post('/createdrawing', function(req,res){
         img: req.body.img
     };
 
-    let query = squel.insert()
+    console.log(toCreate.img.toString());
+    /*let query = squel.insert()
         .into('public."DRAWING"')
         .set('idcreator', toCreate.idcreator)
         .set('idgroup', toCreate.idgroup)
@@ -33,9 +34,13 @@ router.post('/createdrawing', function(req,res){
         .set('drawinglg', toCreate.lg)
         .set('img', toCreate.img)
         .returning('iddrawing')
-        .toString();
+        .toString();*/
 
+    let query = 'INSERT INTO public."DRAWING" (idcreator, idgroup, zoom, description, drawinglt, drawinglg, img)' +
+        ' VALUES(' + toCreate.idcreator + ',' + toCreate.idgroup + ',' + toCreate.zoom + ',\'' + toCreate.description + '\',' + toCreate.lt
+        + ',' + toCreate.lg + ', decode(\'' + toCreate.img + '\', \'base64\')) RETURNING iddrawing';
 
+    console.log("query " + query);
     db.one(query)
         .then((row)=>{
             let response = {
@@ -45,8 +50,8 @@ router.post('/createdrawing', function(req,res){
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.BAD_REQUEST, {status: 'fail',message:'Error while creating drawing'}, res);
             console.log(e);
+            sender.sendResponse(sender.BAD_REQUEST, {status: 'fail',message:'Error while creating drawing'}, res);
         })
 });
 

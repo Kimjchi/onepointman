@@ -17,6 +17,8 @@ router.post('/createpinpoint/', function (req, res) {
         daterdv: req.body.daterdv,
     };
 
+    let daterdv = new Date(toCreate.daterdv);
+    daterdv.setDate(daterdv.getDate());
     let dateexpiration = new Date(toCreate.daterdv);
     dateexpiration.setDate(dateexpiration.getDate() + 1);
 
@@ -27,8 +29,8 @@ router.post('/createpinpoint/', function (req, res) {
         .set('pinlt', parseInt(toCreate.pinlt, 10))
         .set('pinlg', parseInt(toCreate.pinlg, 10))
         .set('description', toCreate.description)
-        .set('daterdv', toCreate.daterdv)
-        .set('dateexpiration', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString())
+        .set('daterdv', daterdv.toISOString())
+        .set('dateexpiration', dateexpiration.toISOString())
         .returning('idpinpoint')
         .toString();
 

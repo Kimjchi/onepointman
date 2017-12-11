@@ -50,12 +50,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * Created by yannick on 05/12/17.
@@ -112,7 +115,7 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.v("ErrorAuth", "Authentification au serveur echouée");
+                    Log.v("CONNEXION_BACKEND", "Authentification au serveur echouée");
                     error.printStackTrace();
                 }
             });
@@ -255,10 +258,8 @@ public class VolleyRequester
                                     @Override
                                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                                         if (b){
-                                            Log.v("CHECKBOX","Checked");
                                             updateLocationSharing(true, id);
                                         }else{
-                                            Log.v("CHECKBOX","Unchecked");
                                             updateLocationSharing(false, id);
                                         }
                                     }
@@ -279,6 +280,8 @@ public class VolleyRequester
                                         MapFragment activity = MapFragment.instance;
                                         activity.setCurrentGroup(id);
                                         activity.clearMarkers();
+                                        VolleyRequester.getInstance(context).groupPositionUpdate(activity.getCurrentGroup());
+                                        activity.updateDisplayMarkers();
                                         return false;
                                     }
                                 });
@@ -346,7 +349,6 @@ public class VolleyRequester
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            Log.v("TAG",response.toString());
                             if((response.getString("status")).equals("success")){
                                 Log.v("SEND POSITION", "Position envoyée avec succès!");
                             }
@@ -410,6 +412,7 @@ public class VolleyRequester
                 String daterdv = pinPoint.getString("daterdv");
                 String desc = pinPoint.getString("description");
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                format.setTimeZone(TimeZone.getTimeZone("GMT"));
                 Date date = format.parse(daterdv);
                 String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
 
@@ -444,6 +447,7 @@ public class VolleyRequester
                 double userlg = Double.parseDouble(usersPosition.getString("userlg"));
                 String dateposition = usersPosition.getString("dateposition");
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                format.setTimeZone(TimeZone.getTimeZone("GMT"));
                 Date date = format.parse(dateposition);
                 String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
 
@@ -451,6 +455,7 @@ public class VolleyRequester
                 String usersPositionTitle = userName;
                 String usersPositionSnippet = "Date dernière position:\r\n" + dateDisplayed;
                 float color;
+
                 if (usersPosition.getBoolean("current")) {
                     color = BitmapDescriptorFactory.HUE_GREEN;
                 } else {
@@ -461,8 +466,7 @@ public class VolleyRequester
                         .position(new LatLng(userlt, userlg))
                         .title(usersPositionTitle)
                         .snippet(usersPositionSnippet)
-                        .icon(BitmapDescriptorFactory.defaultMarker());
-
+                        .icon(BitmapDescriptorFactory.defaultMarker(color));
 
                 MapFragment activity = MapFragment.instance;
                 activity.addMarker(Integer.toString(iduser), marker);
@@ -668,7 +672,6 @@ public class VolleyRequester
 
     public void sendNewPinPoint(int groupId, LatLng lglt, String desc, String date)
     {
-
         String idUser = FacebookInfosRetrieval.user_id;
         String json = "{\"iduser\":"+idUser+",\"idgroup\":" + groupId
             + ",\"pinlg\":"+ lglt.longitude +",\"pinlt\":" + lglt.latitude

@@ -26,6 +26,7 @@ router.post(('/updateposition'), function (req, res) {
         .from('public."USER_GROUP"', 'ugr')
         .field('ugr.idgroup')
         .field('ugr.sharesposition')
+        .field('ugr.istracking')
         .where('ugr.iduser = ?', parseInt(toUpdate.iduser, 10))
         .toString();
     db.any(getGroups)
@@ -63,6 +64,24 @@ router.post(('/updateposition'), function (req, res) {
                                         message: 'failing to update userposition in a group'
                                     });
                                     console.log('failed at updating position in group');
+                                })
+                        }
+                        if (element.istracking === true) {
+                            let inTrack = squel.insert()
+                                .into('public."TRACK_POS"')
+                                .set('lt', toUpdate.userlt)
+                                .set('lg', toUpdate.userlg)
+                                .set('timepos', currentTime.toISOString())
+                                .set('iduser', toUpdate.iduser)
+                                .set('idgroup', element.idgroup)
+                                .toString();
+
+                            db.none(inTrack)
+                                .then(() => {
+                                    console.log('added position in tracking for group ' + element.idgroup);
+                                })
+                                .catch(e => {
+                                    console.log('failed at addinf position for tracking' + e);
                                 })
                         }
 

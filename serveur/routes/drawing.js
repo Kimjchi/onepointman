@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require('../connection');
 const squelb = require('squel');
 const squel = squelb.useFlavour('postgres');
+const sender = require('../sender');
+
 
 
 router.get('/', function(req, res, next) {
@@ -30,11 +32,14 @@ router.post('/createdrawing', function(req,res){
         .set('drawinglt', toCreate.lt)
         .set('drawinglg', toCreate.lg)
         .set('img', toCreate.img)
+        .returning('iddrawing')
         .toString();
+
 
     db.one(query)
         .then((row)=>{
             let response = {
+                status: 'success',
                 iddrawing : row.iddrawing
             };
             sender.sendResponse(sender.SUCCESS_STATUS, response, res)

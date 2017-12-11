@@ -321,6 +321,7 @@ class OptionsContainer extends Component {
                                                     <div>{marker.firstname} {marker.lastname}</div>
                                                     <div>{this._convertDate(marker.date)}</div>
                                                 </div>
+                                                {(marker.current ? <div class="circle"></div> : "")}
                                             </div>
                                         </a>
                                     </li>

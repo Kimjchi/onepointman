@@ -208,12 +208,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         mTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                                boolean condition = false;
+                                boolean conditionM = false;
+                                boolean conditionH = false;
                                 if(selectedMinute<10){
-                                    condition = true;
+                                    conditionM = true;
+                                }
+                                if(selectedHour<10){
+                                    conditionH = true;
                                 }
 
-                                hourPickerText.setText( selectedHour + ":"+ (condition?"0":"") + selectedMinute + ":00");
+                                hourPickerText.setText((conditionH?"0":"") + selectedHour + ":"+ (conditionM?"0":"") + selectedMinute + ":00");
                                 hourRdvSet = true;
                                 checkIfDialogButtonCanBeClickable();
                             }
@@ -355,7 +359,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
                     if (marker.getKey().length() > 8) {
                         if (marker.getKey().substring(0, 8).equals("Pinpoint")) {
-                            Log.v("IDPINPOINT", marker.getKey().substring(8));
                             Marker pinpoint = mMap.addMarker(marker.getValue());
                             pinpoint.setTag(Integer.parseInt(marker.getKey().substring(8)));
                         } else {

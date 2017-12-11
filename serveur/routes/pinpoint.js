@@ -28,7 +28,7 @@ router.post('/createpinpoint/', function (req, res) {
         .set('pinlg', parseInt(toCreate.pinlg, 10))
         .set('description', toCreate.description)
         .set('daterdv', toCreate.daterdv)
-        .set('dateexpiration', dateexpiration.toLocaleDateString() + ' ' + dateexpiration.toLocaleTimeString())
+        .set('dateexpiration', dateexpiration)
         .returning('idpinpoint')
         .toString();
 

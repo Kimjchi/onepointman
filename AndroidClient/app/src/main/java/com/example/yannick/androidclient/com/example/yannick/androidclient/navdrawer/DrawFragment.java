@@ -4,18 +4,12 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import com.example.yannick.androidclient.R;
@@ -41,16 +35,11 @@ public class DrawFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        RelativeLayout relativeLayout = new RelativeLayout(getActivity().getApplicationContext());
-        final TouchEventView draw = new TouchEventView(getActivity().getApplicationContext(), null, background);
-        relativeLayout.addView(draw);
+        View drawLayout = inflater.inflate(R.layout.drawing_layout, container, false);
+        final TouchEventView draw = drawLayout.findViewById(R.id.drawingView);
+        draw.setBackground(background);
 
-        LinearLayout linearLayout = new LinearLayout(getActivity().getApplicationContext());
-
-        ImageButton strokeWidthButton = new ImageButton(getActivity().getApplicationContext());
-        strokeWidthButton.setImageResource(R.drawable.stroke_width_button);
-        linearLayout.addView(strokeWidthButton);
-
+        ImageButton strokeWidthButton = drawLayout.findViewById(R.id.strokeWidthButtonDraw);
         strokeWidthButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,10 +84,7 @@ public class DrawFragment extends Fragment
             }
         });
 
-        ImageButton colorPickerButton = new ImageButton(getActivity().getApplicationContext());
-        colorPickerButton.setImageResource(R.drawable.color_picker_image);
-        linearLayout.addView(colorPickerButton);
-
+        ImageButton colorPickerButton = drawLayout.findViewById(R.id.colorPickerDraw);
         colorPickerButton.setOnClickListener(new View.OnClickListener() {
                                                  @Override
                                                  public void onClick(View view) {
@@ -130,10 +116,7 @@ public class DrawFragment extends Fragment
                                                  }
                                              });
 
-        ImageButton redoButton = new ImageButton(getActivity().getApplicationContext());
-        redoButton.setImageResource(R.drawable.redo_button);
-        linearLayout.addView(redoButton);
-
+        ImageButton redoButton = drawLayout.findViewById(R.id.redoButtonDraw);
         redoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,10 +124,7 @@ public class DrawFragment extends Fragment
             }
         });
 
-        ImageButton undoButton = new ImageButton(getActivity().getApplicationContext());
-        undoButton.setImageResource(R.drawable.undo_button);
-        linearLayout.addView(undoButton);
-
+        ImageButton undoButton = drawLayout.findViewById(R.id.undoButtonDraw);
         undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -152,10 +132,7 @@ public class DrawFragment extends Fragment
             }
         });
 
-        relativeLayout.addView(linearLayout);
-
-        Log.v("DRAWFRAG", "DrawFrag lancer");
-        return relativeLayout;
+        return drawLayout;
     }
 
     public void setBackground(Bitmap background)

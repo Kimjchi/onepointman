@@ -152,6 +152,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //Groupe
                 //Date RDV
                 //Description
+
+                Log.v("TEST", latLng.latitude + " ; " + latLng.longitude);
                 hourRdvSet = false;
                 dateRdvSet = false;
                 nameRdvSet = false;

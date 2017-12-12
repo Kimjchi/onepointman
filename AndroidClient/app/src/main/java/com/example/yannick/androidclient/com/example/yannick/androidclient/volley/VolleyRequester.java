@@ -72,6 +72,7 @@ public class VolleyRequester
     private static Context context;
     //private final String URL_SERVEUR = "http://192.168.0.108:3001";
     private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    //private final String URL_SERVEUR = "http://192.168.43.202:3001";
 
     private VolleyRequester(Context context)
     {
@@ -416,7 +417,7 @@ public class VolleyRequester
         String idUser = FacebookInfosRetrieval.user_id;
         String json = "{\"iduser\":"+ idUser + ",\"userlt\":"
                 + myPosition.getLatitude() + ",\"userlg\":" + myPosition.getLongitude() +"}";
-
+        Log.v("TEST2", json);
         try {
             JSONObject bodyJson = new JSONObject(json);
 
@@ -518,36 +519,37 @@ public class VolleyRequester
         try {
             for(int i=0; i< json.getJSONArray("userpositions").length(); i++) {
                 JSONObject usersPosition = json.getJSONArray("userpositions").getJSONObject(i);
-                int iduser = usersPosition.getInt("iduser");
-                String userName = usersPosition.getString("prenom") + " " +usersPosition.getString("nom");
-                double userlt = Double.parseDouble(usersPosition.getString("userlt"));
-                double userlg = Double.parseDouble(usersPosition.getString("userlg"));
-                String dateposition = usersPosition.getString("dateposition");
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-                format.setTimeZone(TimeZone.getTimeZone("GMT"));
-                Date date = format.parse(dateposition);
-                String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
+                if (!usersPosition.getString("userlt").equals("null")) {
+                    int iduser = usersPosition.getInt("iduser");
+                    String userName = usersPosition.getString("prenom") + " " +usersPosition.getString("nom");
+                    double userlt = Double.parseDouble(usersPosition.getString("userlt"));
+                    double userlg = Double.parseDouble(usersPosition.getString("userlg"));
+                    String dateposition = usersPosition.getString("dateposition");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                    format.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    Date date = format.parse(dateposition);
+                    String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
 
 
-                String usersPositionTitle = userName;
-                String usersPositionSnippet = "Date dernière position:\r\n" + dateDisplayed;
-                float color;
+                    String usersPositionTitle = userName;
+                    String usersPositionSnippet = "Date dernière position:\r\n" + dateDisplayed;
+                    float color;
 
-                if (usersPosition.getBoolean("current")) {
-                    color = BitmapDescriptorFactory.HUE_GREEN;
-                } else {
-                    color = BitmapDescriptorFactory.HUE_RED;
+                    if (usersPosition.getBoolean("current")) {
+                        color = BitmapDescriptorFactory.HUE_GREEN;
+                    } else {
+                        color = BitmapDescriptorFactory.HUE_RED;
+                    }
+
+                    MarkerOptions marker = new MarkerOptions()
+                            .position(new LatLng(userlt, userlg))
+                            .title(usersPositionTitle)
+                            .snippet(usersPositionSnippet)
+                            .icon(BitmapDescriptorFactory.defaultMarker(color));
+
+                    MapFragment activity = MapFragment.instance;
+                    activity.addMarker(Integer.toString(iduser), marker);
                 }
-
-                MarkerOptions marker = new MarkerOptions()
-                        .position(new LatLng(userlt, userlg))
-                        .title(usersPositionTitle)
-                        .snippet(usersPositionSnippet)
-                        .icon(BitmapDescriptorFactory.defaultMarker(color));
-
-                MapFragment activity = MapFragment.instance;
-                activity.addMarker(Integer.toString(iduser), marker);
-
             }
         } catch (JSONException e) {
             e.printStackTrace();

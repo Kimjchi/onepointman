@@ -135,6 +135,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         settingsMenu.clear();
         settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
         settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
+        settingsMenu.add(Menu.NONE, 7, Menu.NONE, "Afficher dessins");
         return true;
     }
 
@@ -181,6 +182,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                         settingsMenu.clear();
                         settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
                         settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
+                        settingsMenu.add(Menu.NONE, 7, Menu.NONE, "Afficher dessins");
                         getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
                         isDrawing = false;
                     }
@@ -198,6 +200,9 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             case DELETE_TRACKING:
                 VolleyRequester.getInstance(getApplicationContext()).updateTracking(false, MapFragment.instance.getCurrentGroup());
                 VolleyRequester.getInstance(getApplicationContext()).deleteTracking(MapFragment.instance.getCurrentGroup());
+                break;
+            case 7:
+                VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
                 break;
         }
 

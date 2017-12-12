@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.draw.Drawing;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,6 +46,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CustomCap;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -89,6 +92,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public VolleyRequester restRequester = null;
     private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>();
     private Map<Integer, PolylineOptions> trace = new HashMap<Integer, PolylineOptions>();
+    private ArrayList<Drawing> drawings = new ArrayList<>();
     private Bitmap cap;
 
     public int getCurrentGroup(){return currentGroup;}
@@ -393,12 +397,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             for (Map.Entry<Integer, PolylineOptions> traceToDisplay : trace.entrySet()) {
                 mMap.addPolyline(traceToDisplay.getValue());
             }
+            displayDrawings();
         }
     }
     public void clearMarkers(){
         synchronized(markers) {
             markers.clear();
             trace.clear();
+            drawings.clear();
         }
     }
 
@@ -523,5 +529,55 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public LatLng getCurrentPosition()
     {
         return mMap.getCameraPosition().target;
+    }
+
+    public void clearDrawings()
+    {
+        drawings.clear();
+    }
+
+    public void displayDrawings()
+    {
+        Log.v("DISPLAY_DRAWING", "Dessins a afficher :" + this.drawings.size());
+        for(Drawing drawing : this.drawings)
+        {
+            GroundOverlayOptions newarkMap = new GroundOverlayOptions()
+                    .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
+                    .position(drawing.getPosition(), drawing.getWidth(), drawing.getHeight());
+            mMap.addGroundOverlay(newarkMap);
+            Log.v("DISPLAY_DRAWING", "Position :" + drawing.getPosition().latitude + " lg: "+drawing.getPosition().longitude);
+        }
+    }
+
+    public void addDrawingToList(JSONObject draw)
+    {
+        try
+        {
+            int idDrawing = draw.getInt("iddrawing");
+
+            for(Drawing d : this.drawings)
+            {
+                if(d.getIdDrawing() == idDrawing)
+                {
+                    return;
+                }
+            }
+
+            String idCreator = draw.getString("idcreator");
+            String nomCreator = draw.getString("nomcreator");
+            String prenomCreator = draw.getString("prenomcreator");
+            LatLng latLng = new LatLng(Double.parseDouble(draw.getString("lt")),
+                    Double.parseDouble(draw.getString("lg")));
+            String stringImage = draw.getString("img");
+
+            Drawing drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
+                    prenomCreator, latLng, stringImage);
+
+            this.drawings.add(drawing);
+        }
+        catch(Exception ex)
+        {
+            Log.v("MAP_FRAG_DRAW", "Error poto");
+        }
     }
 }

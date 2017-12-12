@@ -8,6 +8,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.widget.CompoundButtonCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -70,8 +71,8 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    //private final String URL_SERVEUR = "http://192.168.0.108:3001";
-    private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    private final String URL_SERVEUR = "http://192.168.0.108:3001";
+    //private final String URL_SERVEUR = "http://192.168.137.1:3001";
     //private final String URL_SERVEUR = "http://192.168.43.202:3001";
 
     private VolleyRequester(Context context)
@@ -859,9 +860,10 @@ public class VolleyRequester
     public void sendDrawing(int idgroup, String description, float zoom, LatLng latLng, byte[] img)
     {
         String idUser = FacebookInfosRetrieval.user_id;
+        String encodedImage = Base64.encodeToString(img, Base64.NO_WRAP);
         String json = "{\"iduser\":"+idUser+",\"idgroup\":" + idgroup
                 + ",\"description\":\""+ description + "\", \"zoom\":" + zoom + ", \"lt\":" +
-                latLng.latitude + ", \"lg\":" + latLng.longitude+ ", \"img\":" + img.toString() + "}";
+                latLng.latitude + ", \"lg\":" + latLng.longitude+ ", \"img\":\"" + encodedImage + "\"}";
 
         Log.v("DRAWING", json);
 

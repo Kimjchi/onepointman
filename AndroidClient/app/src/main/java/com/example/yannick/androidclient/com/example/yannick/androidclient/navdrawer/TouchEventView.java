@@ -116,8 +116,6 @@ public class TouchEventView extends View
                 return false;
         }
 
-        System.out.println(path.toString());
-
         invalidate();
         return true;
     }

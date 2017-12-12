@@ -20,6 +20,8 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 /**
@@ -156,7 +158,29 @@ public class DrawFragment extends Fragment
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream .toByteArray();
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+
+/*
+        System.out.println(getActivity().getApplicationContext().getFilesDir());
+
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream("Tmp.png");
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }*/
+
+
 
         return byteArray;
     }

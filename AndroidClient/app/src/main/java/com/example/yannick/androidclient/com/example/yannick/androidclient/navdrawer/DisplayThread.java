@@ -25,6 +25,7 @@ public class DisplayThread implements Runnable {
     private final int MY_POSITION_UPDATE_TIME = 3000;
     private Handler handler = new Handler();
     private boolean displayThreadRunning = true;
+    private boolean firstGroup = true;
     private Location myLocation;
     private MapFragment activity;
 
@@ -60,6 +61,11 @@ public class DisplayThread implements Runnable {
                 }
                 Log.v("LOCATION", "Update displayed!");
                 activity.updateDisplayMarkers();
+                requester.displayGroupForNavDrawer(((NavDrawer)activity.getActivity()).getMenu(), firstGroup);
+                if(firstGroup){
+                    firstGroup = false;
+                }
+
                 if(activity.getCurrentGroup() != 0)
                 {
                     requester.groupPositionUpdate(activity.getCurrentGroup());

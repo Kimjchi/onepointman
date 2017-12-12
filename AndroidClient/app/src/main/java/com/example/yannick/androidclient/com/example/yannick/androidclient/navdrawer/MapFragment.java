@@ -12,7 +12,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.icu.lang.UCharacter;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -38,18 +41,32 @@ import com.example.yannick.androidclient.com.example.yannick.androidclient.volle
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CustomCap;
+import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.gms.maps.model.SquareCap;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static android.graphics.Bitmap.CompressFormat.PNG;
 import static com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.LocationService.getLocationService;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -70,9 +87,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private int currentTag = 0;
     public static MapFragment instance = null;
     public VolleyRequester restRequester = null;
-    private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>() {
-    };
+    private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>();
+    private Map<Integer, PolylineOptions> trace = new HashMap<Integer, PolylineOptions>();
     private Bitmap snapshot;
+    private Bitmap cap;
 
     public int getCurrentGroup(){return currentGroup;}
     public void setCurrentGroup(int group){currentGroup = group;}
@@ -102,6 +120,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onStart(){
+        cap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.cap);
         super.onStart();
         restRequester = VolleyRequester.getInstance(getActivity().getApplicationContext());
         restRequester.groupsRequest();
@@ -122,7 +141,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 popupBuilderInfoMarker(marker).show();
-                //Toast.makeText(getActivity().getApplicationContext(), "Description: " + marker.getSnippet(), Toast.LENGTH_LONG).show();
                 return false;
             }
         });
@@ -371,11 +389,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 }
             }
+            for (Map.Entry<Integer, PolylineOptions> traceToDisplay : trace.entrySet()) {
+                mMap.addPolyline(traceToDisplay.getValue());
+            }
         }
     }
     public void clearMarkers(){
         synchronized(markers) {
             markers.clear();
+            trace.clear();
         }
     }
 
@@ -440,6 +462,55 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         };
         mMap.snapshot(callback);
     }
+
+     public void updateTraceFromJson(JSONObject traceJson, int colorInt){
+        int color = Color.argb(255,0,0,0);;
+        switch (colorInt%8){
+            case 0:
+                color = Color.argb(255,0,0,0);
+                break;
+            case 1:
+                color = Color.argb(255,0,0,255);
+                break;
+            case 2:
+                color = Color.argb(255,0,255,0);
+                break;
+            case 3:
+                color = Color.argb(255,0,255,255);
+                break;
+            case 4:
+                color = Color.argb(255,255,0,0);
+                break;
+            case 5:
+                color = Color.argb(255,255,0,255);
+                break;
+            case 6:
+                color = Color.argb(255,255,255,0);
+                break;
+            case 7:
+                color = Color.argb(255,255,255,255);
+                break;
+        }
+
+        //Entrée: trace{userid, pos[{lt,lg},...]}
+         try {
+             JSONObject position;
+             PolylineOptions line = new PolylineOptions();
+             line.color(color);
+
+             //Pour chaque position
+             for(int i=0; i< traceJson.getJSONArray("tracking").length(); i++) {
+                 position = traceJson.getJSONArray("tracking").getJSONObject(i);
+                 line.add(new LatLng(position.getDouble("lt"),position.getDouble("lg")));
+             }
+             line.startCap(new CustomCap(BitmapDescriptorFactory.fromBitmap(cap),30));
+
+             trace.put(traceJson.getInt("iduser"), line);
+         } catch (JSONException e) {
+             e.printStackTrace();
+         }
+
+     }
 
     public void setSnapshot(Bitmap snap)
     {

@@ -203,8 +203,9 @@ public class VolleyRequester
         this.addToRequestQueue(grpRequest);
     }
 
-    public void displayGroupForNavDrawer(final Menu menuNavDrawer)
+    public void displayGroupForNavDrawer(final Menu menuNavDrawer, final boolean firstGroup)
     {
+        boolean fstGroup = firstGroup;
         String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET,
                 URL_SERVEUR + "/groups/" + idUser, null,
@@ -215,7 +216,7 @@ public class VolleyRequester
                         try {
                             JSONArray array = (JSONArray) response.get("message");
                             menuNavDrawer.findItem(R.id.groups).getSubMenu().clear();
-
+                            boolean fstGroup = firstGroup;
                             for(int i=0; i < array.length(); i++)
                             {
                                 final JSONObject groupe = (JSONObject) array.get(i);
@@ -305,6 +306,10 @@ public class VolleyRequester
                                         return false;
                                     }
                                 });
+                                if(fstGroup){
+                                    MapFragment.instance.setCurrentGroup(id);
+                                    fstGroup = false;
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -547,6 +552,14 @@ public class VolleyRequester
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            for(int i=0; i< json.getJSONArray("trackings").length(); i++) {
+                MapFragment.instance.updateTraceFromJson(json.getJSONArray("trackings").getJSONObject(i), i);
+            }
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }

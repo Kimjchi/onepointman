@@ -11,6 +11,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * Created by yannick on 10/12/17.
  */
@@ -20,20 +23,46 @@ public class TouchEventView extends View
     private Paint paint = new Paint();
     private Path path = new Path();
 
+    private int currentColor;
+    private float strokeWidth;
+    private float mX, mY;
+
+    public static int MAX_VALUE_STROKE = 70;
+
+    private HashMap<Path, Paint> donepathsMap;
+    private HashMap<Path, Paint> undonePathsMap;
+    private ArrayList<Path> undonePaths;
+    private ArrayList<Path> donepaths;
+
     public TouchEventView(Context ctx, AttributeSet attributeSet, Bitmap background)
     {
         super(ctx, attributeSet);
-        paint.setAntiAlias(true);
-        paint.setColor(Color.BLACK);
-        paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3f);
+        undonePaths = new ArrayList<>();
+        donepaths = new ArrayList<>();
+        donepathsMap = new HashMap<>();
+        undonePathsMap = new HashMap<>();
+        currentColor = Color.BLACK;
+        strokeWidth = 4f;
+        setPathAndPaintParams();
 
         this.setBackground(new BitmapDrawable(ctx.getResources(), background));
     }
 
+    private void setPathAndPaintParams()
+    {
+        paint.setAntiAlias(true);
+        paint.setColor(currentColor);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(strokeWidth);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
+        for(Path p : donepathsMap.keySet())
+        {
+            canvas.drawPath(p, donepathsMap.get(p));
+        }
         canvas.drawPath(path, paint);
     }
 
@@ -45,18 +74,83 @@ public class TouchEventView extends View
         switch(event.getAction())
         {
             case MotionEvent.ACTION_DOWN:
+                undonePathsMap.clear();
+                undonePaths.clear();
+                mX = xPos;
+                mY = yPos;
+                path.reset();
                 path.moveTo(xPos, yPos);
                 return true;
             case MotionEvent.ACTION_MOVE:
-                path.lineTo(xPos, yPos);
+                float dx = Math.abs(xPos - mX);
+                float dy = Math.abs(yPos - mY);
+                if (dx >= 4 || dy >= 4) {
+                    path.quadTo(mX, mY, (xPos+ mX)/2, (yPos + mY)/2);
+                    mX = xPos;
+                    mY = yPos;
+                }
                 break;
             case MotionEvent.ACTION_UP:
+                path.lineTo(xPos, yPos);
+                donepathsMap.put(path, paint);
+                donepaths.add(path);
+                path = new Path();
+                paint = new Paint();
+                setPathAndPaintParams();
                 break;
             default:
                 return false;
         }
 
+        System.out.println(path.toString());
+
         invalidate();
         return true;
+    }
+
+    public int getCurrentColor()
+    {
+        return  currentColor;
+    }
+
+    public void changeCurrentColor(int color)
+    {
+        this.currentColor = color;
+        this.paint.setColor(this.currentColor);
+    }
+
+
+    public float getStrokeWidth() {
+        return strokeWidth;
+    }
+
+    public void setStrokeWidth(float strokeWidth) {
+        this.strokeWidth = strokeWidth;
+        this.paint.setStrokeWidth(this.strokeWidth);
+    }
+
+    public void onUndoClick()
+    {
+        if(donepaths.size() > 0)
+        {
+            Path lastPath = donepaths.get(donepaths.size() - 1);
+            undonePaths.add(lastPath);
+            undonePathsMap.put(lastPath, donepathsMap.get(lastPath));
+            donepaths.remove(lastPath);
+            donepathsMap.remove(lastPath);
+            invalidate();
+        }
+    }
+
+    public void onRedoClick()
+    {
+        if(undonePaths.size() > 0)
+        {
+            Path lastPath = undonePaths.get(undonePaths.size() -1);
+            donepathsMap.put(lastPath, undonePathsMap.get(lastPath));
+            undonePathsMap.remove(lastPath);
+            undonePaths.remove(lastPath);
+            invalidate();
+        }
     }
 }

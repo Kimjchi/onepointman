@@ -167,4 +167,9 @@ public class TouchEventView extends View
             invalidate();
         }
     }
+
+    public void removeBackground()
+    {
+        this.setBackgroundResource(0);
+    }
 }

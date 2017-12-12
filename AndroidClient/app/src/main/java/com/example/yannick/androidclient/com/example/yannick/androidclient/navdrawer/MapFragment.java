@@ -89,7 +89,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public VolleyRequester restRequester = null;
     private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>();
     private Map<Integer, PolylineOptions> trace = new HashMap<Integer, PolylineOptions>();
-    private Bitmap snapshot;
     private Bitmap cap;
 
     public int getCurrentGroup(){return currentGroup;}
@@ -453,10 +452,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
             @Override
             public void onSnapshotReady(Bitmap snapshot) {
-                setSnapshot(snapshot);
                 Log.v("SNAPSHOT", "SNAPSHOT TOOK");
                 DrawFragment drawFragment = new DrawFragment();
                 drawFragment.setBackground(snapshot);
+                drawFragment.setZoom(getCurrentZoom());
+                drawFragment.setLatLng(getCurrentPosition());
+                drawFragment.setIdgroup(currentGroup);
                 fm.beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
             }
         };
@@ -512,9 +513,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
      }
 
-    public void setSnapshot(Bitmap snap)
+    public float getCurrentZoom()
     {
-        this.snapshot = snap;
+        return mMap.getCameraPosition().zoom;
     }
 
+    public LatLng getCurrentPosition()
+    {
+        return mMap.getCameraPosition().target;
+    }
 }

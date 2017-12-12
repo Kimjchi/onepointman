@@ -856,5 +856,36 @@ public class VolleyRequester
         }
     }
 
+    public void sendDrawing(int idgroup, String description, float zoom, LatLng latLng, byte[] img)
+    {
+        String idUser = FacebookInfosRetrieval.user_id;
+        String json = "{\"iduser\":"+idUser+",\"idgroup\":" + idgroup
+                + ",\"description\":\""+ description + "\", \"zoom\":" + zoom + ", \"lt\":" +
+                latLng.latitude + ", \"lg\":" + latLng.longitude+ ", \"img\":" + img.toString() + "}";
 
+        Log.v("DRAWING", json);
+
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest sendDrawing = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/drawing/createdrawing", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("DRAWING", "Add drawing success");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("DRAWING", "Error:" + error.getMessage());
+                }
+            });
+            this.addToRequestQueue(sendDrawing);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
 }

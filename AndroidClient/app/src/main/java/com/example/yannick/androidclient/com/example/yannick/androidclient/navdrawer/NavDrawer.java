@@ -1,6 +1,5 @@
 package com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
@@ -20,16 +19,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONObject;
 
 public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -42,8 +35,6 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
     private static final int STOP_DESSINER = 2;
     private static final int ENVOYER_DESSIN = 3;
     private static final int DELETE_TRACKING = 4;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,12 +159,41 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 isDrawing = false;
                 break;
             case ENVOYER_DESSIN:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Description du dessin");
+
+                final EditText input = new EditText(this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setMessage("Choisir la description du dessin");
+
+                builder.setPositiveButton("Envoyer", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String description = input.getText().toString();
+                        DrawFragment drawFragment = ((DrawFragment)getFragmentManager().findFragmentByTag("DRAW_FRAGMENT"));
+                        byte[] image = drawFragment.takeSnapshot();
+
+                        VolleyRequester.getInstance(getApplicationContext())
+                                .sendDrawing(drawFragment.getIdgroup(), description,
+                                        drawFragment.getZoom(), drawFragment.getLatLng(), image);
+                        
+                        settingsMenu.clear();
+                        settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
+                        settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
+                        getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
+                        isDrawing = false;
+                    }
+                });
+                builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
                 //TODO REQUETE ENVOI DU DESSIN
-                settingsMenu.clear();
-                settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
-                settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
-                isDrawing = false;
                 break;
             case DELETE_TRACKING:
                 VolleyRequester.getInstance(getApplicationContext()).updateTracking(false, MapFragment.instance.getCurrentGroup());

@@ -4,18 +4,12 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import com.example.yannick.androidclient.R;
@@ -23,6 +17,9 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.io.ByteArrayOutputStream;
 
 
 /**
@@ -32,6 +29,10 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 public class DrawFragment extends Fragment
 {
     private Bitmap background;
+    private TouchEventView drawView;
+    private float zoom;
+    private LatLng latLng;
+    private int idgroup;
 
     public DrawFragment()
     {
@@ -41,23 +42,18 @@ public class DrawFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        RelativeLayout relativeLayout = new RelativeLayout(getActivity().getApplicationContext());
-        final TouchEventView draw = new TouchEventView(getActivity().getApplicationContext(), null, background);
-        relativeLayout.addView(draw);
+        View drawLayout = inflater.inflate(R.layout.drawing_layout, container, false);
+        drawView = drawLayout.findViewById(R.id.drawingView);
+        drawView.setBackground(background);
 
-        LinearLayout linearLayout = new LinearLayout(getActivity().getApplicationContext());
-
-        ImageButton strokeWidthButton = new ImageButton(getActivity().getApplicationContext());
-        strokeWidthButton.setImageResource(R.drawable.stroke_width_button);
-        linearLayout.addView(strokeWidthButton);
-
+        ImageButton strokeWidthButton = drawLayout.findViewById(R.id.strokeWidthButtonDraw);
         strokeWidthButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final AlertDialog.Builder popDialog = new AlertDialog.Builder(getContext());
                 final SeekBar seek = new SeekBar(getContext());
                 seek.setMax(TouchEventView.MAX_VALUE_STROKE * 10);
-                seek.setProgress((int) (draw.getStrokeWidth() * 10));
+                seek.setProgress((int) (drawView.getStrokeWidth() * 10));
                 seek.setKeyProgressIncrement(1);
 
                 popDialog.setTitle("Sélectionner votre épaisseur de trait");
@@ -67,7 +63,7 @@ public class DrawFragment extends Fragment
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         if(progress >= 10)
                         {
-                            draw.setStrokeWidth(progress / 10);
+                            drawView.setStrokeWidth(progress / 10);
                         }
                     }
 
@@ -95,17 +91,14 @@ public class DrawFragment extends Fragment
             }
         });
 
-        ImageButton colorPickerButton = new ImageButton(getActivity().getApplicationContext());
-        colorPickerButton.setImageResource(R.drawable.color_picker_image);
-        linearLayout.addView(colorPickerButton);
-
+        ImageButton colorPickerButton = drawLayout.findViewById(R.id.colorPickerDraw);
         colorPickerButton.setOnClickListener(new View.OnClickListener() {
                                                  @Override
                                                  public void onClick(View view) {
                                                      ColorPickerDialogBuilder
                                                              .with(getContext())
                                                              .setTitle("Choissisez votre couleur")
-                                                             .initialColor(draw.getCurrentColor())
+                                                             .initialColor(drawView.getCurrentColor())
                                                              .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                                                              .density(12)
                                                              .setOnColorSelectedListener(new OnColorSelectedListener() {
@@ -117,7 +110,7 @@ public class DrawFragment extends Fragment
                                                              .setPositiveButton("Ok", new ColorPickerClickListener() {
                                                                  @Override
                                                                  public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                                                                     draw.changeCurrentColor(selectedColor);
+                                                                     drawView.changeCurrentColor(selectedColor);
                                                                  }
                                                              })
                                                              .setNegativeButton("Retour", new DialogInterface.OnClickListener() {
@@ -130,36 +123,65 @@ public class DrawFragment extends Fragment
                                                  }
                                              });
 
-        ImageButton redoButton = new ImageButton(getActivity().getApplicationContext());
-        redoButton.setImageResource(R.drawable.redo_button);
-        linearLayout.addView(redoButton);
-
+        ImageButton redoButton = drawLayout.findViewById(R.id.redoButtonDraw);
         redoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                draw.onRedoClick();
+                drawView.onRedoClick();
             }
         });
 
-        ImageButton undoButton = new ImageButton(getActivity().getApplicationContext());
-        undoButton.setImageResource(R.drawable.undo_button);
-        linearLayout.addView(undoButton);
-
+        ImageButton undoButton = drawLayout.findViewById(R.id.undoButtonDraw);
         undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                draw.onUndoClick();
+                drawView.onUndoClick();
             }
         });
 
-        relativeLayout.addView(linearLayout);
-
-        Log.v("DRAWFRAG", "DrawFrag lancer");
-        return relativeLayout;
+        return drawLayout;
     }
 
     public void setBackground(Bitmap background)
     {
         this.background = background;
+    }
+
+    public byte[] takeSnapshot()
+    {
+        drawView.removeBackground();
+        drawView.setDrawingCacheEnabled(true);
+        Bitmap bitmap = drawView.getDrawingCache(true).copy(Bitmap.Config.ARGB_8888, false);
+        drawView.destroyDrawingCache();
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+        return byteArray;
+    }
+
+    public float getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
+    }
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
+    }
+
+    public int getIdgroup() {
+        return idgroup;
+    }
+
+    public void setIdgroup(int idgroup) {
+        this.idgroup = idgroup;
     }
 }

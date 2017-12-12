@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,9 +35,8 @@ public class TouchEventView extends View
     private ArrayList<Path> undonePaths;
     private ArrayList<Path> donepaths;
 
-    public TouchEventView(Context ctx, AttributeSet attributeSet, Bitmap background)
-    {
-        super(ctx, attributeSet);
+    public TouchEventView(Context context) {
+        super(context);
         undonePaths = new ArrayList<>();
         donepaths = new ArrayList<>();
         donepathsMap = new HashMap<>();
@@ -44,8 +44,22 @@ public class TouchEventView extends View
         currentColor = Color.BLACK;
         strokeWidth = 4f;
         setPathAndPaintParams();
+    }
 
-        this.setBackground(new BitmapDrawable(ctx.getResources(), background));
+    public TouchEventView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        undonePaths = new ArrayList<>();
+        donepaths = new ArrayList<>();
+        donepathsMap = new HashMap<>();
+        undonePathsMap = new HashMap<>();
+        currentColor = Color.BLACK;
+        strokeWidth = 4f;
+        setPathAndPaintParams();
+    }
+
+    public void setBackground(Bitmap back)
+    {
+        this.setBackground(new BitmapDrawable(getContext().getResources(), back));
     }
 
     private void setPathAndPaintParams()
@@ -152,5 +166,10 @@ public class TouchEventView extends View
             undonePaths.remove(lastPath);
             invalidate();
         }
+    }
+
+    public void removeBackground()
+    {
+        this.setBackgroundResource(0);
     }
 }

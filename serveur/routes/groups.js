@@ -431,7 +431,7 @@ router.post('/creategroup', function (req, res) {
     };
 
     let currentTime = new Date();
-    let query = squel.insert()
+    let query = squel.insert({replaceSingleQuotes: true, singleQuoteReplacement: `''`})
         .into('public."GROUP"')
         .set('nom', toCreate.groupname)
         .set('creationdate', currentTime.toISOString())

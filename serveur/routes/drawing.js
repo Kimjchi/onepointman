@@ -40,7 +40,7 @@ router.post('/createdrawing', function(req,res){
 
     let query = 'INSERT INTO public."DRAWING" (idcreator, idgroup, zoom, description, nelt, nelg, swlt, swlg, img)' +
         ' VALUES(' + toCreate.idcreator + ',' + toCreate.idgroup + ',' + toCreate.zoom + ',\'' + toCreate.description
-        + '\',' + toCreate.nelt + ',' + toCreate.nelg + toCreate.swlt + ',' + toCreate.swlg +
+        + '\',' + toCreate.nelt + ',' + toCreate.nelg + ',' + toCreate.swlt + ',' + toCreate.swlg +
         ', decode(\'' + toCreate.img + '\', \'base64\')) RETURNING iddrawing';
 
     console.log("query " + query);

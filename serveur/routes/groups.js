@@ -163,7 +163,7 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
     let requete = getGroupPinpoints(idgroup);
     db.any(requete)
         .then((result) => {
-            let JSONToReturn = {idgroup: idgroup, issharing: false, pinpoints: [], userpositions: [], trackings:[]};
+            let JSONToReturn = {idgroup: idgroup, issharing: false, pinpoints: [], userpositions: [], trackings: []};
             result.forEach(element => {
 
                 // CHECK SI LA DATE est supérieure de 1 jour de plus de la date de RDV. sinon ne
@@ -229,7 +229,7 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
                     getTrackings(idgroup)
                         .then((result) => {
                             let tracking = buildTrackingArray(result);
-                            JSONToReturn.trackings=tracking;
+                            JSONToReturn.trackings = tracking;
                             if (userCorrectRequest) {
                                 res.send({
                                     status: 'success',
@@ -244,13 +244,13 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
                                 })
                             }
                         })
-                        .catch(error=>{
+                        .catch(error => {
                             res.status(400);
                             res.send({
                                 status: 'fail',
-                                message: 'failed at getting trackings from group'+err.toString()
+                                message: 'failed at getting trackings from group' + err.toString()
                             })
-                            console.log('Failed at getting trackings from group '+ idgroup + error);
+                            console.log('Failed at getting trackings from group ' + idgroup + error);
                         });
 
                 })
@@ -286,24 +286,24 @@ const getTrackings = (idgroup) => {
         .toString())
 };
 
-function buildTrackingArray(array){
+function buildTrackingArray(array) {
     let toReturn = [];
     array.forEach(element => {
         let containsIdUser = false;
         let indexInReturn;
-      //  let objToPush = {iduser: , tracking:[]};
+        //  let objToPush = {iduser: , tracking:[]};
         //Pour chaque element, si l'iduser existe deja ds le tableau on le push pas mais on push sa position dans son tableau
-        toReturn.forEach((newEl, index)=> {
-            if(parseInt(newEl.iduser) === parseInt(element.iduser)) {
+        toReturn.forEach((newEl, index) => {
+            if (parseInt(newEl.iduser) === parseInt(element.iduser)) {
                 containsIdUser = true;
                 indexInReturn = index
             }
         });
-        if(containsIdUser){
-            toReturn[indexInReturn].tracking.push({lt:element.lt,lg:element.lg});
+        if (containsIdUser) {
+            toReturn[indexInReturn].tracking.push({lt: element.lt, lg: element.lg});
         }
-        else{
-            toReturn.push({iduser: parseInt(element.iduser), tracking:[{lt: element.lt, lg: element.lg}]})
+        else {
+            toReturn.push({iduser: parseInt(element.iduser), tracking: [{lt: element.lt, lg: element.lg}]})
         }
     });
     return toReturn;
@@ -311,176 +311,180 @@ function buildTrackingArray(array){
 
 
 let getGroupPinpoints = (idgroup) =>
-squel.select()
-.from('public."GROUP"', 'gr')
-.field('gr.nom', 'nomgroup')
-.field('gr.idgroup')
-.field('pin.idcreator')
-.field('pin.idpinpoint')
-.field('pin.pinlt')
-.field('pin.pinlg')
-.field('pin.description')
-.field('pin.daterdv')
-.field('usr.prenom')
-.field('usr.nom')
-.left_join('public."PINPOINT"', 'pin', 'pin.idgroup = gr.idgroup')
-.left_join('public."USER"', 'usr', 'usr.iduser = pin.idcreator')
-.where('gr.idgroup = ?', idgroup)
-.toString();
+    squel.select()
+        .from('public."GROUP"', 'gr')
+        .field('gr.nom', 'nomgroup')
+        .field('gr.idgroup')
+        .field('pin.idcreator')
+        .field('pin.idpinpoint')
+        .field('pin.pinlt')
+        .field('pin.pinlg')
+        .field('pin.description')
+        .field('pin.daterdv')
+        .field('usr.prenom')
+        .field('usr.nom')
+        .left_join('public."PINPOINT"', 'pin', 'pin.idgroup = gr.idgroup')
+        .left_join('public."USER"', 'usr', 'usr.iduser = pin.idcreator')
+        .where('gr.idgroup = ?', idgroup)
+        .toString();
 
 let getUsersPositions = (idgroup) =>
-squel.select()
-.from('public."GROUP"', 'gr')
-.field('ugr.iduser')
-.field('ugr.sharesposition')
-.field('ugr.userglt')
-.field('ugr.userglg')
-.field("ugr.dateposition")
-.field('usr.nom')
-.field('usr.prenom')
-.left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = gr.idgroup')
-.left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser')
-.where('gr.idgroup = ?', idgroup)
-.toString();
+    squel.select()
+        .from('public."GROUP"', 'gr')
+        .field('ugr.iduser')
+        .field('ugr.sharesposition')
+        .field('ugr.userglt')
+        .field('ugr.userglg')
+        .field("ugr.dateposition")
+        .field('usr.nom')
+        .field('usr.prenom')
+        .left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = gr.idgroup')
+        .left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser')
+        .where('gr.idgroup = ?', idgroup)
+        .toString();
 
 
 //Si la dernière position stockée est > 15min, l'utilisateur est considéré comme inactif
 function compareTimes(currentTime, lastLocationTime) {
-let toReturn = false;
-if (currentTime.getMonth() === lastLocationTime.getMonth()) {
-if (currentTime.getDay() === lastLocationTime.getDay()) {
-if (currentTime.getHours() === lastLocationTime.getHours()) {
-if (currentTime.getMinutes() - lastLocationTime.getMinutes() < 15) {
-toReturn = true;
-}
-}
-}
-}
-return toReturn;
+    let toReturn = false;
+    if (currentTime.getMonth() === lastLocationTime.getMonth()) {
+        if (currentTime.getDay() === lastLocationTime.getDay()) {
+            if (currentTime.getHours() === lastLocationTime.getHours()) {
+                if (currentTime.getMinutes() - lastLocationTime.getMinutes() < 15) {
+                    toReturn = true;
+                }
+            }
+        }
+    }
+    return toReturn;
 }
 
 router.get('/drawings/:iduser/:idgroup', function (req, res) {
-let iduser = req.params.iduser;
-let idgroup = req.params.idgroup;
-let query = getDrawings(idgroup);
-let JSONToReturn = {
-idgroup: idgroup,
-drawings: []
-};
+    let iduser = req.params.iduser;
+    let idgroup = req.params.idgroup;
+    let query = getDrawings(idgroup);
+    let JSONToReturn = {
+        idgroup: idgroup,
+        drawings: []
+    };
 
-db.any(query)
-.then((result) => {
-result.forEach(element => {
-let objectToPush = {
-iddrawing: element.iddrawing,
-idcreator: element.idcreator,
-nomcreator: element.nom,
-prenomcreator: element.prenom,
-description: element.description,
-lt: element.lt,
-lg: element.lg,
-img: element.img
-};
-if (element.actif) {
-JSONToReturn.drawings.push(objectToPush);
-}
-});
-res.send({
-status: 'success',
-message: JSONToReturn
-});
-})
-.catch(e => {
-console.log(e);
-res.status(400);
-res.send({
-status: 'fail',
-message: e.toString()
-});
-});
+    db.any(query)
+        .then((result) => {
+            result.forEach(element => {
+                let objectToPush = {
+                    iddrawing: element.iddrawing,
+                    idcreator: element.idcreator,
+                    nomcreator: element.nom,
+                    prenomcreator: element.prenom,
+                    description: element.description,
+                    nelt: element.nelt,
+                    nelg: element.nelg,
+                    swlt: element.swlt,
+                    swlg: element.swlg,
+                    img: element.img
+                };
+                if (element.actif) {
+                    JSONToReturn.drawings.push(objectToPush);
+                }
+            });
+            res.send({
+                status: 'success',
+                message: JSONToReturn
+            });
+        })
+        .catch(e => {
+            console.log(e);
+            res.status(400);
+            res.send({
+                status: 'fail',
+                message: e.toString()
+            });
+        });
 
 });
 
 
 let getDrawings = (idgroup) =>
-squel.select()
-.from('public."DRAWING"', 'draw')
-.field('draw.iddrawing')
-.field('draw.idcreator')
-.field('draw.actif')
-.field("encode(draw.img, 'base64')", 'img')
-.field('draw.drawinglg', 'lg')
-.field('draw.drawinglt', 'lt')
-.field('description')
-.field('usr.nom')
-.field('usr.prenom')
-.left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator')
-.where('draw.idgroup = ?', idgroup)
-.toString();
+    squel.select()
+        .from('public."DRAWING"', 'draw')
+        .field('draw.iddrawing')
+        .field('draw.idcreator')
+        .field('draw.actif')
+        .field("encode(draw.img, 'base64')", 'img')
+        .field('draw.nelg')
+        .field('draw.nelt')
+        .field('draw.swlt')
+        .field('draw.swlg')
+        .field('description')
+        .field('usr.nom')
+        .field('usr.prenom')
+        .left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator')
+        .where('draw.idgroup = ?', idgroup)
+        .toString();
 
 //ca passe en post
 router.post('/creategroup', function (req, res) {
 
-let toCreate = {
-iduser: req.body.iduser,
-groupname: req.body.groupname
-};
+    let toCreate = {
+        iduser: req.body.iduser,
+        groupname: req.body.groupname
+    };
 
-let currentTime = new Date();
-let query = squel.insert()
-.into('public."GROUP"')
-.set('nom', toCreate.groupname)
-.set('creationdate', currentTime.toISOString())
-.returning('idgroup')
-.toString();
+    let currentTime = new Date();
+    let query = squel.insert()
+        .into('public."GROUP"')
+        .set('nom', toCreate.groupname)
+        .set('creationdate', currentTime.toISOString())
+        .returning('idgroup')
+        .toString();
 
-db.one(query)
-.then((row) => {
-let inUserGroup = squel.insert()
-.into('public."USER_GROUP"', 'ugr')
-.set('idgroup', row.idgroup)
-.set('iduser', toCreate.iduser)
-.set('iscreator', true)
-.toString();
-db.none(inUserGroup)
-.then(() => {
-let response = {
-idgroup: row.idgroup
-};
-sender.sendResponse(sender.SUCCESS_STATUS, response, res)
-})
-.catch(err => {
-sender.sendResponse(sender.BAD_REQUEST, 'Failed to insert user in USER_GROUP', res);
-console.log(err);
-})
+    db.one(query)
+        .then((row) => {
+            let inUserGroup = squel.insert()
+                .into('public."USER_GROUP"', 'ugr')
+                .set('idgroup', row.idgroup)
+                .set('iduser', toCreate.iduser)
+                .set('iscreator', true)
+                .toString();
+            db.none(inUserGroup)
+                .then(() => {
+                    let response = {
+                        idgroup: row.idgroup
+                    };
+                    sender.sendResponse(sender.SUCCESS_STATUS, response, res)
+                })
+                .catch(err => {
+                    sender.sendResponse(sender.BAD_REQUEST, 'Failed to insert user in USER_GROUP', res);
+                    console.log(err);
+                })
 
-})
-.catch(e => {
-sender.sendResponse(sender.BAD_REQUEST, 'Failed to create group', res);
-console.log(e);
-})
+        })
+        .catch(e => {
+            sender.sendResponse(sender.BAD_REQUEST, 'Failed to create group', res);
+            console.log(e);
+        })
 });
 
 router.post('/changegroupname', function (req, res) {
-let toChange = {
-idgroup: req.body.idgroup,
-groupname: req.body.newgroupname
-};
+    let toChange = {
+        idgroup: req.body.idgroup,
+        groupname: req.body.newgroupname
+    };
 
-let query = squel.update()
-.table('public."GROUP"')
-.set('nom', toChange.groupname)
-.where('idgroup = ?', toChange.idgroup)
-.toString();
-db.none(query)
-.then(() => {
-let response = {status: 'success', message: 'groupname updated successfully'};
-sender.sendResponse(sender.SUCCESS_STATUS, response, res)
-})
-.catch(e => {
-sender.sendResponse(sender.BAD_REQUEST, {status: 'fail', message: 'Failed to update groupname'}, res);
-console.log(e);
-})
+    let query = squel.update()
+        .table('public."GROUP"')
+        .set('nom', toChange.groupname)
+        .where('idgroup = ?', toChange.idgroup)
+        .toString();
+    db.none(query)
+        .then(() => {
+            let response = {status: 'success', message: 'groupname updated successfully'};
+            sender.sendResponse(sender.SUCCESS_STATUS, response, res)
+        })
+        .catch(e => {
+            sender.sendResponse(sender.BAD_REQUEST, {status: 'fail', message: 'Failed to update groupname'}, res);
+            console.log(e);
+        })
 
 });
 

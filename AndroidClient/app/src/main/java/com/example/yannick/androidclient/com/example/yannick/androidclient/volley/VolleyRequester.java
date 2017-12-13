@@ -817,7 +817,7 @@ public class VolleyRequester
         String idUser = FacebookInfosRetrieval.user_id;
         String encodedImage = Base64.encodeToString(img, Base64.NO_WRAP);
         String json = "{\"iduser\":"+idUser+",\"idgroup\":" + idgroup
-                + ",\"description\":\""+ description + "\", \"zoom\":" + zoom + ", \"nelt\":" +
+                + ",\"description\":\""+ description + "\" , \"nelt\":" +
                 latLng.northeast.latitude + ", \"nelg\":" + latLng.northeast.longitude + ", \"swlt\":"
                 + latLng.southwest.latitude + ", \"swlg\":" + latLng.southwest.longitude +
                 ", \"img\":\"" + encodedImage + "\"}";

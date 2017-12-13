@@ -72,8 +72,8 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    private final String URL_SERVEUR = "http://192.168.0.108:3001";
-    //private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    //private final String URL_SERVEUR = "http://192.168.0.108:3001";
+    private final String URL_SERVEUR = "http://192.168.137.1:3001";
     //private final String URL_SERVEUR = "http://192.168.43.202:3001";
 
     private VolleyRequester(Context context)
@@ -880,6 +880,7 @@ public class VolleyRequester
     public void getDrawings(int idgroup)
     {
         String idUser = FacebookInfosRetrieval.user_id;
+
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
                 URL_SERVEUR + "/groups/drawings/"+idUser+"/"+idgroup, null,
                 new Response.Listener<JSONObject>() {
@@ -893,7 +894,7 @@ public class VolleyRequester
 
                             for(int i=0; i < drawings.length(); i++)
                             {
-                                JSONObject tmpDraw = drawings.getJSONObject(0);
+                                JSONObject tmpDraw = drawings.getJSONObject(i);
                                 MapFragment.instance.addDrawingToList(tmpDraw);
                             }
 

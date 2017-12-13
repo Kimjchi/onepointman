@@ -5,29 +5,47 @@ var router = express.Router();
 var db = require('../connection');
 var squelb = require('squel');
 var squel = squelb.useFlavour('postgres');
+var sender = require('../sender');
 
 router.get('/', function (req, res, next) {});
 
 router.post('/createdrawing', function (req, res) {
+    console.log("YOOOOOOOOOOOO");
     var toCreate = {
         idcreator: req.body.iduser,
         idgroup: req.body.idgroup,
         description: req.body.description,
+        zoom: req.body.zoom,
         lt: req.body.lt,
         lg: req.body.lg,
         img: req.body.img
     };
 
-    var query = squel.insert().into('public."DRAWING"').set('idcreator', toCreate.idcreator).set('idgroup', toCreate.idgroup).set('description', toCreate.description).set('drawinglt', toCreate.lt).set('drawinglg', toCreate.lg).set('img', toCreate.img).toString();
+    console.log(toCreate.img.toString());
+    /*let query = squel.insert()
+        .into('public."DRAWING"')
+        .set('idcreator', toCreate.idcreator)
+        .set('idgroup', toCreate.idgroup)
+        .set('zoom', toCreate.zoom)
+        .set('description', toCreate.description)
+        .set('drawinglt', toCreate.lt)
+        .set('drawinglg', toCreate.lg)
+        .set('img', toCreate.img)
+        .returning('iddrawing')
+        .toString();*/
 
+    var query = 'INSERT INTO public."DRAWING" (idcreator, idgroup, zoom, description, drawinglt, drawinglg, img)' + ' VALUES(' + toCreate.idcreator + ',' + toCreate.idgroup + ',' + toCreate.zoom + ',\'' + toCreate.description + '\',' + toCreate.lt + ',' + toCreate.lg + ', decode(\'' + toCreate.img + '\', \'base64\')) RETURNING iddrawing';
+
+    console.log("query " + query);
     db.one(query).then(function (row) {
         var response = {
+            status: 'success',
             iddrawing: row.iddrawing
         };
         sender.sendResponse(sender.SUCCESS_STATUS, response, res);
     }).catch(function (e) {
-        sender.sendResponse(sender.BAD_REQUEST, { status: 'fail', message: 'Error while creating drawing' }, res);
         console.log(e);
+        sender.sendResponse(sender.BAD_REQUEST, { status: 'fail', message: 'Error while creating drawing' }, res);
     });
 });
 

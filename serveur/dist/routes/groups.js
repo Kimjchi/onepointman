@@ -67,11 +67,11 @@ var getUserDataFromGroup = function getUserDataFromGroup(idGroup) {
 };
 
 var getGroups = function getGroups(iduser) {
-    return squel.select().from('public."USER_GROUP"', 'ugr').field('ugr.idgroup').field('gr.nom').field('ugr.sharesposition').where('ugr.iduser = ?', iduser).left_join('public."GROUP"', 'gr', 'ugr.idgroup = gr.idgroup');
+    return squel.select().from('public."USER_GROUP"', 'ugr').field('ugr.idgroup').field('gr.nom').field('ugr.sharesposition').field('ugr.istracking').where('ugr.iduser = ?', iduser).left_join('public."GROUP"', 'gr', 'ugr.idgroup = gr.idgroup');
 };
 
 var getUsersInGroups = function getUsersInGroups(iduser) {
-    return squel.select().from(getGroups(iduser), 'listgroups').left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = listgroups.idgroup').left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser').field('listgroups.sharesposition').field('usr.prenom').field('usr.nom', 'nomuser').field('usr.iduser').field('listgroups.nom', 'nomgroup').field('ugr.idgroup').toString();
+    return squel.select().from(getGroups(iduser), 'listgroups').left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = listgroups.idgroup').left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser').field('listgroups.sharesposition').field('listgroups.istracking').field('usr.prenom').field('usr.nom', 'nomuser').field('usr.iduser').field('listgroups.nom', 'nomgroup').field('ugr.idgroup').toString();
 };
 
 function buildGroupsObject(queryResult) {
@@ -91,6 +91,7 @@ function buildGroupsObject(queryResult) {
             groups.push({
                 idgroup: element.idgroup,
                 issharing: element.sharesposition,
+                istracking: element.istracking,
                 nomgroup: element.nomgroup,
                 membres: []
             });
@@ -131,7 +132,7 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
     // les positions des gens SSI ils décident de la partager avec ce groupe
     var requete = getGroupPinpoints(idgroup);
     db.any(requete).then(function (result) {
-        var JSONToReturn = { idgroup: idgroup, issharing: false, pinpoints: [], userpositions: [] };
+        var JSONToReturn = { idgroup: idgroup, issharing: false, pinpoints: [], userpositions: [], trackings: [] };
         result.forEach(function (element) {
 
             // CHECK SI LA DATE est supérieure de 1 jour de plus de la date de RDV. sinon ne
@@ -189,19 +190,30 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
                     }
                 }
             });
-
-            if (userCorrectRequest) {
-                res.send({
-                    status: 'success',
-                    message: JSONToReturn
-                });
-            } else {
+            //ici on build le tableau des tracking
+            getTrackings(idgroup).then(function (result) {
+                var tracking = buildTrackingArray(result);
+                JSONToReturn.trackings = tracking;
+                if (userCorrectRequest) {
+                    res.send({
+                        status: 'success',
+                        message: JSONToReturn
+                    });
+                } else {
+                    res.status(400);
+                    res.send({
+                        status: 'fail',
+                        message: 'You requested the informations of a group in which you DON\'T belong'
+                    });
+                }
+            }).catch(function (error) {
                 res.status(400);
                 res.send({
                     status: 'fail',
-                    message: 'You requested the informations of a group in which you DON\'T belong, bitch'
+                    message: 'failed at getting trackings from group' + err.toString()
                 });
-            }
+                console.log('Failed at getting trackings from group ' + idgroup + error);
+            });
         }).catch(function (err) {
             res.status(400);
             res.send({
@@ -217,6 +229,31 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
         });
     });
 });
+var getTrackings = function getTrackings(idgroup) {
+    return db.query(squel.select().field('lt').field('lg').field('timepos').field('iduser').from('public."TRACK_POS"').where('idgroup = ?', idgroup).order('iduser').order('timepos').toString());
+};
+
+function buildTrackingArray(array) {
+    var toReturn = [];
+    array.forEach(function (element) {
+        var containsIdUser = false;
+        var indexInReturn = void 0;
+        //  let objToPush = {iduser: , tracking:[]};
+        //Pour chaque element, si l'iduser existe deja ds le tableau on le push pas mais on push sa position dans son tableau
+        toReturn.forEach(function (newEl, index) {
+            if (parseInt(newEl.iduser) === parseInt(element.iduser)) {
+                containsIdUser = true;
+                indexInReturn = index;
+            }
+        });
+        if (containsIdUser) {
+            toReturn[indexInReturn].tracking.push({ lt: element.lt, lg: element.lg });
+        } else {
+            toReturn.push({ iduser: parseInt(element.iduser), tracking: [{ lt: element.lt, lg: element.lg }] });
+        }
+    });
+    return toReturn;
+}
 
 var getGroupPinpoints = function getGroupPinpoints(idgroup) {
     return squel.select().from('public."GROUP"', 'gr').field('gr.nom', 'nomgroup').field('gr.idgroup').field('pin.idcreator').field('pin.idpinpoint').field('pin.pinlt').field('pin.pinlg').field('pin.description').field('pin.daterdv').field('usr.prenom').field('usr.nom').left_join('public."PINPOINT"', 'pin', 'pin.idgroup = gr.idgroup').left_join('public."USER"', 'usr', 'usr.iduser = pin.idcreator').where('gr.idgroup = ?', idgroup).toString();
@@ -266,12 +303,12 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
                 JSONToReturn.drawings.push(objectToPush);
             }
         });
-        console.log(JSONToReturn);
         res.send({
             status: 'success',
             message: JSONToReturn
         });
     }).catch(function (e) {
+        console.log(e);
         res.status(400);
         res.send({
             status: 'fail',
@@ -281,7 +318,7 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
 });
 
 var getDrawings = function getDrawings(idgroup) {
-    return squel.select().from('public."DRAWING"', 'draw').field('draw.iddrawing').field('draw.idcreator').field('draw.actif').field('draw.img').field('draw.drawinglg', 'lg').field('draw.drawinglt', 'lt').field('description').field('usr.nom').field('usr.prenom').left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator').where('draw.idgroup = ?', idgroup).toString();
+    return squel.select().from('public."DRAWING"', 'draw').field('draw.iddrawing').field('draw.idcreator').field('draw.actif').field("encode(draw.img, 'base64')", 'img').field('draw.drawinglg', 'lg').field('draw.drawinglt', 'lt').field('description').field('usr.nom').field('usr.prenom').left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator').where('draw.idgroup = ?', idgroup).toString();
 };
 
 //ca passe en post

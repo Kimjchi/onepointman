@@ -24,7 +24,7 @@ router.post('/updateposition', function (req, res) {
         userlt: req.body.userlt
     };
 
-    var getGroups = squel.select().from('public."USER_GROUP"', 'ugr').field('ugr.idgroup').field('ugr.sharesposition').where('ugr.iduser = ?', parseInt(toUpdate.iduser, 10)).toString();
+    var getGroups = squel.select().from('public."USER_GROUP"', 'ugr').field('ugr.idgroup').field('ugr.sharesposition').field('ugr.istracking').where('ugr.iduser = ?', parseInt(toUpdate.iduser, 10)).toString();
     db.any(getGroups).then(function (groups) {
         var currentTime = new Date();
         var updateUserTable = squel.update().table('public."USER"').set('lg', toUpdate.userlg).set('lt', toUpdate.userlt).set('dateposition', currentTime.toISOString()).where('iduser = ?', toUpdate.iduser).toString();
@@ -38,27 +38,33 @@ router.post('/updateposition', function (req, res) {
                     db.none(query).then(function () {
                         console.log('Updated position of user in group ' + element.idgroup);
                     }).catch(function (e) {
-                        res.status(400);
-                        res.send({
-                            status: 'fail',
-                            message: 'failing to update userposition in a group'
-                        });
+
                         console.log('failed at updating position in group');
+                    });
+                }
+                if (element.istracking === true) {
+                    var inTrack = squel.insert().into('public."TRACK_POS"').set('lt', toUpdate.userlt).set('lg', toUpdate.userlg).set('timepos', currentTime.toISOString()).set('iduser', toUpdate.iduser).set('idgroup', element.idgroup).toString();
+
+                    db.none(inTrack).then(function () {
+                        console.log('added position in tracking for group ' + element.idgroup);
+                    }).catch(function (e) {
+                        console.log('failed at addinf position for tracking' + e);
                     });
                 }
             });
         });
 
-        res.send({
+        /*res.send({
             status: 'success',
             message: 'Position updated successfully'
-        });
-    }).catch(function (e) {
+        })
+        })
+        .catch(e => {
         res.status(400);
         res.send({
             status: 'fail',
             message: e.toString()
-        });
+        })*/
     });
 });
 

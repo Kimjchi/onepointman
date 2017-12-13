@@ -53,7 +53,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -538,16 +537,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Log.v("DISPLAY_DRAWING", "Dessins a afficher :" + this.drawings.size());
         for(Drawing drawing : this.drawings.keySet())
         {
-            if(this.drawings.get(drawing) == null)
-            {
+            /*if(this.drawings.get(drawing) == null)
+            {*/
                 GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
                         .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
-                        .position(drawing.getPosition(), drawing.getWidth(), drawing.getHeight());
+                        .positionFromBounds(drawing.getBounds());
                 drawingOverlayOptions.clickable(true);
                 GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
                 this.drawings.put(drawing, drawingOverlay);
-            }
-            Log.v("DISPLAY_DRAWING", "Position :" + drawing.getPosition().latitude + " lg: "+drawing.getPosition().longitude);
+            //}
         }
     }
 
@@ -568,18 +566,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             String idCreator = draw.getString("idcreator");
             String nomCreator = draw.getString("nomcreator");
             String prenomCreator = draw.getString("prenomcreator");
-            LatLng latLng = new LatLng(Double.parseDouble(draw.getString("lt")),
-                    Double.parseDouble(draw.getString("lg")));
+            LatLng sw = new LatLng(Double.parseDouble(draw.getString("swlt")),
+                    Double.parseDouble(draw.getString("swlg")));
+            LatLng ne = new LatLng(Double.parseDouble(draw.getString("nelt")),
+                    Double.parseDouble(draw.getString("nelg")));
+            LatLngBounds bounds = new LatLngBounds(sw, ne);
             String stringImage = draw.getString("img");
 
             Drawing drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
-                    prenomCreator, latLng, stringImage);
+                    prenomCreator, bounds, stringImage);
 
             this.drawings.put(drawing, null);
         }
         catch(Exception ex)
         {
-            Log.v("MAP_FRAG_DRAW", "Error poto");
+            Log.v("MAP_FRAG_DRAW", "Error poto: "+ex.getMessage());
         }
     }
 }

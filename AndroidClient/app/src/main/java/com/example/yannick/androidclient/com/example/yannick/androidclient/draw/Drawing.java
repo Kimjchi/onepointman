@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.util.Base64;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
  * Created by yannick on 12/12/17.
@@ -17,18 +18,18 @@ public class Drawing
     private String idCreator;
     private String nomCreator;
     private String prenomCreator;
-    private LatLng position;
+    private LatLngBounds bounds;
     private Bitmap image;
     private int height;
     private int width;
 
-    public Drawing(int idDrawing, int idGroup, String idCreator, String nomCreator, String prenomCreator, LatLng position, String bytes) {
+    public Drawing(int idDrawing, int idGroup, String idCreator, String nomCreator, String prenomCreator, LatLngBounds bounds, String bytes) {
         this.idDrawing = idDrawing;
         this.idGroup = idGroup;
         this.idCreator = idCreator;
         this.nomCreator = nomCreator;
         this.prenomCreator = prenomCreator;
-        this.position = position;
+        this.bounds = bounds;
         byte[] decodedString = Base64.decode(bytes, Base64.NO_WRAP);
         this.image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         this.height = image.getHeight();
@@ -75,12 +76,12 @@ public class Drawing
         this.prenomCreator = prenomCreator;
     }
 
-    public LatLng getPosition() {
-        return position;
+    public LatLngBounds getBounds() {
+        return this.bounds;
     }
 
-    public void setPosition(LatLng position) {
-        this.position = position;
+    public void setBounds(LatLngBounds bounds) {
+        this.bounds = bounds;
     }
 
     public Bitmap getImage() {

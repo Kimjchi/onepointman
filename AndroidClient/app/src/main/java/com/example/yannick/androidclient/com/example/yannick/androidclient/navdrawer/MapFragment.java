@@ -13,18 +13,14 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.icu.lang.UCharacter;
 import android.location.Criteria;
-import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,33 +39,26 @@ import com.example.yannick.androidclient.com.example.yannick.androidclient.volle
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CustomCap;
+import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
-import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.RoundCap;
-import com.google.android.gms.maps.model.SquareCap;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static android.graphics.Bitmap.CompressFormat.PNG;
 import static com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.LocationService.getLocationService;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -92,7 +81,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public VolleyRequester restRequester = null;
     private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>();
     private Map<Integer, PolylineOptions> trace = new HashMap<Integer, PolylineOptions>();
-    private ArrayList<Drawing> drawings = new ArrayList<>();
+    private HashMap<Drawing, GroundOverlay> drawings = new HashMap<>();
     private Bitmap cap;
 
     public int getCurrentGroup(){return currentGroup;}
@@ -145,6 +134,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public boolean onMarkerClick(Marker marker) {
                 popupBuilderInfoMarker(marker).show();
                 return false;
+            }
+        });
+
+        mMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener() {
+            @Override
+            public void onGroundOverlayClick(GroundOverlay groundOverlay) {
+                //TODO Check which overylay is clicked
             }
         });
 
@@ -404,7 +400,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         synchronized(markers) {
             markers.clear();
             trace.clear();
-            drawings.clear();
+            clearDrawings();
         }
     }
 
@@ -461,10 +457,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onSnapshotReady(Bitmap snapshot) {
                 Log.v("SNAPSHOT", "SNAPSHOT TOOK");
+                LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
                 DrawFragment drawFragment = new DrawFragment();
                 drawFragment.setBackground(snapshot);
                 drawFragment.setZoom(getCurrentZoom());
-                drawFragment.setLatLng(getCurrentPosition());
+                drawFragment.setBounds(bounds);
                 drawFragment.setIdgroup(currentGroup);
                 fm.beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
             }
@@ -539,12 +536,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void displayDrawings()
     {
         Log.v("DISPLAY_DRAWING", "Dessins a afficher :" + this.drawings.size());
-        for(Drawing drawing : this.drawings)
+        for(Drawing drawing : this.drawings.keySet())
         {
-            GroundOverlayOptions newarkMap = new GroundOverlayOptions()
-                    .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
-                    .position(drawing.getPosition(), drawing.getWidth(), drawing.getHeight());
-            mMap.addGroundOverlay(newarkMap);
+            if(this.drawings.get(drawing) == null)
+            {
+                GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
+                        .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
+                        .position(drawing.getPosition(), drawing.getWidth(), drawing.getHeight());
+                drawingOverlayOptions.clickable(true);
+                GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
+                this.drawings.put(drawing, drawingOverlay);
+            }
             Log.v("DISPLAY_DRAWING", "Position :" + drawing.getPosition().latitude + " lg: "+drawing.getPosition().longitude);
         }
     }
@@ -555,7 +557,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         {
             int idDrawing = draw.getInt("iddrawing");
 
-            for(Drawing d : this.drawings)
+            for(Drawing d : this.drawings.keySet())
             {
                 if(d.getIdDrawing() == idDrawing)
                 {
@@ -573,7 +575,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Drawing drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
                     prenomCreator, latLng, stringImage);
 
-            this.drawings.add(drawing);
+            this.drawings.put(drawing, null);
         }
         catch(Exception ex)
         {

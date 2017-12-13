@@ -18,6 +18,7 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -33,7 +34,7 @@ public class DrawFragment extends Fragment
     private Bitmap background;
     private TouchEventView drawView;
     private float zoom;
-    private LatLng latLng;
+    private LatLngBounds bounds;
     private int idgroup;
 
     public DrawFragment()
@@ -193,12 +194,12 @@ public class DrawFragment extends Fragment
         this.zoom = zoom;
     }
 
-    public LatLng getLatLng() {
-        return latLng;
+    public LatLngBounds getBounds() {
+        return bounds;
     }
 
-    public void setLatLng(LatLng latLng) {
-        this.latLng = latLng;
+    public void setBounds(LatLngBounds bounds) {
+        this.bounds = bounds;
     }
 
     public int getIdgroup() {

@@ -12,9 +12,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Criteria;
-import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
@@ -34,18 +34,26 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.draw.Drawing;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CustomCap;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
-import java.io.FileOutputStream;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -70,9 +78,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private int currentTag = 0;
     public static MapFragment instance = null;
     public VolleyRequester restRequester = null;
-    private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>() {
-    };
-    private Bitmap snapshot;
+    private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>();
+    private Map<Integer, PolylineOptions> trace = new HashMap<Integer, PolylineOptions>();
+    private HashMap<Drawing, GroundOverlay> drawings = new HashMap<>();
+    private Bitmap cap;
 
     public int getCurrentGroup(){return currentGroup;}
     public void setCurrentGroup(int group){currentGroup = group;}
@@ -102,6 +111,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onStart(){
+        cap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.cap);
         super.onStart();
         restRequester = VolleyRequester.getInstance(getActivity().getApplicationContext());
         restRequester.groupsRequest();
@@ -122,8 +132,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 popupBuilderInfoMarker(marker).show();
-                //Toast.makeText(getActivity().getApplicationContext(), "Description: " + marker.getSnippet(), Toast.LENGTH_LONG).show();
                 return false;
+            }
+        });
+
+        mMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener() {
+            @Override
+            public void onGroundOverlayClick(GroundOverlay groundOverlay) {
+                //TODO Check which overylay is clicked
             }
         });
 
@@ -134,6 +150,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //Groupe
                 //Date RDV
                 //Description
+
+                Log.v("TEST", latLng.latitude + " ; " + latLng.longitude);
                 hourRdvSet = false;
                 dateRdvSet = false;
                 nameRdvSet = false;
@@ -340,7 +358,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void stopDisplayThread() {
-        if (updateMyPosition.getdisplayThreadRunning()) {
+        if (updateMyPosition != null && updateMyPosition.getdisplayThreadRunning()) {
             updateMyPosition.stopDisplay();
             Log.v("GPS Service", "Display thread stopped");
         }
@@ -371,11 +389,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 }
             }
+            for (Map.Entry<Integer, PolylineOptions> traceToDisplay : trace.entrySet()) {
+                mMap.addPolyline(traceToDisplay.getValue());
+            }
+            displayDrawings();
         }
     }
     public void clearMarkers(){
         synchronized(markers) {
             markers.clear();
+            trace.clear();
+            clearDrawings();
         }
     }
 
@@ -431,19 +455,132 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
             @Override
             public void onSnapshotReady(Bitmap snapshot) {
-                setSnapshot(snapshot);
                 Log.v("SNAPSHOT", "SNAPSHOT TOOK");
+                LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
                 DrawFragment drawFragment = new DrawFragment();
                 drawFragment.setBackground(snapshot);
+                drawFragment.setZoom(getCurrentZoom());
+                drawFragment.setBounds(bounds);
+                drawFragment.setIdgroup(currentGroup);
                 fm.beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
             }
         };
         mMap.snapshot(callback);
     }
 
-    public void setSnapshot(Bitmap snap)
+     public void updateTraceFromJson(JSONObject traceJson, int colorInt){
+        int color = Color.argb(255,0,0,0);;
+        switch (colorInt%8){
+            case 0:
+                color = Color.argb(255,0,0,0);
+                break;
+            case 1:
+                color = Color.argb(255,0,0,255);
+                break;
+            case 2:
+                color = Color.argb(255,0,255,0);
+                break;
+            case 3:
+                color = Color.argb(255,0,255,255);
+                break;
+            case 4:
+                color = Color.argb(255,255,0,0);
+                break;
+            case 5:
+                color = Color.argb(255,255,0,255);
+                break;
+            case 6:
+                color = Color.argb(255,255,255,0);
+                break;
+            case 7:
+                color = Color.argb(255,255,255,255);
+                break;
+        }
+
+        //Entrée: trace{userid, pos[{lt,lg},...]}
+         try {
+             JSONObject position;
+             PolylineOptions line = new PolylineOptions();
+             line.color(color);
+
+             //Pour chaque position
+             for(int i=0; i< traceJson.getJSONArray("tracking").length(); i++) {
+                 position = traceJson.getJSONArray("tracking").getJSONObject(i);
+                 line.add(new LatLng(position.getDouble("lt"),position.getDouble("lg")));
+             }
+             line.startCap(new CustomCap(BitmapDescriptorFactory.fromBitmap(cap),30));
+
+             trace.put(traceJson.getInt("iduser"), line);
+         } catch (JSONException e) {
+             e.printStackTrace();
+         }
+
+     }
+
+    public float getCurrentZoom()
     {
-        this.snapshot = snap;
+        return mMap.getCameraPosition().zoom;
     }
 
+    public LatLng getCurrentPosition()
+    {
+        return mMap.getCameraPosition().target;
+    }
+
+    public void clearDrawings()
+    {
+        drawings.clear();
+    }
+
+    public void displayDrawings()
+    {
+        Log.v("DISPLAY_DRAWING", "Dessins a afficher :" + this.drawings.size());
+        for(Drawing drawing : this.drawings.keySet())
+        {
+            /*if(this.drawings.get(drawing) == null)
+            {*/
+                GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
+                        .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
+                        .positionFromBounds(drawing.getBounds());
+                drawingOverlayOptions.clickable(true);
+                GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
+                this.drawings.put(drawing, drawingOverlay);
+            //}
+        }
+    }
+
+    public void addDrawingToList(JSONObject draw)
+    {
+        try
+        {
+            int idDrawing = draw.getInt("iddrawing");
+
+            for(Drawing d : this.drawings.keySet())
+            {
+                if(d.getIdDrawing() == idDrawing)
+                {
+                    return;
+                }
+            }
+
+            String idCreator = draw.getString("idcreator");
+            String nomCreator = draw.getString("nomcreator");
+            String prenomCreator = draw.getString("prenomcreator");
+            LatLng sw = new LatLng(Double.parseDouble(draw.getString("swlt")),
+                    Double.parseDouble(draw.getString("swlg")));
+            LatLng ne = new LatLng(Double.parseDouble(draw.getString("nelt")),
+                    Double.parseDouble(draw.getString("nelg")));
+            LatLngBounds bounds = new LatLngBounds(sw, ne);
+            String stringImage = draw.getString("img");
+
+            Drawing drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
+                    prenomCreator, bounds, stringImage);
+
+            this.drawings.put(drawing, null);
+        }
+        catch(Exception ex)
+        {
+            Log.v("MAP_FRAG_DRAW", "Error poto: "+ex.getMessage());
+        }
+    }
 }

@@ -297,6 +297,11 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
                 description: element.description,
                 lt: element.lt,
                 lg: element.lg,
+
+                nelt: element.nelt,
+                nelg: element.nelg,
+                swlt: element.swlt,
+                swlg: element.swlg,
                 img: element.img
             };
             if (element.actif) {
@@ -318,7 +323,7 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
 });
 
 var getDrawings = function getDrawings(idgroup) {
-    return squel.select().from('public."DRAWING"', 'draw').field('draw.iddrawing').field('draw.idcreator').field('draw.actif').field("encode(draw.img, 'base64')", 'img').field('draw.drawinglg', 'lg').field('draw.drawinglt', 'lt').field('description').field('usr.nom').field('usr.prenom').left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator').where('draw.idgroup = ?', idgroup).toString();
+    return squel.select().from('public."DRAWING"', 'draw').field('draw.iddrawing').field('draw.idcreator').field('draw.actif').field("encode(draw.img, 'base64')", 'img').field('draw.nelg').field('draw.nelt').field('draw.swlt').field('draw.swlg').field('description').field('usr.nom').field('usr.prenom').left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator').where('draw.idgroup = ?', idgroup).toString();
 };
 
 //ca passe en post
@@ -330,7 +335,7 @@ router.post('/creategroup', function (req, res) {
     };
 
     var currentTime = new Date();
-    var query = squel.insert().into('public."GROUP"').set('nom', toCreate.groupname).set('creationdate', currentTime.toISOString()).returning('idgroup').toString();
+    var query = squel.insert({ replaceSingleQuotes: true, singleQuoteReplacement: '\'\'' }).into('public."GROUP"').set('nom', toCreate.groupname).set('creationdate', currentTime.toISOString()).returning('idgroup').toString();
 
     db.one(query).then(function (row) {
         var inUserGroup = squel.insert().into('public."USER_GROUP"', 'ugr').set('idgroup', row.idgroup).set('iduser', toCreate.iduser).set('iscreator', true).toString();
@@ -355,7 +360,7 @@ router.post('/changegroupname', function (req, res) {
         groupname: req.body.newgroupname
     };
 
-    var query = squel.update().table('public."GROUP"').set('nom', toChange.groupname).where('idgroup = ?', toChange.idgroup).toString();
+    var query = squel.update({ replaceSingleQuotes: true, singleQuoteReplacement: '\'\'' }).table('public."GROUP"').set('nom', toChange.groupname).where('idgroup = ?', toChange.idgroup).toString();
     db.none(query).then(function () {
         var response = { status: 'success', message: 'groupname updated successfully' };
         sender.sendResponse(sender.SUCCESS_STATUS, response, res);

@@ -84,7 +84,7 @@ router.post(('/updateposition'), function (req, res) {
                 })
             });
 
-            /*res.send({
+            res.send({
                 status: 'success',
                 message: 'Position updated successfully'
             })
@@ -94,7 +94,7 @@ router.post(('/updateposition'), function (req, res) {
             res.send({
                 status: 'fail',
                 message: e.toString()
-            })*/
+            })
         });
 });
 

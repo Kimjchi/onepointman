@@ -372,15 +372,21 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
         .then((result) => {
             result.forEach(element => {
                 let objectToPush = {
-                    iddrawing: element.iddrawing,
-                    idcreator: element.idcreator,
-                    nomcreator: element.nom,
-                    prenomcreator: element.prenom,
-                    description: element.description,
-                    lt: element.lt,
-                    lg: element.lg,
-                    img: element.img
-                };
+                        iddrawing: element.iddrawing,
+                        idcreator: element.idcreator,
+                        nomcreator: element.nom,
+                        prenomcreator: element.prenom,
+                        description: element.description,
+                        lt: element.lt,
+                        lg: element.lg,
+
+                        nelt: element.nelt,
+                        nelg: element.nelg,
+                        swlt: element.swlt,
+                        swlg: element.swlg,
+                        img: element.img
+                    }
+                ;
                 if (element.actif) {
                     JSONToReturn.drawings.push(objectToPush);
                 }
@@ -409,8 +415,10 @@ let getDrawings = (idgroup) =>
         .field('draw.idcreator')
         .field('draw.actif')
         .field("encode(draw.img, 'base64')", 'img')
-        .field('draw.drawinglg', 'lg')
-        .field('draw.drawinglt', 'lt')
+        .field('draw.nelg')
+        .field('draw.nelt')
+        .field('draw.swlt')
+        .field('draw.swlg')
         .field('description')
         .field('usr.nom')
         .field('usr.prenom')
@@ -427,7 +435,7 @@ router.post('/creategroup', function (req, res) {
     };
 
     let currentTime = new Date();
-    let query = squel.insert()
+    let query = squel.insert({replaceSingleQuotes: true, singleQuoteReplacement: `''`})
         .into('public."GROUP"')
         .set('nom', toCreate.groupname)
         .set('creationdate', currentTime.toISOString())
@@ -467,11 +475,12 @@ router.post('/changegroupname', function (req, res) {
         groupname: req.body.newgroupname
     };
 
-    let query = squel.update()
-        .table('public."GROUP"')
-        .set('nom', toChange.groupname)
-        .where('idgroup = ?', toChange.idgroup)
-        .toString();
+    let
+        query = squel.update({replaceSingleQuotes: true, singleQuoteReplacement: `''`})
+            .table('public."GROUP"')
+            .set('nom', toChange.groupname)
+            .where('idgroup = ?', toChange.idgroup)
+            .toString();
     db.none(query)
         .then(() => {
             let response = {status: 'success', message: 'groupname updated successfully'};

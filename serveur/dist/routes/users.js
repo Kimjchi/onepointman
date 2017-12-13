@@ -54,17 +54,16 @@ router.post('/updateposition', function (req, res) {
             });
         });
 
-        /*res.send({
+        res.send({
             status: 'success',
             message: 'Position updated successfully'
-        })
-        })
-        .catch(e => {
+        });
+    }).catch(function (e) {
         res.status(400);
         res.send({
             status: 'fail',
             message: e.toString()
-        })*/
+        });
     });
 });
 

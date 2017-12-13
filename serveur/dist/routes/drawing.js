@@ -16,8 +16,10 @@ router.post('/createdrawing', function (req, res) {
         idgroup: req.body.idgroup,
         description: req.body.description,
         zoom: req.body.zoom,
-        lt: req.body.lt,
-        lg: req.body.lg,
+        nelt: req.body.nelt,
+        nelg: req.body.nelg,
+        swlt: req.body.swlt,
+        swlg: req.body.swlg,
         img: req.body.img
     };
 
@@ -34,7 +36,7 @@ router.post('/createdrawing', function (req, res) {
         .returning('iddrawing')
         .toString();*/
 
-    var query = 'INSERT INTO public."DRAWING" (idcreator, idgroup, zoom, description, drawinglt, drawinglg, img)' + ' VALUES(' + toCreate.idcreator + ',' + toCreate.idgroup + ',' + toCreate.zoom + ',\'' + toCreate.description + '\',' + toCreate.lt + ',' + toCreate.lg + ', decode(\'' + toCreate.img + '\', \'base64\')) RETURNING iddrawing';
+    var query = 'INSERT INTO public."DRAWING" (idcreator, idgroup, zoom, description, nelt, nelg, swlt, swlg, img)' + ' VALUES(' + toCreate.idcreator + ',' + toCreate.idgroup + ',' + toCreate.zoom + ',\'' + toCreate.description + '\',' + toCreate.nelt + ',' + toCreate.nelg + ',' + toCreate.swlt + ',' + toCreate.swlg + ', decode(\'' + toCreate.img + '\', \'base64\')) RETURNING iddrawing';
 
     console.log("query " + query);
     db.one(query).then(function (row) {

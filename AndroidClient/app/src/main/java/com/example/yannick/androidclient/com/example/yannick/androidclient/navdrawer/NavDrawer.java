@@ -1,6 +1,5 @@
 package com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
@@ -20,22 +19,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONObject;
-
 public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private Menu navigationMenu;
     private Menu settingsMenu;
-    private int selectedGroup = -1;
     private boolean isDrawing;
     private MapFragment mapFragment;
 
@@ -81,35 +73,10 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
 
         isDrawing = false;
 
-        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu);
+        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu, false);
 
         final Handler updateGroupInfos = new Handler();
         final String url = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";
-        updateGroupInfos.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (selectedGroup != -1)
-                {
-                    System.out.println("Récupérer les infos du groupe courrant");
-                    JsonObjectRequest updateGroupRequest =
-                            new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response)
-                                {
-                                    System.out.println("Ici on attends la réponse");
-                                }
-                            }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error)
-                            {
-                                System.out.println("On a pas eu la réponse MORRAY");
-                            }
-                });
-                VolleyRequester.getInstance(getApplicationContext()).addToRequestQueue(updateGroupRequest);
-                }
-                updateGroupInfos.postDelayed(this, 1000);
-            }
-        }, 1000);
 
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -140,11 +107,14 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         });
 
     }
+    public Menu getMenu() {
+        return navigationMenu;
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu);
+        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu, true);
     }
 
     @Override
@@ -165,6 +135,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         settingsMenu.clear();
         settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
         settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
+        settingsMenu.add(Menu.NONE, 7, Menu.NONE, "Afficher dessins");
         return true;
     }
 
@@ -185,20 +156,54 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 settingsMenu.clear();
                 settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
                 settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
+                settingsMenu.add(Menu.NONE, 7, Menu.NONE, "Afficher dessins");
                 getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
                 isDrawing = false;
                 break;
             case ENVOYER_DESSIN:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Description du dessin");
+
+                final EditText input = new EditText(this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setMessage("Choisir la description du dessin");
+
+                builder.setPositiveButton("Envoyer", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String description = input.getText().toString();
+                        DrawFragment drawFragment = ((DrawFragment)getFragmentManager().findFragmentByTag("DRAW_FRAGMENT"));
+                        byte[] image = drawFragment.takeSnapshot();
+
+                        VolleyRequester.getInstance(getApplicationContext())
+                                .sendDrawing(drawFragment.getIdgroup(), description,
+                                        drawFragment.getZoom(), drawFragment.getBounds(), image);
+                        
+                        settingsMenu.clear();
+                        settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
+                        settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
+                        settingsMenu.add(Menu.NONE, 7, Menu.NONE, "Afficher dessins");
+                        getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
+                        isDrawing = false;
+                    }
+                });
+                builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
                 //TODO REQUETE ENVOI DU DESSIN
-                settingsMenu.clear();
-                settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
-                settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
-                isDrawing = false;
                 break;
             case DELETE_TRACKING:
                 VolleyRequester.getInstance(getApplicationContext()).updateTracking(false, MapFragment.instance.getCurrentGroup());
                 VolleyRequester.getInstance(getApplicationContext()).deleteTracking(MapFragment.instance.getCurrentGroup());
+                break;
+            case 7:
+                VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
                 break;
         }
 

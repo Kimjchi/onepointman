@@ -8,6 +8,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.widget.CompoundButtonCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -39,6 +40,7 @@ import com.example.yannick.androidclient.com.example.yannick.androidclient.frien
 import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.UserAdapterSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.UserModelAdd;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
@@ -70,8 +72,9 @@ public class VolleyRequester
     private static VolleyRequester instance;
     private RequestQueue requestQueue;
     private static Context context;
-    //private final String URL_SERVEUR = "http://192.168.0.108:3001";
-    private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    private final String URL_SERVEUR = "http://192.168.0.108:3001";
+    //private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    //private final String URL_SERVEUR = "http://192.168.43.202:3001";
 
     private VolleyRequester(Context context)
     {
@@ -128,59 +131,6 @@ public class VolleyRequester
         }
     }
 
-    public void connectToFbFromServer()
-    {
-        JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
-                URL_SERVEUR + "/fblogin", null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(final JSONObject response) {
-                        try {
-                            System.out.println("Response: " + response.toString());
-                            String uri = response.getString("redirectURI") +  "app_id=" + response.getString("client_id")+
-                                    "redirect_uri=" + "http://google.com";
-                            AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                            alert.setTitle("Title here");
-
-                            WebView wv = new WebView(context);
-                            wv.loadUrl(uri);
-                            wv.setWebViewClient(new WebViewClient() {
-                                @Override
-                                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                    view.loadUrl(url);
-
-                                    return true;
-                                }
-                            });
-
-                            alert.setView(wv);
-                            alert.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.dismiss();
-                                }
-                            });
-                            alert.show();
-                        }
-                        catch(JSONException jsonex)
-                        {
-                            jsonex.printStackTrace();
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // TODO Auto-generated method stub
-                //MDR LÉ EREUR C POUR LÉ FèBLe
-
-                System.out.println("Erreur lors du login fb");
-            }
-        });
-        this.addToRequestQueue(grpRequest);
-    }
-
     public void groupsRequest(){
         String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
@@ -203,8 +153,9 @@ public class VolleyRequester
         this.addToRequestQueue(grpRequest);
     }
 
-    public void displayGroupForNavDrawer(final Menu menuNavDrawer)
+    public void displayGroupForNavDrawer(final Menu menuNavDrawer, final boolean firstGroup)
     {
+        boolean fstGroup = firstGroup;
         String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest setGroups = new JsonObjectRequest(Request.Method.GET,
                 URL_SERVEUR + "/groups/" + idUser, null,
@@ -215,7 +166,7 @@ public class VolleyRequester
                         try {
                             JSONArray array = (JSONArray) response.get("message");
                             menuNavDrawer.findItem(R.id.groups).getSubMenu().clear();
-
+                            boolean fstGroup = firstGroup;
                             for(int i=0; i < array.length(); i++)
                             {
                                 final JSONObject groupe = (JSONObject) array.get(i);
@@ -305,6 +256,10 @@ public class VolleyRequester
                                         return false;
                                     }
                                 });
+                                if(fstGroup){
+                                    MapFragment.instance.setCurrentGroup(id);
+                                    fstGroup = false;
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -411,7 +366,7 @@ public class VolleyRequester
         String idUser = FacebookInfosRetrieval.user_id;
         String json = "{\"iduser\":"+ idUser + ",\"userlt\":"
                 + myPosition.getLatitude() + ",\"userlg\":" + myPosition.getLongitude() +"}";
-
+        Log.v("TEST2", json);
         try {
             JSONObject bodyJson = new JSONObject(json);
 
@@ -513,40 +468,49 @@ public class VolleyRequester
         try {
             for(int i=0; i< json.getJSONArray("userpositions").length(); i++) {
                 JSONObject usersPosition = json.getJSONArray("userpositions").getJSONObject(i);
-                int iduser = usersPosition.getInt("iduser");
-                String userName = usersPosition.getString("prenom") + " " +usersPosition.getString("nom");
-                double userlt = Double.parseDouble(usersPosition.getString("userlt"));
-                double userlg = Double.parseDouble(usersPosition.getString("userlg"));
-                String dateposition = usersPosition.getString("dateposition");
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-                format.setTimeZone(TimeZone.getTimeZone("GMT"));
-                Date date = format.parse(dateposition);
-                String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
+                if (!usersPosition.getString("userlt").equals("null")) {
+                    int iduser = usersPosition.getInt("iduser");
+                    String userName = usersPosition.getString("prenom") + " " +usersPosition.getString("nom");
+                    double userlt = Double.parseDouble(usersPosition.getString("userlt"));
+                    double userlg = Double.parseDouble(usersPosition.getString("userlg"));
+                    String dateposition = usersPosition.getString("dateposition");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                    format.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    Date date = format.parse(dateposition);
+                    String dateDisplayed = new SimpleDateFormat("HH:mm - dd MM yyyy").format(date);
 
 
-                String usersPositionTitle = userName;
-                String usersPositionSnippet = "Date dernière position:\r\n" + dateDisplayed;
-                float color;
+                    String usersPositionTitle = userName;
+                    String usersPositionSnippet = "Date dernière position:\r\n" + dateDisplayed;
+                    float color;
 
-                if (usersPosition.getBoolean("current")) {
-                    color = BitmapDescriptorFactory.HUE_GREEN;
-                } else {
-                    color = BitmapDescriptorFactory.HUE_RED;
+                    if (usersPosition.getBoolean("current")) {
+                        color = BitmapDescriptorFactory.HUE_GREEN;
+                    } else {
+                        color = BitmapDescriptorFactory.HUE_RED;
+                    }
+
+                    MarkerOptions marker = new MarkerOptions()
+                            .position(new LatLng(userlt, userlg))
+                            .title(usersPositionTitle)
+                            .snippet(usersPositionSnippet)
+                            .icon(BitmapDescriptorFactory.defaultMarker(color));
+
+                    MapFragment activity = MapFragment.instance;
+                    activity.addMarker(Integer.toString(iduser), marker);
                 }
-
-                MarkerOptions marker = new MarkerOptions()
-                        .position(new LatLng(userlt, userlg))
-                        .title(usersPositionTitle)
-                        .snippet(usersPositionSnippet)
-                        .icon(BitmapDescriptorFactory.defaultMarker(color));
-
-                MapFragment activity = MapFragment.instance;
-                activity.addMarker(Integer.toString(iduser), marker);
-
             }
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            for(int i=0; i< json.getJSONArray("trackings").length(); i++) {
+                MapFragment.instance.updateTraceFromJson(json.getJSONArray("trackings").getJSONObject(i), i);
+            }
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -569,6 +533,7 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(context,"Serveur indisponible. Veuillez réessayer", Toast.LENGTH_SHORT);
                     Log.v("DELETE_USER", "Fail to delete user "+itemId + " from group "+groupId + " : "+error.getMessage());
                 }
 
@@ -607,6 +572,7 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(context,"Serveur indisponible. Veuillez réessayer", Toast.LENGTH_SHORT);
                     Log.v("ADD_USER", "Fail to add user "+itemId + "from group "+groupId);
                 }
             });
@@ -666,7 +632,8 @@ public class VolleyRequester
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                    Log.v("FRIENDS_LIST", "Erreur lors de la recupération de la liste d'amis: "+error.getMessage());
+                Toast.makeText(context,"Serveur indisponible. Veuillez réessayer", Toast.LENGTH_SHORT);
+                Log.v("FRIENDS_LIST", "Erreur lors de la recupération de la liste d'amis: "+error.getMessage());
             }
         });
         this.addToRequestQueue(grpRequest);
@@ -699,8 +666,8 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(context, "Erreur lors de la création du groupe", Toast.LENGTH_LONG).show();
-                    Log.v("CREATE_GROUP", "Fail to create groupe "+newGroupName);
+                    Log.v("CREATE_GROUP", "Groupe non créé");
+                    Toast.makeText(context,"Serveur indisponible. Veuillez réessayer", Toast.LENGTH_SHORT);
                 }
             });
             this.addToRequestQueue(createGroupRequest);
@@ -732,6 +699,7 @@ public class VolleyRequester
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.v("CHANGE_GROUP_NAME", "GROUPE "+groupId+": Erreur changement de nom du groupe");
+                    Toast.makeText(context,"Serveur indisponible. Veuillez réessayer", Toast.LENGTH_SHORT);
                 }
             });
             this.addToRequestQueue(deleteRequest);
@@ -759,13 +727,14 @@ public class VolleyRequester
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.v("PINPOINT", "Add succesfully");
+                            Log.v("PINPOINT_ADD", "Add succesfully");
 
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.v("PINPOINT", "Error:" + error.getMessage());
+                    Log.v("PINPOINT_ADD", "Pinpoint add error");
+                    Toast.makeText(context,"Serveur indisponible. Veuillez réessayer", Toast.LENGTH_SHORT);
                 }
             });
             this.addToRequestQueue(addRequest);
@@ -779,7 +748,6 @@ public class VolleyRequester
 
     public void getUserInGroup(final int groupId, final ArrayList<UserModelSettings> userModels, final UserAdapterSettings adapter)
     {
-        String idUser = FacebookInfosRetrieval.user_id;
         JsonObjectRequest grpInfoRequest = new JsonObjectRequest (Request.Method.GET,
                 URL_SERVEUR + "/groups/getGroupInfo/"+groupId, null,
                 new Response.Listener<JSONObject>() {
@@ -798,6 +766,7 @@ public class VolleyRequester
                             }
 
                             adapter.notifyDataSetChanged();
+                            Log.v("GET_USER_GROUP", "Get user in group ok");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -805,7 +774,8 @@ public class VolleyRequester
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //MDR LÉ EREUR C POUR LÉ FèBLe
+                Log.v("GET_USER_GROUP", "Error retreive user in group");
+                Toast.makeText(context,"Serveur indisponible. Veuillez réessayer", Toast.LENGTH_SHORT);
             }
         });
         this.addToRequestQueue(grpInfoRequest);
@@ -825,12 +795,13 @@ public class VolleyRequester
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            Log.v("PINPOINT", "Delete succesfully");
+                            Log.v("PINPOINT_DELETE", "Delete succesfully");
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.v("PINPOINT", "Error:" + error.getMessage());
+                    Log.v("PINPOINT_DELETE", "Delete fail");
+                    Toast.makeText(context,"Serveur indisponible, point non supprimé!", Toast.LENGTH_SHORT);
                 }
             });
             this.addToRequestQueue(deletePinPointRequest);
@@ -841,5 +812,105 @@ public class VolleyRequester
         }
     }
 
+    public void sendDrawing(int idgroup, String description, float zoom, LatLngBounds latLng, byte[] img)
+    {
+        String idUser = FacebookInfosRetrieval.user_id;
+        String encodedImage = Base64.encodeToString(img, Base64.NO_WRAP);
+        String json = "{\"iduser\":"+idUser+",\"idgroup\":" + idgroup
+                + ",\"description\":\""+ description + "\", \"zoom\":"+zoom+", \"nelt\":" +
+                latLng.northeast.latitude + ", \"nelg\":" + latLng.northeast.longitude + ", \"swlt\":"
+                + latLng.southwest.latitude + ", \"swlg\":" + latLng.southwest.longitude +
+                ", \"img\":\"" + encodedImage + "\"}";
 
+        Log.v("DRAWING", json);
+
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest sendDrawing = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/drawing/createdrawing", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("DRAWING_ADD", "Add drawing success");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("DRAWING_ADD", "Add drawing fail");
+                    Toast.makeText(context,"Serveur indisponible, dessin non ajouté!", Toast.LENGTH_SHORT);
+                }
+            });
+            this.addToRequestQueue(sendDrawing);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public void deleteDrawing(int iddrawing)
+    {
+        String json = "{\"iddrawing:\""+iddrawing+"}";
+        try
+        {
+            JSONObject bodyJson = new JSONObject(json);
+            JsonObjectRequest sendDrawing = new JsonObjectRequest(Request.Method.POST,
+                    URL_SERVEUR + "/drawing/deletedrawing", bodyJson,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.v("DELETE_DRAWING", "Delete drawing success");
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.v("DELETE_DRAWING", "Delete drawing failed");
+                    Toast.makeText(context,"Serveur indisponible, dessin non supprimé!", Toast.LENGTH_SHORT);
+                }
+            });
+            this.addToRequestQueue(sendDrawing);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public void getDrawings(int idgroup)
+    {
+        String idUser = FacebookInfosRetrieval.user_id;
+        JsonObjectRequest grpRequest = new JsonObjectRequest (Request.Method.GET,
+                URL_SERVEUR + "/groups/drawings/"+idUser+"/"+idgroup, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response)
+                    {
+                        try
+                        {
+                            JSONObject msg = (JSONObject) response.get("message");
+                            JSONArray drawings = msg.getJSONArray("drawings");
+
+                            for(int i=0; i < drawings.length(); i++)
+                            {
+                                JSONObject tmpDraw = drawings.getJSONObject(0);
+                                MapFragment.instance.addDrawingToList(tmpDraw);
+                            }
+
+                            Log.v("GET_DRAWINGS", "Done, drawing list bien retrieve");
+                        }
+                        catch(Exception ex)
+                        {
+                            Log.v("GET_DRAWINGS", "Erreur lors du fetch de la reponse JSON: "+ex.getMessage());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context,"Serveur indisponible. Veuillez réessayer", Toast.LENGTH_SHORT);
+                Log.v("GET_DRAWINGS", "Erreur lors de la recupération des dessins: "+error.getMessage());
+            }
+        });
+        this.addToRequestQueue(grpRequest);
+    }
 }

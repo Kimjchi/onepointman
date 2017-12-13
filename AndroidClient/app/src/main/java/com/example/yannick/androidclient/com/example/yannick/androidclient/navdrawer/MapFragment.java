@@ -358,7 +358,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void stopDisplayThread() {
-        if (updateMyPosition.getdisplayThreadRunning()) {
+        if (updateMyPosition != null && updateMyPosition.getdisplayThreadRunning()) {
             updateMyPosition.stopDisplay();
             Log.v("GPS Service", "Display thread stopped");
         }

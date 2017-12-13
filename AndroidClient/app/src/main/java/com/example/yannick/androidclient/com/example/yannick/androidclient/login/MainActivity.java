@@ -14,6 +14,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
+import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -37,12 +38,25 @@ public class MainActivity extends Activity {
         loginButton = findViewById(R.id.login_button);
         loginButton.setReadPermissions(Arrays.asList("user_friends"));
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
+            private ProfileTracker profileTracker;
+
             @Override
             public void onSuccess(LoginResult loginResult) {
-                retreiveInfos();
-                authServer();
-                System.out.println("Succès login");
-                goToMap();
+                System.out.println("On success login button");
+                if(Profile.getCurrentProfile() == null)
+                {
+                    profileTracker = new ProfileTracker() {
+                        @Override
+                        protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                            System.out.println("On current profile change");
+                            retreiveInfos();
+                            authServer();
+                            goToMap();
+                            profileTracker.stopTracking();
+                        }
+                    };
+                }
             }
 
             @Override
@@ -58,6 +72,7 @@ public class MainActivity extends Activity {
 
         if(isLogged())
         {
+            System.out.println("On est dans le is logged");
             retreiveInfos();
             authServer();
             goToMap();
@@ -82,8 +97,15 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        System.out.println("On est par la");
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
+
+        System.out.println("On activity result");
+
+        if(callbackManager.onActivityResult(requestCode, resultCode, data))
+        {
+            System.out.println("On activity result call back");
+            return;
+        }
     }
 
     public boolean isLogged()
@@ -98,6 +120,7 @@ public class MainActivity extends Activity {
 
     private void retreiveInfos()
     {
+        System.out.println("On est dans le retreive infos");
         Profile.fetchProfileForCurrentAccessToken();
         Profile profile = Profile.getCurrentProfile();
         FacebookInfosRetrieval.user_id = profile.getId();

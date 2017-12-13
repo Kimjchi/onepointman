@@ -13,8 +13,8 @@ CREATE TABLE "USER"(
     nom varchar(50),
     prenom varchar(50),
     lastconnexion timestamp with time zone,
-    lt numeric(9,6),
-    lg numeric(9,6),
+    lt numeric(10,8),
+    lg numeric(11,8),
     dateposition timestamp with time zone
 );
 
@@ -27,8 +27,8 @@ CREATE TABLE "GROUP"(
 CREATE TABLE "PINPOINT"(
     idpinpoint serial PRIMARY KEY,
     description varchar(255),
-    pinlt numeric(9,6),
-    pinlg numeric(9,6),
+    pinlt numeric(10,8),
+    pinlg numeric(11,8),
     daterdv timestamp with time zone,
     dateexpiration timestamp with time zone,
     idcreator bigint REFERENCES "USER" (iduser),
@@ -38,8 +38,10 @@ CREATE TABLE "PINPOINT"(
 CREATE TABLE "DRAWING"(
     iddrawing serial PRIMARY KEY,
     description varchar(255),
-    drawinglg numeric(9,6),
-    drawinglt numeric(9,6),
+    nelg numeric(11,8),
+    swlg numeric(11,8),
+    swlt numeric(10,8),
+    nelt numeric(10,8),
     actif boolean DEFAULT true,
     zoom integer,
     img bytea,
@@ -57,8 +59,8 @@ CREATE TABLE "USER_GROUP"(
     sharesposition boolean DEFAULT true,
     iscreator boolean DEFAULT false,
     istracking boolean DEFAULT false,
-    userglt numeric(9,6),
-    userglg numeric(9,6),
+    userglt numeric(10,8),
+    userglg numeric(11,8),
     dateposition timestamp with time zone,
     iduser bigint REFERENCES "USER" (iduser),
     idgroup integer REFERENCES "GROUP" (idgroup),
@@ -66,8 +68,8 @@ CREATE TABLE "USER_GROUP"(
 );
 
 CREATE TABLE "TRACK_POS"(
-    lg numeric(9,6),
-    lt numeric(9,6),
+    lg numeric(11,8),
+    lt numeric(10,8),
     idgroup integer REFERENCES "GROUP" (idgroup),
     iduser bigint REFERENCES "USER" (iduser),
     timepos timestamp with time zone,

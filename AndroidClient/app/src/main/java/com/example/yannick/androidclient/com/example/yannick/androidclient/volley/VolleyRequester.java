@@ -40,6 +40,7 @@ import com.example.yannick.androidclient.com.example.yannick.androidclient.frien
 import com.example.yannick.androidclient.com.example.yannick.androidclient.settings.UserAdapterSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.friendlist.UserModelAdd;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
@@ -811,13 +812,15 @@ public class VolleyRequester
         }
     }
 
-    public void sendDrawing(int idgroup, String description, float zoom, LatLng latLng, byte[] img)
+    public void sendDrawing(int idgroup, String description, float zoom, LatLngBounds latLng, byte[] img)
     {
         String idUser = FacebookInfosRetrieval.user_id;
         String encodedImage = Base64.encodeToString(img, Base64.NO_WRAP);
         String json = "{\"iduser\":"+idUser+",\"idgroup\":" + idgroup
-                + ",\"description\":\""+ description + "\", \"zoom\":" + zoom + ", \"lt\":" +
-                latLng.latitude + ", \"lg\":" + latLng.longitude+ ", \"img\":\"" + encodedImage + "\"}";
+                + ",\"description\":\""+ description + "\", \"zoom\":" + zoom + ", \"nelt\":" +
+                latLng.northeast.latitude + ", \"nelg\":" + latLng.northeast.longitude + ", \"swlt\":"
+                + latLng.southwest.latitude + ", \"swlg\":" + latLng.southwest.longitude +
+                ", \"img\":\"" + encodedImage + "\"}";
 
         Log.v("DRAWING", json);
 

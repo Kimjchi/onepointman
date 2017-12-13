@@ -177,7 +177,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
 
                         VolleyRequester.getInstance(getApplicationContext())
                                 .sendDrawing(drawFragment.getIdgroup(), description,
-                                        drawFragment.getZoom(), drawFragment.getLatLng(), image);
+                                        drawFragment.getZoom(), drawFragment.getBounds(), image);
                         
                         settingsMenu.clear();
                         settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");

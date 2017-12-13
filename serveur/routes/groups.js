@@ -471,7 +471,7 @@ router.post('/changegroupname', function (req, res) {
         groupname: req.body.newgroupname
     };
 
-    let query = squel.update()
+    let query = squel.update({replaceSingleQuotes: true, singleQuoteReplacement: `''`})
         .table('public."GROUP"')
         .set('nom', toChange.groupname)
         .where('idgroup = ?', toChange.idgroup)

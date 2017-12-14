@@ -372,17 +372,21 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
         .then((result) => {
             result.forEach(element => {
                 let objectToPush = {
-                    iddrawing: element.iddrawing,
-                    idcreator: element.idcreator,
-                    nomcreator: element.nom,
-                    prenomcreator: element.prenom,
-                    description: element.description,
-                    nelt: element.nelt,
-                    nelg: element.nelg,
-                    swlt: element.swlt,
-                    swlg: element.swlg,
-                    img: element.img
-                };
+                        iddrawing: element.iddrawing,
+                        idcreator: element.idcreator,
+                        nomcreator: element.nom,
+                        prenomcreator: element.prenom,
+                        description: element.description,
+                        lt: element.lt,
+                        lg: element.lg,
+
+                        nelt: element.nelt,
+                        nelg: element.nelg,
+                        swlt: element.swlt,
+                        swlg: element.swlg,
+                        img: element.img
+                    }
+                ;
                 if (element.actif) {
                     JSONToReturn.drawings.push(objectToPush);
                 }
@@ -471,11 +475,12 @@ router.post('/changegroupname', function (req, res) {
         groupname: req.body.newgroupname
     };
 
-    let query = squel.update({replaceSingleQuotes: true, singleQuoteReplacement: `''`})
-        .table('public."GROUP"')
-        .set('nom', toChange.groupname)
-        .where('idgroup = ?', toChange.idgroup)
-        .toString();
+    let
+        query = squel.update({replaceSingleQuotes: true, singleQuoteReplacement: `''`})
+            .table('public."GROUP"')
+            .set('nom', toChange.groupname)
+            .where('idgroup = ?', toChange.idgroup)
+            .toString();
     db.none(query)
         .then(() => {
             let response = {status: 'success', message: 'groupname updated successfully'};

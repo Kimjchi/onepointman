@@ -23,9 +23,22 @@ class MapContainer extends Component {
         if(!!this.props.opMap.map) {
             let zoom = this.props.opMap.map.getZoom();
             let center = this.props.opMap.map.getCenter();
+            let northeast = this.props.opMap.map.getBounds().getNorthEast();
+            let southwest = this.props.opMap.map.getBounds().getSouthWest();
+            let bounds = {
+                north: {
+                    lat: northeast.lat(),
+                    lng: northeast.lng()
+                },
+                south: {
+                    lat : southwest.lat(),
+                    lng : southwest.lng()
+                }
+            };
+            console.log(bounds);
             if(this.props.opMap.zoom != zoom || this.props.opMap.mapCenter.lat != center.lat() || this.props.opMap.mapCenter.lng != center.lng()) {
                 let centerPoint = {lat : center.lat(), lng : center.lng()};
-                this.props.recenterMap(centerPoint, zoom);
+                this.props.recenterMap(centerPoint, zoom, bounds);
             }
         }
     }
@@ -73,8 +86,8 @@ const  mapDispatchToProps = (dispatch) => {
         changeMap: (map) => {
             dispatch(changeMap(map))
         },
-        recenterMap: (mapCenter, zoom) => {
-            dispatch(recenterMap(mapCenter, zoom))
+        recenterMap: (mapCenter, zoom, bounds) => {
+            dispatch(recenterMap(mapCenter, zoom, bounds))
         },
         updateMarkerMembers: (markers) => {
             dispatch(updateMarkerMembers(markers))

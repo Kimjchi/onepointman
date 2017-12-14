@@ -9,8 +9,8 @@ export const CHANGE_PINPOINTS_DISPLAY = 'CHANGE_PINPOINTS_DISPLAY';
 export const CHANGE_MARKER_MEMBER_DISPLAY = 'CHANGE_MARKER_MEMBER_DISPLAY';
 
 
-export function recenterMap (mapCenter, zoom){
-    return {type: CHANGE_MAP_CENTER, mapCenter, zoom}
+export function recenterMap (mapCenter, zoom, bounds){
+    return {type: CHANGE_MAP_CENTER, mapCenter, zoom, bounds}
 }
 
 export function updateMarkerSelect (marker){

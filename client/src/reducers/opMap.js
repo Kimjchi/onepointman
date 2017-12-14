@@ -22,6 +22,7 @@ let initialState = {
     isMarkerShown : true,
     isPinPointShown : true,
     mapCenter : { lat: 45.380002, lng: -71.925438 },
+    bounds : {},
     zoom : 3,
     markerSelect : { lat: 45.380002, lng: -71.925438},
     locationSelect : "",
@@ -36,7 +37,7 @@ export default function reducer (state = initialState, action ){
     switch (action.type){
 
         case CHANGE_MAP_CENTER:
-            return {...state , mapCenter: action.mapCenter, zoom : action.zoom};
+            return {...state , mapCenter: action.mapCenter, zoom : action.zoom, bounds : action.bounds};
 
         case CHANGE_LOCATION_SELECT:
             return {...state , locationSelect: action.locationSelect};

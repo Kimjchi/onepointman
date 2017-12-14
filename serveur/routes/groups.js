@@ -275,8 +275,8 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
 const getTrackings = (idgroup) => {
     return db.query(squel
         .select()
-        .field('lt')
-        .field('lg')
+        .field('lt', 'lat')
+        .field('lg', 'lng')
         .field('timepos')
         .field('iduser')
         .from('public."TRACK_POS"')

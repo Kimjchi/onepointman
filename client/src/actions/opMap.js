@@ -7,7 +7,7 @@ export const CHANGE_MAP = 'CHANGE_MAP';
 export const CHANGE_MARKER_MEMBERS = 'CHANGE_MARKER_MEMBERS';
 export const CHANGE_PINPOINTS_DISPLAY = 'CHANGE_PINPOINTS_DISPLAY';
 export const CHANGE_MARKER_MEMBER_DISPLAY = 'CHANGE_MARKER_MEMBER_DISPLAY';
-
+export const CHANGE_TRACKINGS = 'CHANGE_TRACKINGS';
 
 export function recenterMap (mapCenter, zoom, bounds){
     return {type: CHANGE_MAP_CENTER, mapCenter, zoom, bounds}
@@ -43,4 +43,8 @@ export function changeMarkerMemberDisplay() {
 
 export function changePinPointDisplay () {
     return {type : CHANGE_PINPOINTS_DISPLAY}
+}
+
+export function changeTrackings(trackings) {
+    return {type : CHANGE_TRACKINGS, trackings}
 }

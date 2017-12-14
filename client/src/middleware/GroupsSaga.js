@@ -6,7 +6,7 @@ import {
     ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_PHOTO, getGroups, getPhoto, SEND_CHANGE_NAME,
     setPhoto
 } from "../actions/opGroups";
-import {changePinPoints, updateMarkerMembers} from "../actions/opMap";
+import {changePinPoints, changeTrackings, updateMarkerMembers} from "../actions/opMap";
 import {changeIdGroup, changeUsers} from "../actions/opUsers";
 import {changeSharing} from "../actions/opOptions";
 
@@ -156,6 +156,20 @@ export function * requestInfosGroup() {
 
                     let isSharing = response.data.message.issharing;
                     store.dispatch(changeSharing(isSharing));
+
+                    let trackings = response.data.message.trackings;
+
+                    let trackingsFormat = [];
+                    trackings.map((tracking => {
+                        if(!!trackings.iduser) {
+                            let newTracking = {
+                                iduser: tracking.iduser,
+                                path: tracking.tracking
+                            };
+                            trackingsFormat.push(newTracking);
+                        }
+                    }));
+                    store.dispatch(changeTrackings(trackings));
                 }
             })
             .catch(function (error) {

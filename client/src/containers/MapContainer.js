@@ -35,7 +35,6 @@ class MapContainer extends Component {
                     lng : southwest.lng()
                 }
             };
-            console.log(bounds);
             if(this.props.opMap.zoom != zoom || this.props.opMap.mapCenter.lat != center.lat() || this.props.opMap.mapCenter.lng != center.lng()) {
                 let centerPoint = {lat : center.lat(), lng : center.lng()};
                 this.props.recenterMap(centerPoint, zoom, bounds);

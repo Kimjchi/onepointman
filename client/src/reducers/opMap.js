@@ -14,6 +14,7 @@ import {CHANGE_MAP} from "../actions/opMap";
 import {CHANGE_MARKER_MEMBERS} from "../actions/opMap";
 import {CHANGE_MARKER_MEMBER_DISPLAY} from "../actions/opMap";
 import {CHANGE_PINPOINTS_DISPLAY} from "../actions/opMap";
+import {CHANGE_TRACKINGS} from "../actions/opMap";
 
 //ajouter le reste dans l'import
 
@@ -23,6 +24,7 @@ let initialState = {
     isPinPointShown : true,
     mapCenter : { lat: 45.380002, lng: -71.925438 },
     bounds : {},
+    trackings : [],
     zoom : 3,
     markerSelect : { lat: 45.380002, lng: -71.925438},
     locationSelect : "",
@@ -61,6 +63,9 @@ export default function reducer (state = initialState, action ){
 
         case CHANGE_MARKER_MEMBER_DISPLAY:
             return {...state, isMarkerShown : !state.isMarkerShown};
+
+        case CHANGE_TRACKINGS:
+            return {...state, trackings : action.trackings};
 
 
         default:

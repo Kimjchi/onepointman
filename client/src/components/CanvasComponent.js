@@ -59,7 +59,7 @@ class CanvasComponent extends React.Component {
         console.log(data);*/
         let draw = this.props.drawing;
 
-        this.props.sendDrawing(draw.substring(draw.indexOf(',')+1, draw.length), this.props.idUser, this.props.groupToDisplay, this.props.description, this.props.zoom, this.props.mapCenter);
+        this.props.sendDrawing(draw.substring(draw.indexOf(',')+1, draw.length), this.props.idUser, this.props.groupToDisplay, this.props.description, this.props.zoom, this.props.bounds);
         this._close();
     }
 

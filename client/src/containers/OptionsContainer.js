@@ -23,7 +23,7 @@ import Datetime from "react-datetime";
 import dateFormat from "dateformat";
 import {hours} from "moment";
 import fbDefaultImage from "../pictures/SMART_BOY_FB.jpg"
-import {draw, getDrawingsGroup} from "../actions/opCanvas";
+import {draw, getDrawingsGroup, setDrawingToShow, showDrawing} from "../actions/opCanvas";
 import {push} from "react-router-redux";
 
 var ATLANTIC_OCEAN = {
@@ -63,7 +63,6 @@ class OptionsContainer extends Component {
         this._deletePinPoint = this._deletePinPoint.bind(this);
         this._handleModeDessin = this._handleModeDessin.bind(this);
         this._handleChangeSharing = this._handleChangeSharing.bind(this);
-        this._showDessins = this._showDessins.bind(this);
         this._handlePinPointDisplayChange = this._handlePinPointDisplayChange.bind(this);
         this._handleMarkerMemberDisplayChange = this._handleMarkerMemberDisplayChange.bind(this);
         setInterval(this._checkLocation, INTERVAL);
@@ -96,8 +95,8 @@ class OptionsContainer extends Component {
         console.log(lat);
         console.log(lng);
         let point = {
-            lat : lat,
-            lng : lng
+            lat: lat,
+            lng: lng
         };
         this.props.recenterMap(point, 15);
     }
@@ -133,14 +132,14 @@ class OptionsContainer extends Component {
         event.preventDefault();
         console.log(event);
         let pinPoint = {
-            iduser : this.props.opLogin.idUser,
-            idgroup : Number(this.props.opUsers.groupToDisplay),
-            pinlg : this.props.opMap.markerSelect.lng,
-            pinlt : this.props.opMap.markerSelect.lat,
-            description : this.props.opOptions.pinPoint.desc,
-            daterdv : this.props.opOptions.pinPoint.date
-        }
-        if(Number(this.props.opUsers.groupToDisplay) != 0) {
+            iduser: this.props.opLogin.idUser,
+            idgroup: Number(this.props.opUsers.groupToDisplay),
+            pinlg: this.props.opMap.markerSelect.lng,
+            pinlt: this.props.opMap.markerSelect.lat,
+            description: this.props.opOptions.pinPoint.desc,
+            daterdv: this.props.opOptions.pinPoint.date
+        };
+        if (Number(this.props.opUsers.groupToDisplay) != 0) {
             this.props.createPinPoint(pinPoint, this.props.opLogin.idUser, Number(this.props.opUsers.groupToDisplay));
             this._close();
         }
@@ -152,21 +151,21 @@ class OptionsContainer extends Component {
     }
 
     _handleConstantPositionSending(event) {
-        if(!this.props.opOptions.isSharingPosition) {
-            document.getElementById('markerBound').style.visibility='visible';
+        if (!this.props.opOptions.isSharingPosition) {
+            document.getElementById('markerBound').style.visibility = 'visible';
             intervall = setInterval(this._checkLocation, INTERVAL);
         } else {
             clearInterval(intervall);
-            document.getElementById('markerBound').style.visibility='hidden';
+            document.getElementById('markerBound').style.visibility = 'hidden';
         }
         this.props.changeSendingMode();
     }
 
-    _handleChangeSharing(event){
+    _handleChangeSharing(event) {
         let {isSharing} = this.props.opOptions;
         let idUser = this.props.opLogin.idUser;
         let idGroup = this.props.opUsers.groupToDisplay;
-        if(!!idGroup && idGroup !== "") {
+        if (!!idGroup && idGroup !== "") {
             this.props.changeSharing(!isSharing);
             this.props.transmitSharingMode(!isSharing, idUser, idGroup)
         }
@@ -180,10 +179,10 @@ class OptionsContainer extends Component {
         }
     }
 
-    _processLocation (location) {
+    _processLocation(location) {
         let point = {
-            lat : location.coords.latitude,
-            lng : location.coords.longitude
+            lat: location.coords.latitude,
+            lng: location.coords.longitude
         };
         let pointArray = [point];
         let idUser = this.props.opLogin.idUser;
@@ -205,11 +204,11 @@ class OptionsContainer extends Component {
         this.props.deletePinPoint(this.props.opOptions.pinPointToRemove.id, this.props.opLogin.idUser, this.props.opUsers.groupToDisplay);
     }
 
-    _geocodeAddress () {
+    _geocodeAddress() {
         let {address} = this.props.opOptions;
         googleMapsClient.geocode({
             address: address
-        }, function(err, response) {
+        }, function (err, response) {
             if (!err && response.json.status == "OK") {
                 let position = response.json.results[0].geometry.location;
                 let address = response.json.results[0].formatted_address;
@@ -226,7 +225,7 @@ class OptionsContainer extends Component {
                 lng: ATLANTIC_OCEAN.longitude
             }, 3);
 
-            let marker= {
+            let marker = {
                 lat: ATLANTIC_OCEAN.latitude,
                 lng: ATLANTIC_OCEAN.longitude
             };
@@ -241,24 +240,24 @@ class OptionsContainer extends Component {
         let allUsers = users.concat(friends);
         let user = null;
         user = allUsers.filter((obj) => {
-            if(obj.iduser == idUser) {
+            if (obj.iduser == idUser) {
                 return true;
             } else {
                 return false;
             }
         });
 
-        if(user.length == 0) {
+        if (user.length == 0) {
             return fbDefaultImage;
         }
         return user[0].urlPhoto;
     }
 
-    _reverseGeocodeAddress () {
+    _reverseGeocodeAddress() {
         let {markerSelect} = this.props.opMap;
         googleMapsClient.reverseGeocode({
             latlng: [markerSelect.lat, markerSelect.lng]
-        }, function(err, response) {
+        }, function (err, response) {
             let address = "";
             let result = response.json.results;
             if (!err && response.json.status == "OK") {
@@ -277,20 +276,21 @@ class OptionsContainer extends Component {
         event.preventDefault();
         let boolean = this.props.opCanvas.draw;
         let idGroup = this.props.opUsers.groupToDisplay;
-        console.log(idGroup);
-        if(!boolean && idGroup !== '') {
+        if (!boolean && idGroup !== '') {
             boolean = true;
         }
         else {
             boolean = false;
         }
-        console.log(boolean);
         this.props.draw(boolean);
     }
 
-    _showDessins(event) {
+    _showDessin(dessin, event) {
         event.preventDefault();
-        this.props.getDrawingGroups(this.props.opLogin.idUser, this.props.opUsers.groupToDisplay);
+        let centerLat = ((parseFloat(dessin.swlt) + parseFloat(dessin.nelt))/2);
+        let centerLng = ((parseFloat(dessin.swlg) + parseFloat(dessin.nelg))/2);
+        let mapCenter = { lat: centerLat, lng: centerLng };
+        this.props.showDrawing(dessin, mapCenter, 3);
     }
 
     render() {
@@ -300,113 +300,131 @@ class OptionsContainer extends Component {
         let {markersMembers} = this.props.opMap;
         let {locationSelect} = this.props.opMap;
         let {isSharing} = this.props.opOptions;
+        let {drawingsGroup} = this.props.opCanvas;
         return (
 
             <div className='wrapper'>
                 <input type='checkbox'/>
                 <label id="search" htmlFor='pictures'>
-                    <input type="text" id="fname" name="fname" placeholder="Entrez une adresse" value = {address}
+                    <input type="text" id="fname" name="fname" placeholder="Entrez une adresse" value={address}
                            onKeyPress={this._handleAddressSearch} onChange={this._handleAddressChange}/>
                 </label>
                 <input id='jobs' type='checkbox'/>
-                    <label htmlFor='jobs'>
-                        <p className ="accordion"><span className="ico"/>Partage</p>
-                        <div className='lil_arrow'/>
-                        <div className='content'>
-                            <ul>
-                                <li>
-                                    <a href='#' onClick = {this._handleChangeSharing} className='sharePosition'>
-                                        {isSharing? 'Partage activé' : 'Partage désactivé'}
-                                    <i id= "markerBound" className="material-icons markerG"
-                                       style={{visibility : (isSharing? "visible" : "hidden")}}>place</i>
+                <label htmlFor='jobs'>
+                    <p className="accordion"><span className="ico"/>Partage</p>
+                    <div className='lil_arrow'/>
+                    <div className='content'>
+                        <ul>
+                            <li>
+                                <a href='#' onClick={this._handleChangeSharing} className='sharePosition'>
+                                    {isSharing ? 'Partage activé' : 'Partage désactivé'}
+                                    <i id="markerBound" className="material-icons markerG"
+                                       style={{visibility: (isSharing ? "visible" : "hidden")}}>place</i>
+                                </a>
+                            </li>
+                            {markersMembers.map((marker) => (
+                                <li key={marker.iduser}>
+                                    <a href='#' className='aMarkersMembers'
+                                       onClick={this._displayMarker.bind(this, marker.pos.lt, marker.pos.lg)}>
+                                        <div className='liMarkersMembers'>
+                                            <div className='imageMarkersMembers'>
+                                                <img className='profilFb' src={(this._getUserUrlPhoto(marker.iduser))}
+                                                     alt="photo de profil" height="60" width="60"/>
+                                            </div>
+                                            <div className='infoMarkersMembers'>
+                                                <div>{marker.firstname} {marker.lastname}</div>
+                                                <div>{this._convertDate(marker.date)}</div>
+                                            </div>
+                                            {(marker.current ? <div className="circle"/> : "")}
+                                        </div>
                                     </a>
                                 </li>
-                                {markersMembers.map((marker) => (
-                                    <li key={marker.iduser}>
-                                        <a href='#' className='aMarkersMembers' onClick = {this._displayMarker.bind(this, marker.pos.lt, marker.pos.lg)}>
-                                            <div className='liMarkersMembers'>
-                                                <div className='imageMarkersMembers'>
-                                                    <img className='profilFb' src={(this._getUserUrlPhoto(marker.iduser))} alt="photo de profil" height="60" width="60"/>
-                                                </div>
-                                                <div className='infoMarkersMembers'>
-                                                    <div>{marker.firstname} {marker.lastname}</div>
-                                                    <div>{this._convertDate(marker.date)}</div>
-                                                </div>
-                                                {(marker.current ? <div class="circle"></div> : "")}
-                                            </div>
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <span/>
-                    </label>
+                            ))}
+                        </ul>
+                    </div>
+                    <span/>
+                </label>
                 <input id='financial' type='checkbox'/>
-                    <label htmlFor='financial'>
-                        <p className ="accordion"><span className="ico"/>Rendez-vous</p>
-                        <div className='lil_arrow'/>
-                        <div className='content'>
-                            <ul>
-                                 <li>
-                                    <a href='#' onClick = {this._open}>Créer un rendez-vous</a>
-                                </li>
-                                {pinPoints.map((pinPoint) => (
-                                    <li key={pinPoint.id}>
-                                        <a href='#' className='aPinPoint' onClick = {this._displayMarker.bind(this, pinPoint.pos.lt, pinPoint.pos.lg)}>
-                                            <div className='liPinPoint'>
-                                                <div className='imagePinPoint'>
-                                                    <img className='profilFb' src={(this._getUserUrlPhoto(pinPoint.idCreator))} alt="photo de profil" height="60" width="60"/>
-                                                </div>
-                                                <div className='infoPinPoint'>
-                                                    <div>{(pinPoint.desc.length) > 20 ? pinPoint.desc.substring(0,20) + "..." : pinPoint.desc}</div>
-                                                    <div>{this._convertDate(pinPoint.date)}</div>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href='#' className="menu-icon" onClick={this._openPp.bind(this, pinPoint)}>
-                                            <div className="line top"></div>
-                                            <div className="line right"></div>
-                                            <div className="line bottom"></div>
-                                            <div className="line left"></div>
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <span/>
-                    </label>
-                <input id='events' type='checkbox'/>
-                    <label htmlFor='events'>
-                        <p className ="accordion"> <span className="ico"/>Filtres</p>
-                        <div className='lil_arrow'/>
-                        <div className='content'>
-                            <ul>
-                                <li>
-                                    <a href='#' onClick = {this._handleMarkerMemberDisplayChange}> {(this.props.opMap.isMarkerShown ? "+ Positions" : "- Position")}</a>
-                                </li>
-                                <li>
-                                <a href='#' onClick = {this._handlePinPointDisplayChange}>{(this.props.opMap.isPinPointShown ? "+ Rendez-vous" : "- Rendez-vous")}</a>
-                                </li>
-                                <li>
-                                    <a onClick={this._showDessins}>Dessins</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <span/>
-                    </label>
-                <input id='settings' type='checkbox'/>
-                    <label htmlFor='settings'>
-                        <p className ="accordion"><span className="ico"/>Dessins</p>
-                        <div className='lil_arrow'/>
-                        <div className='content'>
+                <label htmlFor='financial'>
+                    <p className="accordion"><span className="ico"/>Rendez-vous</p>
+                    <div className='lil_arrow'/>
+                    <div className='content'>
                         <ul>
+                            <li>
+                                <a href='#' onClick={this._open}>Créer un rendez-vous</a>
+                            </li>
+                            {pinPoints.map((pinPoint) => (
+                                <li key={pinPoint.id}>
+                                    <a href='#' className='aPinPoint'
+                                       onClick={this._displayMarker.bind(this, pinPoint.pos.lt, pinPoint.pos.lg)}>
+                                        <div className='liPinPoint'>
+                                            <div className='imagePinPoint'>
+                                                <img className='profilFb'
+                                                     src={(this._getUserUrlPhoto(pinPoint.idCreator))}
+                                                     alt="photo de profil" height="60" width="60"/>
+                                            </div>
+                                            <div className='infoPinPoint'>
+                                                <div>{(pinPoint.desc.length) > 20 ? pinPoint.desc.substring(0, 20) + "..." : pinPoint.desc}</div>
+                                                <div>{this._convertDate(pinPoint.date)}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href='#' className="menu-icon" onClick={this._openPp.bind(this, pinPoint)}>
+                                        <div className="line top"/>
+                                        <div className="line right"/>
+                                        <div className="line bottom"/>
+                                        <div className="line left"/>
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <span/>
+                </label>
+                <input id='events' type='checkbox'/>
+                <label htmlFor='events'>
+                    <p className="accordion"><span className="ico"/>Filtres</p>
+                    <div className='lil_arrow'/>
+                    <div className='content'>
+                        <ul>
+                            <li>
+                                <a href='#'
+                                   onClick={this._handleMarkerMemberDisplayChange}> {(this.props.opMap.isMarkerShown ? "+ Positions" : "- Position")}</a>
+                            </li>
+                            <li>
+                                <a href='#'
+                                   onClick={this._handlePinPointDisplayChange}>{(this.props.opMap.isPinPointShown ? "+ Rendez-vous" : "- Rendez-vous")}</a>
+                            </li>
                             <li>
                                 <a onClick={this._handleModeDessin}>Mode dessin</a>
                             </li>
                         </ul>
-                        </div>
-                        <span/>
-                    </label>
+                    </div>
+                    <span/>
+                </label>
+                <input id='settings' type='checkbox'/>
+                <label htmlFor='settings'>
+                    <p className="accordion"><span className="ico"/>Dessins du groupe</p>
+                    <div className='lil_arrow'/>
+                    <div className='content'>
+                        <ul>
+                            {
+                                drawingsGroup.length !== 0 && drawingsGroup.map((drawing, index) => {
+                                    return <li key={index}  onClick={this._showDessin.bind(this, drawing)}>
+                                        <a>{drawing.description}</a>
+                                    </li>
+                                })
+                            }
+                            {
+                                drawingsGroup.length === 0 &&
+                                <li>
+                                    Pas encore de dessins !
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <span/>
+                </label>
                 <Modal show={this.props.opOptions.showModalRdv} onHide={this._close} className="moddal">
                     <Modal.Header closeButton>
                         <Modal.Title>Création d'un rendez-vous</Modal.Title>
@@ -424,7 +442,7 @@ class OptionsContainer extends Component {
                                 />
                                 <ControlLabel>Heure</ControlLabel>
                                 <Datetime
-                                    inputProps={{readOnly:true}}
+                                    inputProps={{readOnly: true}}
                                     onChange={this._handlePinPointDateChange}
                                     defaultValue={new Date()}
                                     timeFormat="HH:mm"
@@ -455,23 +473,23 @@ class OptionsContainer extends Component {
     }
 }
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
 
-    return{
+    return {
         opOptions: state.opOptions,
-        opMap : state.opMap,
-        opUsers : state.opUsers,
-        opLogin : state.opLogin,
-        opGroups: state. opGroups,
+        opMap: state.opMap,
+        opUsers: state.opUsers,
+        opLogin: state.opLogin,
+        opGroups: state.opGroups,
         opCanvas: state.opCanvas
     }
 }
 
 //fonctions
-const  mapDispatchToProps = (dispatch) => {
-    return{
+const mapDispatchToProps = (dispatch) => {
+    return {
         recenterMap: (mapCenter, zoom) => {
-            dispatch(recenterMap(mapCenter, zoom))
+            dispatch(recenterMap(mapCenter, zoom));
         },
         changeAddress: (newAddress, validAddress) => {
             dispatch(changeAddress(newAddress, validAddress))
@@ -497,10 +515,10 @@ const  mapDispatchToProps = (dispatch) => {
         createPinPoint: (pinPoint, idUser, idGroup) => {
             dispatch(createPinPoint(pinPoint, idUser, idGroup))
         },
-        changeRmPpModalVisibility:() => {
+        changeRmPpModalVisibility: () => {
             dispatch(changeRmPpModalVisibility())
         },
-        changePinPointToRemove:(pinPointToRemove) => {
+        changePinPointToRemove: (pinPointToRemove) => {
             dispatch(changePinPointToRemove(pinPointToRemove))
         },
         deletePinPoint: (idPinPoint, idUser, idGroup) => {
@@ -515,9 +533,11 @@ const  mapDispatchToProps = (dispatch) => {
         transmitSharingMode: (isSharing, idUser, idGroup) => {
             dispatch(transmitSharingMode(isSharing, idUser, idGroup))
         },
-        getDrawingGroups: (idUser, idGroup) => {
-            dispatch(getDrawingsGroup(idUser, idGroup));
-            dispatch(push("/drawings"));
+        showDrawing: (img, mapCenter, zoom) => {
+            dispatch(recenterMap(mapCenter, zoom));
+            dispatch(showDrawing(false));
+            setTimeout(function(){ dispatch(showDrawing(true)); }, 500);
+            dispatch(setDrawingToShow(img));
         },
         changeMarkerMemberDisplay: () => {
             dispatch(changeMarkerMemberDisplay())
@@ -528,4 +548,4 @@ const  mapDispatchToProps = (dispatch) => {
     }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps) (OptionsContainer)
+export default connect(mapStateToProps, mapDispatchToProps)(OptionsContainer)

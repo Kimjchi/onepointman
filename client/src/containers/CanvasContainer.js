@@ -4,7 +4,7 @@ import {addGroup, changeGroupName, getGroups, getInfosGroup} from "../actions/op
 import GroupsComponent from "../components/GroupsComponent";
 import {addUser} from "../actions/opUsers";
 import CanvasComponent from "../components/CanvasComponent";
-import {changeDescription, sendDrawing, setDrawings} from "../actions/opCanvas";
+import {changeDescription, draw, sendDrawing, setDrawings} from "../actions/opCanvas";
 import {push} from "react-router-redux";
 
 class CanvasContainer extends Component {
@@ -16,14 +16,14 @@ class CanvasContainer extends Component {
         let {drawings, description} = this.props.opCanvas;
         let {idUser} = this.props.opLogin;
         let {groupToDisplay} = this.props.opUsers;
-        let {mapCenter, zoom} = this.props.opMap;
+        let {bounds, zoom} = this.props.opMap;
         return (
             <CanvasComponent setDrawings={this.props.setDrawings}
                              drawing={drawings}
                              description={description}
                              idUser={idUser}
                              groupToDisplay={groupToDisplay}
-                             mapCenter={mapCenter}
+                             bounds={bounds}
                              zoom={zoom}
                              sendDrawing={this.props.sendDrawing}
                              changeDescription={this.props.changeDescription}
@@ -50,10 +50,11 @@ const  mapDispatchToProps = (dispatch) => {
             dispatch(setDrawings(drawings));
         },
         changeDescription: (description) => {
-            dispatch(changeDescription(description))
+            dispatch(changeDescription(description));
         },
         sendDrawing:(drawing, idUser, idGroup, description, zoom, center) => {
-            dispatch(sendDrawing(drawing, idUser, idGroup, description, zoom, center))
+            dispatch(sendDrawing(drawing, idUser, idGroup, description, zoom, center));
+            dispatch(draw(false));
         }
     }
 };

@@ -6,6 +6,7 @@ import {
     changePinPoints, recenterMap, updateMarkerGeoLocation, updateMarkerMembers, updateMarkers, updateMarkerSelect,
     updateMarkersSelect
 } from "../actions/opMap";
+import {showDrawing} from "../actions/opCanvas";
 
 
 class MapContainer extends Component {
@@ -19,8 +20,8 @@ class MapContainer extends Component {
         this.props.changeMap(mapRef);
     }
 
-    _onIdleChanged(){
-        if(!!this.props.opMap.map) {
+    _onIdleChanged() {
+        if (!!this.props.opMap.map) {
             let zoom = this.props.opMap.map.getZoom();
             let center = this.props.opMap.map.getCenter();
             let northeast = this.props.opMap.map.getBounds().getNorthEast();
@@ -31,12 +32,12 @@ class MapContainer extends Component {
                     lng: northeast.lng()
                 },
                 south: {
-                    lat : southwest.lat(),
-                    lng : southwest.lng()
+                    lat: southwest.lat(),
+                    lng: southwest.lng()
                 }
             };
-            if(this.props.opMap.zoom != zoom || this.props.opMap.mapCenter.lat != center.lat() || this.props.opMap.mapCenter.lng != center.lng()) {
-                let centerPoint = {lat : center.lat(), lng : center.lng()};
+            if (this.props.opMap.zoom != zoom || this.props.opMap.mapCenter.lat != center.lat() || this.props.opMap.mapCenter.lng != center.lng()) {
+                let centerPoint = {lat: center.lat(), lng: center.lng()};
                 this.props.recenterMap(centerPoint, zoom, bounds);
             }
         }
@@ -54,28 +55,34 @@ class MapContainer extends Component {
         let updateMarkerMembers = this.props.updateMarkerMembers;
         let {pinPoints} = this.props.opMap;
         let changePinPoints = this.props.changePinPoints;
+        let {drawingToShow, showDrawing} = this.props.opCanvas;
         return (
-            <Map isMarkerShown = {isMarkerShown} mapCenter = {mapCenter}
-                 zoom = {zoom} updateMarkerSelect = {updateMarkerSelect}
-                 markerSelect = {markerSelect} markersGeoLocation = {markersGeoLocation}
-                 markersPinPoint = {pinPoints} changePinPoints = {changePinPoints}
-                 _onMapMounted = {this._onMapMounted} _onIdleChanged = {this._onIdleChanged}
-                 markersMembers = {markersMembers} updateMarkerMembers = {updateMarkerMembers}
-                 isPinPointShown = {isPinPointShown}/>
-    )
+            <Map isMarkerShown={isMarkerShown} mapCenter={mapCenter}
+                 zoom={zoom} updateMarkerSelect={updateMarkerSelect}
+                 markerSelect={markerSelect} markersGeoLocation={markersGeoLocation}
+                 markersPinPoint={pinPoints} changePinPoints={changePinPoints}
+                 _onMapMounted={this._onMapMounted} _onIdleChanged={this._onIdleChanged}
+                 markersMembers={markersMembers} updateMarkerMembers={updateMarkerMembers}
+                 isPinPointShown={isPinPointShown}
+                 drawing={drawingToShow}
+                 showDrawing={showDrawing}
+                 show={this.props.showDrawing}
+            />
+        )
     }
 }
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
 
-    return{
+    return {
         opMap: state.opMap,
+        opCanvas: state.opCanvas
     }
 }
 
 //fonctions
-const  mapDispatchToProps = (dispatch) => {
-    return{
+const mapDispatchToProps = (dispatch) => {
+    return {
         updateMarkerSelect: (newMarker) => {
             dispatch(updateMarkerSelect(newMarker))
         },
@@ -90,8 +97,11 @@ const  mapDispatchToProps = (dispatch) => {
         },
         updateMarkerMembers: (markers) => {
             dispatch(updateMarkerMembers(markers))
+        },
+        showDrawing: (boolean) => {
+            dispatch(showDrawing(boolean));
         }
     }
 };
 
-export default connect(mapStateToProps, mapDispatchToProps) (MapContainer)
+export default connect(mapStateToProps, mapDispatchToProps)(MapContainer)

@@ -17,9 +17,7 @@ export function* requestSendDrawing() {
         let idGroup = drawing.idGroup;
         let description = drawing.description;
         let zoom = drawing.zoom;
-        let center = drawing.center;
-
-        console.log(drawing);
+        let bounds = drawing.bounds;
 
         let server = "http://localhost:3001/drawing/createdrawing";
 
@@ -28,14 +26,16 @@ export function* requestSendDrawing() {
             idgroup: idGroup,
             description: description,
             zoom: zoom,
-            lt: center.lat,
-            lg: center.lng,
-            img:draw,
+            nelt: bounds.north.lat,
+            nelg: bounds.north.lng,
+            swlt: bounds.south.lat,
+            swlg: bounds.south.lng,
+            img: draw,
 
-    })
+        })
             .then(function (response) {
-                if(!!response.status && response.status === 200) {
-                    console.log(response.data.iddrawing);
+                if (!!response.status && response.status === 200) {
+                    //console.log(response.data.iddrawing);
                     //store.dispatch(setPhoto(id, response.data.data.url));
                 }
             })
@@ -53,17 +53,18 @@ export function* requestGetDrawings() {
 
         let idUser = drawing.idUser;
         let idGroup = drawing.idGroup;
-        console.log(idUser);
-        console.log("YOOOOOO");
-        let server = "http://localhost:3001/groups/drawings/"+idUser+"/"+idGroup;
+        console.log("On récupère les drawings avec l'idUser " + idUser + " et l'idGroup " + idGroup);
+        let server = "http://localhost:3001/groups/drawings/" + idUser + "/" + idGroup;
 
         axios.get(server)
             .then(function (response) {
-                if(!!response.data.status && response.data.status === 'success') {
-                    if(response.data.message.drawings.length !== 0) {
+                if (!!response.data.status && response.data.status === 'success') {
+                    if (response.data.message.drawings.length !== 0) {
+                        console.log(response.data.message);
                         store.dispatch(bindDrawingsGroup(response.data.message.drawings));
                     }
                     else {
+                        console.log("Ce groupe n'a pas d'images");
                         store.dispatch(bindDrawingsGroup([]));
                     }
                 }

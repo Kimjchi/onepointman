@@ -336,7 +336,7 @@ let getUsersPositions = (idgroup) =>
         .field('ugr.sharesposition')
         .field('ugr.userglt')
         .field('ugr.userglg')
-        .field('ugr.msg')
+        .field('usr.msg')
         .field("ugr.dateposition")
         .field('usr.nom')
         .field('usr.prenom')

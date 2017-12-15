@@ -379,7 +379,7 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
                         description: element.description,
                         lt: element.lt,
                         lg: element.lg,
-
+                        zoom: element.zoom,
                         nelt: element.nelt,
                         nelg: element.nelg,
                         swlt: element.swlt,
@@ -419,6 +419,7 @@ let getDrawings = (idgroup) =>
         .field('draw.nelt')
         .field('draw.swlt')
         .field('draw.swlg')
+        .field('draw.zoom')
         .field('description')
         .field('usr.nom')
         .field('usr.prenom')

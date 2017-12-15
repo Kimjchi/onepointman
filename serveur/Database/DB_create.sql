@@ -11,6 +11,7 @@ CREATE TABLE "USER"(
     isconnected boolean,
     nom varchar(50),
     prenom varchar(50),
+    msg varchar(255),
     lastconnexion timestamp with time zone,
     lt numeric(10,8),
     lg numeric(11,8),

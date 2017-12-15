@@ -216,6 +216,7 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
                             nom: element.nom,
                             userlt: element.userglt,
                             userlg: element.userglg,
+                            msg: element.msg,
                             current: isCurrent,
                             dateposition: element.dateposition
                         };
@@ -335,6 +336,7 @@ let getUsersPositions = (idgroup) =>
         .field('ugr.sharesposition')
         .field('ugr.userglt')
         .field('ugr.userglg')
+        .field('ugr.msg')
         .field("ugr.dateposition")
         .field('usr.nom')
         .field('usr.prenom')
@@ -346,7 +348,12 @@ let getUsersPositions = (idgroup) =>
 
 //Si la dernière position stockée est > 15min, l'utilisateur est considéré comme inactif
 function compareTimes(currentTime, lastLocationTime) {
+    let difference = lastLocationTime - currentTime;
     let toReturn = false;
+    if (difference < 900000){
+        toReturn = true
+    }
+   /* let toReturn = false;
     if (currentTime.getMonth() === lastLocationTime.getMonth()) {
         if (currentTime.getDay() === lastLocationTime.getDay()) {
             if (currentTime.getHours() === lastLocationTime.getHours()) {
@@ -355,7 +362,7 @@ function compareTimes(currentTime, lastLocationTime) {
                 }
             }
         }
-    }
+    }*/
     return toReturn;
 }
 

@@ -123,6 +123,48 @@ router.post(('/updatepositionsharing/'), function(req, res){
         })
 });
 
+router.post('/updatemsg', function(req,res){
+   let toUpdate = {
+       iduser : req.body.iduser,
+       msg: req.body.msg
+   };
+   console.log(toUpdate);
+   let query = squel.update({replaceSingleQuotes: true, singleQuoteReplacement: `''`})
+       .table('public."USER"')
+       .set('msg', toUpdate.msg)
+       .where('iduser = ?', toUpdate.iduser)
+       .toString();
+console.log(query);
+   db.none(query)
+       .then(()=>{
+           sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'message updated successfully successfully'}, res)
+       })
+       .catch(e=>{
+           sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Error while updating message'}, res);
+           console.log(e);
+       })
+   //UPDATE MESSAGE
+
+});
+
+router.get('/getmsg/:iduser', function(req,res){
+    let iduser = req.params.iduser;
+    let query= squel.select()
+        .from('public."USER"')
+        .field('msg')
+        .where('iduser = ?', iduser)
+        .toString();
+
+    db.one(query)
+        .then((msg) => {
+            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:msg}, res)
+        })
+        .catch(e=>{
+            sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Error while getting message'}, res);
+            console.log(e);
+        })
+});
+
 router.post('/createuser/', function (req, res) {
 
     let toCreate = {

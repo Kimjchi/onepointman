@@ -290,7 +290,7 @@ class OptionsContainer extends Component {
         let centerLat = ((parseFloat(dessin.swlt) + parseFloat(dessin.nelt))/2);
         let centerLng = ((parseFloat(dessin.swlg) + parseFloat(dessin.nelg))/2);
         let mapCenter = { lat: centerLat, lng: centerLng };
-        this.props.showDrawing(dessin, mapCenter, 3);
+        this.props.showDrawing(dessin, mapCenter, dessin.zoom);
     }
 
     render() {

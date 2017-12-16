@@ -216,6 +216,7 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
                             nom: element.nom,
                             userlt: element.userglt,
                             userlg: element.userglg,
+                            msg: element.msg,
                             current: isCurrent,
                             dateposition: element.dateposition
                         };
@@ -275,8 +276,8 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
 const getTrackings = (idgroup) => {
     return db.query(squel
         .select()
-        .field('lt')
-        .field('lg')
+        .field('lt', 'lat')
+        .field('lg', 'lng')
         .field('timepos')
         .field('iduser')
         .from('public."TRACK_POS"')
@@ -335,6 +336,7 @@ let getUsersPositions = (idgroup) =>
         .field('ugr.sharesposition')
         .field('ugr.userglt')
         .field('ugr.userglg')
+        .field('usr.msg')
         .field("ugr.dateposition")
         .field('usr.nom')
         .field('usr.prenom')
@@ -346,15 +348,11 @@ let getUsersPositions = (idgroup) =>
 
 //Si la dernière position stockée est > 15min, l'utilisateur est considéré comme inactif
 function compareTimes(currentTime, lastLocationTime) {
+    let difference = currentTime - lastLocationTime;
     let toReturn = false;
-    if (currentTime.getMonth() === lastLocationTime.getMonth()) {
-        if (currentTime.getDay() === lastLocationTime.getDay()) {
-            if (currentTime.getHours() === lastLocationTime.getHours()) {
-                if (currentTime.getMinutes() - lastLocationTime.getMinutes() < 15) {
-                    toReturn = true;
-                }
-            }
-        }
+    console.log(difference);
+    if (difference < 900000){
+        toReturn = true
     }
     return toReturn;
 }
@@ -379,7 +377,7 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
                         description: element.description,
                         lt: element.lt,
                         lg: element.lg,
-
+                        zoom: element.zoom,
                         nelt: element.nelt,
                         nelg: element.nelg,
                         swlt: element.swlt,
@@ -419,6 +417,7 @@ let getDrawings = (idgroup) =>
         .field('draw.nelt')
         .field('draw.swlt')
         .field('draw.swlg')
+        .field('draw.zoom')
         .field('description')
         .field('usr.nom')
         .field('usr.prenom')

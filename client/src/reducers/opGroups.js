@@ -1,4 +1,7 @@
-import {ADD_GROUP, CHANGE_GROUP_ID, CHANGE_GROUP_NAME, CHANGE_GROUPS, SET_PHOTO} from "../actions/opGroups";
+import {
+    ADD_GROUP, CHANGE_GROUP_ID, CHANGE_GROUP_NAME, CHANGE_GROUPS, SET_MESSAGE,
+    SET_PHOTO
+} from "../actions/opGroups";
 
 //ajouter le reste dans l'import
 
@@ -8,6 +11,7 @@ let initialState = {
     idGroup: '',
     groups: [],
     errors: '',
+    message: '',
     isLoading: false,
 };
 
@@ -32,6 +36,8 @@ export default function reducer (state = initialState, action ){
             return {...state, groups: groups, error: ''};
         case CHANGE_GROUP_ID:
             return {...state, idGroup: action.id, error:''};
+        case SET_MESSAGE:
+            return {...state, message: action.message, error:''};
         default:
             return state
 

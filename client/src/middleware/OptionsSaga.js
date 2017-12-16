@@ -23,7 +23,7 @@ export function* transmitPosition() {
                 'Content-Type': 'application/json'
             }})
         .then(function (response) {
-            console.log(response);
+            //console.log(response);
         })
         .catch(function (error) {
             console.log(error);
@@ -49,7 +49,7 @@ export function* transmitSharingMode() {
                 'Content-Type': 'application/json'
             }})
             .then(function (response) {
-                console.log(response);
+                //console.log(response);
             })
             .catch(function (error) {
                 console.log(error);

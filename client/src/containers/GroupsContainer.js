@@ -1,8 +1,12 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import {addGroup, changeGroupId, changeGroupName, getGroups, getInfosGroup, sendChangeName} from "../actions/opGroups";
+import {
+    addGroup, changeGroupId, changeGroupName, getGroups, getInfosGroup, getMessage,
+    sendChangeName
+} from "../actions/opGroups";
 import GroupsComponent from "../components/GroupsComponent";
 import {addUser} from "../actions/opUsers";
+import {getDrawingsGroup, showDrawing} from "../actions/opCanvas";
 
 
 class GroupsContainer extends Component {
@@ -52,11 +56,15 @@ const  mapDispatchToProps = (dispatch) => {
             dispatch(addGroup(groupName, idUser));
         },
         addUser: (arrayUsers, idGroup, idUser) => {
+            dispatch(showDrawing(false));
             dispatch(addUser(arrayUsers, idGroup));
             dispatch(getInfosGroup(idUser, idGroup));
+            dispatch(getDrawingsGroup(idUser, idGroup));
+            //dispatch(push("/drawings"));
         },
         getGroups: (idUser) => {
             dispatch(getGroups(idUser));
+            dispatch(getMessage(idUser));
         },
         sendChangeName: (idGroup, groupName, idUser) => {
             dispatch(sendChangeName(idGroup, groupName, idUser));

@@ -2,9 +2,21 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import LoginComponent from "../components/LoginComponent";
 import {loginRequest} from "../actions/opLogin";
+import openSocket from 'socket.io-client';
 
 
 class LoginContainer extends Component {
+
+    constructor(props) {
+        super(props);
+
+        //TODO: establish websocket connection
+        const  socket = openSocket('http://localhost:3002');
+
+        socket.on('Notification', (data) => {
+            alert(data);
+        });
+    }
 
     render() {
         return (

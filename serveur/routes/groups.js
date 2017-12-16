@@ -348,21 +348,12 @@ let getUsersPositions = (idgroup) =>
 
 //Si la dernière position stockée est > 15min, l'utilisateur est considéré comme inactif
 function compareTimes(currentTime, lastLocationTime) {
-    let difference = lastLocationTime - currentTime;
+    let difference = currentTime - lastLocationTime;
     let toReturn = false;
+    console.log(difference);
     if (difference < 900000){
         toReturn = true
     }
-   /* let toReturn = false;
-    if (currentTime.getMonth() === lastLocationTime.getMonth()) {
-        if (currentTime.getDay() === lastLocationTime.getDay()) {
-            if (currentTime.getHours() === lastLocationTime.getHours()) {
-                if (currentTime.getMinutes() - lastLocationTime.getMinutes() < 15) {
-                    toReturn = true;
-                }
-            }
-        }
-    }*/
     return toReturn;
 }
 

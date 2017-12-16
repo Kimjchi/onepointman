@@ -7,6 +7,9 @@ export const SET_PHOTO = 'SET_PHOTO';
 export const GET_INFOS_GROUP = 'GET_INFOS_GROUP';
 export const SEND_CHANGE_NAME = 'SEND_CHANGE_NAME';
 export const CHANGE_GROUP_ID = 'CHANGE_GROUP_ID';
+export const GET_MESSAGE = 'GET_MESSAGE';
+export const SET_MESSAGE = 'SET_MESSAGE';
+export const UPDATE_MESSAGE = 'UPDATE_MESSAGE';
 
 export function changeGroupName (groupName){
     return {type: CHANGE_GROUP_NAME, groupName}
@@ -42,4 +45,16 @@ export function sendChangeName(idGroup, groupName, idUser) {
 
 export function changeGroupId(id) {
     return {type: CHANGE_GROUP_ID, id}
+}
+
+export function getMessage(id) {
+    return {type: GET_MESSAGE, id}
+}
+
+export function setMessage(message) {
+    return {type: SET_MESSAGE, message}
+}
+
+export function updateMessage(id, message) {
+    return {type: UPDATE_MESSAGE, id, message}
 }

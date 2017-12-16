@@ -111,7 +111,7 @@ class Map extends Component {
                         >
                             {marker.showInfo && <InfoWindow onCloseClick={this._handleClicMarker.bind(this, marker)}>
                                 <div className='divMarker'>
-                                    Bonjour
+                                    {marker.desc}
                                 </div>
                             </InfoWindow>}
                         </Marker>

@@ -25,6 +25,7 @@ import {hours} from "moment";
 import fbDefaultImage from "../pictures/SMART_BOY_FB.jpg"
 import {draw, getDrawingsGroup, setDrawingToShow, showDrawing} from "../actions/opCanvas";
 import {push} from "react-router-redux";
+import {setMessage, updateMessage} from "../actions/opGroups";
 
 var ATLANTIC_OCEAN = {
     latitude: 29.532804,
@@ -65,6 +66,8 @@ class OptionsContainer extends Component {
         this._handleChangeSharing = this._handleChangeSharing.bind(this);
         this._handlePinPointDisplayChange = this._handlePinPointDisplayChange.bind(this);
         this._handleMarkerMemberDisplayChange = this._handleMarkerMemberDisplayChange.bind(this);
+        this._onChangeMessage = this._onChangeMessage.bind(this);
+        this._handleUpdateMessage = this._handleUpdateMessage.bind(this);
         setInterval(this._checkLocation, INTERVAL);
     }
 
@@ -293,6 +296,18 @@ class OptionsContainer extends Component {
         this.props.showDrawing(dessin, mapCenter, dessin.zoom);
     }
 
+    _onChangeMessage(event) {
+        this.props.setMessage(event.target.value);
+    }
+
+    _handleUpdateMessage(event) {
+        if (event.key === 'Enter') {
+            let message = this.props.opGroups.message;
+            let idUser = this.props.opLogin.idUser;
+            this.props.updateMessage(idUser, message);
+        }
+    }
+
     render() {
         let {address} = this.props.opOptions;
         let {isSharingPosition} = this.props.opOptions;
@@ -301,6 +316,7 @@ class OptionsContainer extends Component {
         let {locationSelect} = this.props.opMap;
         let {isSharing} = this.props.opOptions;
         let {drawingsGroup} = this.props.opCanvas;
+        let {message} = this.props.opGroups;
         return (
 
             <div className='wrapper'>
@@ -308,6 +324,11 @@ class OptionsContainer extends Component {
                 <label id="search" htmlFor='pictures'>
                     <input type="text" id="fname" name="fname" placeholder="Entrez une adresse" value={address}
                            onKeyPress={this._handleAddressSearch} onChange={this._handleAddressChange}/>
+                </label>
+                <input type='checkbox'/>
+                <label id="message" htmlFor='msg'>
+                    <input type="text" id="msg" name="msg" value={message}
+                           onChange={this._onChangeMessage} onKeyPress={this._handleUpdateMessage}/>
                 </label>
                 <input id='jobs' type='checkbox'/>
                 <label htmlFor='jobs'>
@@ -544,6 +565,12 @@ const mapDispatchToProps = (dispatch) => {
         },
         changePinPointDisplay: () => {
             dispatch(changePinPointDisplay())
+        },
+        setMessage: (message) => {
+            dispatch(setMessage(message))
+        },
+        updateMessage: (id, message) => {
+            dispatch(updateMessage(id, message))
         }
     }
 };

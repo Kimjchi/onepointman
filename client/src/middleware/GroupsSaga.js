@@ -3,8 +3,9 @@ import axios from 'axios';
 import {store} from '../store';
 import {
     ADD_GROUP,
-    ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_PHOTO, getGroups, getPhoto, SEND_CHANGE_NAME,
-    setPhoto
+    ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_MESSAGE, GET_PHOTO, getGroups, getPhoto,
+    SEND_CHANGE_NAME, setMessage,
+    setPhoto, UPDATE_MESSAGE
 } from "../actions/opGroups";
 import {changePinPoints, changeTrackings, updateMarkerMembers} from "../actions/opMap";
 import {changeIdGroup, changeUsers} from "../actions/opUsers";
@@ -128,7 +129,7 @@ export function * requestInfosGroup() {
                                 idCreator: pinPoint.idcreator,
                                 date: pinPoint.daterdv,
                                 showInfo: false
-                            }
+                            };
                             newPinpoints.push(newPinPoint);
                         }
                     }));
@@ -142,7 +143,7 @@ export function * requestInfosGroup() {
                             let newPosition = {
                                 iduser: position.iduser,
                                 pos: {lt: Number(position.userlt), lg: Number(position.userlg)},
-                                desc: position.description,
+                                desc: position.msg,
                                 current: position.current,
                                 date: position.dateposition,
                                 showInfo: false,
@@ -152,6 +153,7 @@ export function * requestInfosGroup() {
                             newPositions.push(newPosition);
                         }
                     }));
+                    console.log(newPositions);
                     store.dispatch(updateMarkerMembers(newPositions));
 
                     let isSharing = response.data.message.issharing;
@@ -208,10 +210,61 @@ export function * requestChangeNameGroup() {
     }
 }
 
+export function * requestMessage() {
+    while (true) {
+        let user = yield take(GET_MESSAGE);
+        let id = user.id;
+        console.log(id);
+        let server = "http://localhost:3001/users/getmsg/"+id;
+
+        axios.get(server)
+            .then(function (response) {
+                if (!!response.data.status && response.data.status === "success") {
+                    store.dispatch(setMessage(response.data.message.msg));
+                    console.log(response.data.message.msg);
+                }
+                else if(response.data.status === 'fail') {
+                    alert(response.data.message);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+}
+
+export function * requestUpdateMessage() {
+    while (true) {
+        let user = yield take(UPDATE_MESSAGE);
+        let id = user.id;
+        let message = user.message;
+        let server = "http://localhost:3001/users/updatemsg";
+
+        axios.post(server, {
+            iduser: id,
+            msg: message
+        })
+            .then(function (response) {
+                if (!!response.data.status && response.data.status === "success") {
+                    console.log("update du message");
+                }
+                else if(response.data.status === 'fail') {
+                    alert(response.data.message);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+}
+
 export function * GroupsFlow() {
     yield fork(requestGroups);
     yield fork(requestAddGroup);
     yield fork(requestPhoto);
     yield fork(requestInfosGroup);
     yield fork(requestChangeNameGroup);
+    yield fork(requestMessage);
+    yield fork(requestUpdateMessage);
+
 }

@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import {addGroup, changeGroupId, changeGroupName, getGroups, getInfosGroup, sendChangeName} from "../actions/opGroups";
+import {
+    addGroup, changeGroupId, changeGroupName, getGroups, getInfosGroup, getMessage,
+    sendChangeName
+} from "../actions/opGroups";
 import GroupsComponent from "../components/GroupsComponent";
 import {addUser} from "../actions/opUsers";
 import {getDrawingsGroup, showDrawing} from "../actions/opCanvas";
@@ -61,6 +64,7 @@ const  mapDispatchToProps = (dispatch) => {
         },
         getGroups: (idUser) => {
             dispatch(getGroups(idUser));
+            dispatch(getMessage(idUser));
         },
         sendChangeName: (idGroup, groupName, idUser) => {
             dispatch(sendChangeName(idGroup, groupName, idUser));

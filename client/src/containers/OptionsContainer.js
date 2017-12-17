@@ -475,14 +475,19 @@ class OptionsContainer extends Component {
                         <ul>
                             <li>
                                 <a href='#'
-                                   onClick={this._handleMarkerMemberDisplayChange}> {(this.props.opMap.isMarkerShown ? "+ Positions" : "- Position")}</a>
+                                   onClick={this._handleMarkerMemberDisplayChange}>
+                                    <div style={{'color' : (this.props.opMap.isMarkerShown ? '#ffffff' : '#a1a1a1')}}>
+                                            Position
+                                    </div>
+                                </a>
                             </li>
                             <li>
                                 <a href='#'
-                                   onClick={this._handlePinPointDisplayChange}>{(this.props.opMap.isPinPointShown ? "+ Rendez-vous" : "- Rendez-vous")}</a>
-                            </li>
-                            <li>
-                                <a onClick={this._handleModeDessin}>Mode dessin</a>
+                                   onClick={this._handlePinPointDisplayChange}>
+                                    <div style={{'color' : (this.props.opMap.isPinPointShown ? '#ffffff' : '#a1a1a1')}}>
+                                        Rendez-vous
+                                    </div>
+                                </a>
                             </li>
                         </ul>
                     </div>

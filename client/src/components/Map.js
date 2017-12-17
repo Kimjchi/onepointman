@@ -129,7 +129,7 @@ class Map extends Component {
                         })
                     }
 
-                    {
+                    {this.props.isMarkerShown &&
                         this.props.trackings.map((tracking, index) => {
                             return <Polyline
                                 path={tracking.path}

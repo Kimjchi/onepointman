@@ -25,3 +25,5 @@ package-lock.json
 package.json\
 
 /.idea
+/serveur/.idea
+/client/.idea

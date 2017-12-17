@@ -85,6 +85,35 @@ router.post('/updatepositionsharing/', function (req, res) {
     });
 });
 
+router.post('/updatemsg', function (req, res) {
+    var toUpdate = {
+        iduser: req.body.iduser,
+        msg: req.body.msg
+    };
+    console.log(toUpdate);
+    var query = squel.update({ replaceSingleQuotes: true, singleQuoteReplacement: '\'\'' }).table('public."USER"').set('msg', toUpdate.msg).where('iduser = ?', toUpdate.iduser).toString();
+    console.log(query);
+    db.none(query).then(function () {
+        sender.sendResponse(sender.SUCCESS_STATUS, { status: 'success', message: 'message updated successfully successfully' }, res);
+    }).catch(function (e) {
+        sender.sendResponse(sender.BAD_REQUEST, { status: 'fail', message: 'Error while updating message' }, res);
+        console.log(e);
+    });
+    //UPDATE MESSAGE
+});
+
+router.get('/getmsg/:iduser', function (req, res) {
+    var iduser = req.params.iduser;
+    var query = squel.select().from('public."USER"').field('msg').where('iduser = ?', iduser).toString();
+
+    db.one(query).then(function (msg) {
+        sender.sendResponse(sender.SUCCESS_STATUS, { status: 'success', message: msg }, res);
+    }).catch(function (e) {
+        sender.sendResponse(sender.BAD_REQUEST, { status: 'fail', message: 'Error while getting message' }, res);
+        console.log(e);
+    });
+});
+
 router.post('/createuser/', function (req, res) {
 
     var toCreate = {

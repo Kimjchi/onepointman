@@ -2,12 +2,14 @@ import {take, fork} from 'redux-saga/effects';
 import axios from 'axios';
 import {store} from '../store';
 import {
-    ADD_USER_GROUP,
+    ADD_USER_GROUP, addUser,
     changeFriends, changeUsers, DELETE_USER_TEST, GET_FRIENDS, GET_PHOTO_FRIENDS, GET_USERS,
     getPhotoFriends,
-    getUsers, SEND_DELETE_USER, setFriends, setPhotoFriends
+    getUsers, PHOTO_GROUP, photoGroup, SEND_DELETE_USER, setFriends, setPhotoFriends, setPhotoGroup, STAY_GROUP,
+    stayGroup
 } from "../actions/opUsers";
-import {getGroups} from "../actions/opGroups";
+import {getGroups, setPhoto} from "../actions/opGroups";
+import {setPhotoUser} from "../actions/opLogin";
 
 export function * requestUsersGroup() {
     while (true) {
@@ -50,7 +52,7 @@ export function * requestAddUsers() {
         })
             .then(function (response) {
                 if (!!response.status && response.status === 200) {
-                    store.dispatch(getGroups(idUser));
+                    store.dispatch(getGroups(idUser, idGroup));
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);
@@ -80,7 +82,7 @@ export function * requestDeleteUser() {
         })
             .then(function (response) {
                 if (!!response.data.status && response.data.status === "success") {
-                    store.dispatch(getGroups(idUser));
+                    store.dispatch(getGroups(idUser, idGroup));
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);
@@ -142,10 +144,59 @@ export function * requestPhoto() {
     }
 }
 
+export function * requestGroupInfo() {
+    while (true) {
+        let user = yield take(STAY_GROUP);
+        let idUser = user.idUser;
+        let idGroup = user.idGroup;
+
+        let server = "http://localhost:3001/groups/getGroupInfo/"+idGroup;
+
+        axios.get(server)
+            .then(function (response) {
+                console.log(response);
+                if(!!response.status && response.status === 200) {
+                    let membres = response.data.listeMembres;
+                    let groupe = membres.map(user => {
+                        return {...user, nomuser: user.nom}
+                    });
+                    store.dispatch(addUser(groupe, idGroup));
+
+                    groupe.forEach(user => {
+                        store.dispatch(photoGroup(user.iduser));
+                    });
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+}
+
+export function * requestPhotoUsers() {
+    while (true) {
+        let user = yield take(PHOTO_GROUP);
+        let id = user.idUser;
+        let server = "https://graph.facebook.com/"+id+"/picture?redirect=false&type=normal";
+
+        axios.get(server)
+            .then(function (response) {
+                if(!!response.status && response.status === 200) {
+                    store.dispatch(setPhotoGroup(id, response.data.data.url));
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+}
+
 export function * UsersFlow(socket) {
     yield fork(requestUsersGroup);
     yield fork(requestAddUsers);
     yield fork(requestDeleteUser);
     yield fork(requestFriends);
     yield fork(requestPhoto);
+    yield fork(requestGroupInfo);
+    yield fork(requestPhotoUsers);
 }

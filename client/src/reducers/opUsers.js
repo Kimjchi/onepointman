@@ -3,7 +3,8 @@
 
 //pour le register e mail
 import {
-    ADD_USER, CHANGE_ID_GROUP, CHANGE_SEARCH, CHANGE_USERS, DELETE_USER, FRIENDS_TO_ADD, SET_FRIENDS, SET_PHOTO_FRIENDS
+    ADD_USER, CHANGE_ID_GROUP, CHANGE_SEARCH, CHANGE_USERS, DELETE_USER, FRIENDS_TO_ADD, SET_FRIENDS, SET_PHOTO_FRIENDS,
+    SET_PHOTO_GROUP
 } from "../actions/opUsers";
 
 let initialState = {
@@ -43,6 +44,15 @@ export default function reducer (state = initialState, action ){
             return {...state,friendsToAdd: action.friends, error: ''};
         case CHANGE_ID_GROUP:
             return {...state,groupToDisplay: action.idGroup, error: ''};
+        case SET_PHOTO_GROUP:
+            let iduser = action.idUser;
+            let users = state.users;
+            users.forEach(user => {
+                if(user.iduser === iduser) {
+                    user.urlPhoto = action.url;
+                }
+            });
+            return {...state, users: users, error: ''};
         default:
             return state
 

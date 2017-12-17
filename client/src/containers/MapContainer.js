@@ -6,7 +6,6 @@ import {
     changePinPoints, recenterMap, updateMarkerGeoLocation, updateMarkerMembers, updateMarkers, updateMarkerSelect,
     updateMarkersSelect
 } from "../actions/opMap";
-import {showDrawing} from "../actions/opCanvas";
 
 
 class MapContainer extends Component {
@@ -55,7 +54,7 @@ class MapContainer extends Component {
         let updateMarkerMembers = this.props.updateMarkerMembers;
         let {pinPoints} = this.props.opMap;
         let changePinPoints = this.props.changePinPoints;
-        let {drawingToShow, showDrawing} = this.props.opCanvas;
+        let {drawingsToShow} = this.props.opCanvas;
         return (
             <Map isMarkerShown={isMarkerShown} mapCenter={mapCenter}
                  zoom={zoom} updateMarkerSelect={updateMarkerSelect}
@@ -64,8 +63,7 @@ class MapContainer extends Component {
                  _onMapMounted={this._onMapMounted} _onIdleChanged={this._onIdleChanged}
                  markersMembers={markersMembers} updateMarkerMembers={updateMarkerMembers}
                  isPinPointShown={isPinPointShown}
-                 drawing={drawingToShow}
-                 showDrawing={showDrawing}
+                 drawingsToShow={drawingsToShow}
                  show={this.props.showDrawing}
             />
         )
@@ -97,9 +95,6 @@ const mapDispatchToProps = (dispatch) => {
         },
         updateMarkerMembers: (markers) => {
             dispatch(updateMarkerMembers(markers))
-        },
-        showDrawing: (boolean) => {
-            dispatch(showDrawing(boolean));
         }
     }
 };

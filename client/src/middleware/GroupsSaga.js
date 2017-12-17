@@ -3,21 +3,21 @@ import axios from 'axios';
 import {store} from '../store';
 import {
     ADD_GROUP,
-    ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_MESSAGE, GET_PHOTO, getGroups, getPhoto,
+    ADD_GROUP_TEST, changeGroups, GET_GROUPS, GET_INFOS_GROUP, GET_MESSAGE, GET_PHOTO, getGroups, getInfosGroup,
+    getPhoto,
     SEND_CHANGE_NAME, setMessage,
     setPhoto, UPDATE_MESSAGE
 } from "../actions/opGroups";
 import {changePinPoints, changeTrackings, updateMarkerMembers} from "../actions/opMap";
-import {changeIdGroup, changeUsers} from "../actions/opUsers";
+import {addUser, changeIdGroup, changeUsers, stayGroup} from "../actions/opUsers";
 import {changeSharing} from "../actions/opOptions";
 
 export function * requestGroups() {
     while (true) {
         let user = yield take(GET_GROUPS);
         let id = user.idUser;
-
+        let idGroup = user.idGroup;
         let server = "http://localhost:3001/groups/"+id;
-
         axios.get(server)
             .then(function (response) {
                 if (!!response.data.status && response.data.status === 'success') {
@@ -40,10 +40,15 @@ export function * requestGroups() {
                     store.dispatch(changeUsers(users));
                     groups.forEach(group => {
                         group.membres.forEach(membre => {
-                            store.dispatch(getPhoto(membre.iduser))
+                            store.dispatch(getPhoto(membre.iduser));
                         })
                     });
-                    store.dispatch(changeIdGroup(''));
+                    if(!idGroup) {
+                        store.dispatch(changeIdGroup(''));
+                    }
+                    else {
+                        store.dispatch(stayGroup(id, idGroup));
+                    }
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);
@@ -111,13 +116,11 @@ export function * requestInfosGroup() {
         let user = yield take(GET_INFOS_GROUP);
         let idUser = user.idUser;
         let idGroup = user.idGroup;
-
         let server = "http://localhost:3001/groups/positions/"+idUser+"/"+idGroup;
 
         axios.get(server)
             .then(function (response) {
                 if(!!response.data.status && response.data.status === 'success') {
-                    console.log(response.data.message);
                     let pinpoints = response.data.message.pinpoints;
                     let newPinpoints = [];
                     pinpoints.map((pinPoint => {
@@ -153,7 +156,6 @@ export function * requestInfosGroup() {
                             newPositions.push(newPosition);
                         }
                     }));
-                    console.log(newPositions);
                     store.dispatch(updateMarkerMembers(newPositions));
 
                     let isSharing = response.data.message.issharing;
@@ -221,7 +223,6 @@ export function * requestMessage() {
             .then(function (response) {
                 if (!!response.data.status && response.data.status === "success") {
                     store.dispatch(setMessage(response.data.message.msg));
-                    console.log(response.data.message.msg);
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);
@@ -246,7 +247,7 @@ export function * requestUpdateMessage() {
         })
             .then(function (response) {
                 if (!!response.data.status && response.data.status === "success") {
-                    console.log("update du message");
+                    alert("update du message");
                 }
                 else if(response.data.status === 'fail') {
                     alert(response.data.message);

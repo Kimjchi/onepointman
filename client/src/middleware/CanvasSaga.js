@@ -4,7 +4,11 @@ import {HANDLE_AUTH_REQ} from "../actions/opHandleAuth";
 import {store} from '../store';
 import {getPhotoUser, idUser, setAuthState} from "../actions/opLogin";
 import {push} from "react-router-redux";
-import {bindDrawingsGroup, GET_DRAWINGS_GROUP, SEND_DRAWING} from "../actions/opCanvas";
+import {
+    bindDrawingsGroup, DELETE_DRAWING, GET_DRAWINGS_GROUP, getDrawingsGroup,
+    SEND_DRAWING
+} from "../actions/opCanvas";
+import {stayGroup} from "../actions/opUsers";
 
 export function* requestSendDrawing() {
 
@@ -35,8 +39,8 @@ export function* requestSendDrawing() {
         })
             .then(function (response) {
                 if (!!response.status && response.status === 200) {
-                    //console.log(response.data.iddrawing);
-                    //store.dispatch(setPhoto(id, response.data.data.url));
+                    store.dispatch(stayGroup(idUser, idGroup));
+                    store.dispatch(getDrawingsGroup(idUser, idGroup));
                 }
             })
             .catch(function (error) {
@@ -53,15 +57,17 @@ export function* requestGetDrawings() {
 
         let idUser = drawing.idUser;
         let idGroup = drawing.idGroup;
-        console.log("On récupère les drawings avec l'idUser " + idUser + " et l'idGroup " + idGroup);
         let server = "http://localhost:3001/groups/drawings/" + idUser + "/" + idGroup;
 
         axios.get(server)
             .then(function (response) {
                 if (!!response.data.status && response.data.status === 'success') {
-                    if (response.data.message.drawings.length !== 0) {
-                        console.log(response.data.message);
-                        store.dispatch(bindDrawingsGroup(response.data.message.drawings));
+                    let drawings = response.data.message.drawings;
+                    if (drawings !== 0) {
+                        let newDrawings = drawings.map(dessin => {
+                            return {...dessin, show: false};
+                        });
+                        store.dispatch(bindDrawingsGroup(newDrawings));
                     }
                     else {
                         console.log("Ce groupe n'a pas d'images");
@@ -75,7 +81,37 @@ export function* requestGetDrawings() {
     }
 }
 
+export function* requestDeleteDrawing() {
+
+    while (true) {
+
+        let drawing = yield take(DELETE_DRAWING);
+
+        let idDrawing = drawing.id;
+        let idUser = drawing.idUser;
+        let idGroup = drawing.idGroup;
+        let server = "http://localhost:3001/drawing/deletedrawing";
+
+        axios.post(server, {
+            iddrawing: idDrawing
+        })
+            .then(function (response) {
+                if (!!response.data.status && response.data.status === 'success') {
+                        store.dispatch(getDrawingsGroup(idUser, idGroup));
+                        alert("GR8 JOB M8");
+                    }
+                    else {
+                        console.log("Fail to delete");
+                    }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+}
+
 export function* CanvasFlow(socket) {
     yield fork(requestSendDrawing);
     yield fork(requestGetDrawings);
+    yield fork(requestDeleteDrawing);
 }

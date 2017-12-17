@@ -58,7 +58,6 @@ class Map extends Component {
     render() {
         let id = 0;
         let markerSelect = this.props.markerSelect;
-        let drawing = this.props.drawing;
         return (
             <div className="center">
                 <GoogleMapsWrapper
@@ -117,15 +116,17 @@ class Map extends Component {
                         </Marker>
                     ))}
                     {
-                        this.props.showDrawing &&
-                        <GroundOverlay
-                            url={"data:image/png;base64,"+drawing.img}
-                            bounds={new window.google.maps.LatLngBounds(
-                                new window.google.maps.LatLng(parseFloat(drawing.swlt), parseFloat(drawing.swlg)),
-                                new window.google.maps.LatLng(parseFloat(drawing.nelt), parseFloat(drawing.nelg))
-                            )}
-                            defaultOpacity={1}
-                        />
+                        this.props.drawingsToShow.map((drawing, index) => {
+                            return <GroundOverlay
+                                key={index}
+                                url={"data:image/png;base64,"+drawing.img}
+                                bounds={new window.google.maps.LatLngBounds(
+                                    new window.google.maps.LatLng(parseFloat(drawing.swlt), parseFloat(drawing.swlg)),
+                                    new window.google.maps.LatLng(parseFloat(drawing.nelt), parseFloat(drawing.nelg))
+                                )}
+                                defaultOpacity={1}
+                            />
+                        })
                     }
 
                 </GoogleMapsWrapper>

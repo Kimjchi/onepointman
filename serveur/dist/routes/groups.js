@@ -181,6 +181,7 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
                     nom: element.nom,
                     userlt: element.userglt,
                     userlg: element.userglg,
+                    msg: element.msg,
                     current: isCurrent,
                     dateposition: element.dateposition
                 };
@@ -230,7 +231,7 @@ router.get('/positions/:iduser/:idgroup', function (req, res) {
     });
 });
 var getTrackings = function getTrackings(idgroup) {
-    return db.query(squel.select().field('lt').field('lg').field('timepos').field('iduser').from('public."TRACK_POS"').where('idgroup = ?', idgroup).order('iduser').order('timepos').toString());
+    return db.query(squel.select().field('lt', 'lat').field('lg', 'lng').field('timepos').field('iduser').from('public."TRACK_POS"').where('idgroup = ?', idgroup).order('iduser').order('timepos').toString());
 };
 
 function buildTrackingArray(array) {
@@ -260,20 +261,16 @@ var getGroupPinpoints = function getGroupPinpoints(idgroup) {
 };
 
 var getUsersPositions = function getUsersPositions(idgroup) {
-    return squel.select().from('public."GROUP"', 'gr').field('ugr.iduser').field('ugr.sharesposition').field('ugr.userglt').field('ugr.userglg').field("ugr.dateposition").field('usr.nom').field('usr.prenom').left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = gr.idgroup').left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser').where('gr.idgroup = ?', idgroup).toString();
+    return squel.select().from('public."GROUP"', 'gr').field('ugr.iduser').field('ugr.sharesposition').field('ugr.userglt').field('ugr.userglg').field('usr.msg').field("ugr.dateposition").field('usr.nom').field('usr.prenom').left_join('public."USER_GROUP"', 'ugr', 'ugr.idgroup = gr.idgroup').left_join('public."USER"', 'usr', 'usr.iduser = ugr.iduser').where('gr.idgroup = ?', idgroup).toString();
 };
 
 //Si la dernière position stockée est > 15min, l'utilisateur est considéré comme inactif
 function compareTimes(currentTime, lastLocationTime) {
+    var difference = currentTime - lastLocationTime;
     var toReturn = false;
-    if (currentTime.getMonth() === lastLocationTime.getMonth()) {
-        if (currentTime.getDay() === lastLocationTime.getDay()) {
-            if (currentTime.getHours() === lastLocationTime.getHours()) {
-                if (currentTime.getMinutes() - lastLocationTime.getMinutes() < 15) {
-                    toReturn = true;
-                }
-            }
-        }
+    console.log(difference);
+    if (difference < 900000) {
+        toReturn = true;
     }
     return toReturn;
 }
@@ -297,7 +294,7 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
                 description: element.description,
                 lt: element.lt,
                 lg: element.lg,
-
+                zoom: element.zoom,
                 nelt: element.nelt,
                 nelg: element.nelg,
                 swlt: element.swlt,
@@ -323,7 +320,7 @@ router.get('/drawings/:iduser/:idgroup', function (req, res) {
 });
 
 var getDrawings = function getDrawings(idgroup) {
-    return squel.select().from('public."DRAWING"', 'draw').field('draw.iddrawing').field('draw.idcreator').field('draw.actif').field("encode(draw.img, 'base64')", 'img').field('draw.nelg').field('draw.nelt').field('draw.swlt').field('draw.swlg').field('description').field('usr.nom').field('usr.prenom').left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator').where('draw.idgroup = ?', idgroup).toString();
+    return squel.select().from('public."DRAWING"', 'draw').field('draw.iddrawing').field('draw.idcreator').field('draw.actif').field("encode(draw.img, 'base64')", 'img').field('draw.nelg').field('draw.nelt').field('draw.swlt').field('draw.swlg').field('draw.zoom').field('description').field('usr.nom').field('usr.prenom').left_join('public."USER"', 'usr', 'usr.iduser = draw.idcreator').where('draw.idgroup = ?', idgroup).toString();
 };
 
 //ca passe en post

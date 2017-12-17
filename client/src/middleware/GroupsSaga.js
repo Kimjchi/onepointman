@@ -117,10 +117,10 @@ export function * requestInfosGroup() {
         let idUser = user.idUser;
         let idGroup = user.idGroup;
         let server = "http://localhost:3001/groups/positions/"+idUser+"/"+idGroup;
-
         axios.get(server)
             .then(function (response) {
                 if(!!response.data.status && response.data.status === 'success') {
+                    console.log(response.data);
                     let pinpoints = response.data.message.pinpoints;
                     let newPinpoints = [];
                     pinpoints.map((pinPoint => {

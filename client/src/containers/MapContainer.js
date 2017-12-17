@@ -55,6 +55,7 @@ class MapContainer extends Component {
         let {pinPoints} = this.props.opMap;
         let changePinPoints = this.props.changePinPoints;
         let {drawingsToShow} = this.props.opCanvas;
+        let {trackings} = this.props.opMap;
         return (
             <Map isMarkerShown={isMarkerShown} mapCenter={mapCenter}
                  zoom={zoom} updateMarkerSelect={updateMarkerSelect}
@@ -62,7 +63,7 @@ class MapContainer extends Component {
                  markersPinPoint={pinPoints} changePinPoints={changePinPoints}
                  _onMapMounted={this._onMapMounted} _onIdleChanged={this._onIdleChanged}
                  markersMembers={markersMembers} updateMarkerMembers={updateMarkerMembers}
-                 isPinPointShown={isPinPointShown}
+                 isPinPointShown={isPinPointShown} trackings = {trackings}
                  drawingsToShow={drawingsToShow}
                  show={this.props.showDrawing}
             />

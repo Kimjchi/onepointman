@@ -74,6 +74,7 @@ class CanvasComponent extends React.Component {
                              lineWidth={3}/>
                 <div className="toolbar">
                     <ul className="navlist">
+                        <li><i className="fa fa-ban fa-4x" style={{color: 'black'}} onClick={this.props.handleModeDessin}/></li>
                         <li><i className="fa fa-undo fa-4x" style={{color: 'black'}} onClick={this._undo}/></li>
                         <li><i className="fa fa-repeat fa-4x" style={{color: 'black'}} onClick={this._redo}/></li>
                         <li><i className="fa fa-check fa-4x" style={{color: 'black'}} onClick={this._save}/></li>

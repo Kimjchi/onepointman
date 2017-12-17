@@ -10,6 +10,20 @@ import {push} from "react-router-redux";
 class CanvasContainer extends Component {
     constructor(props) {
         super(props);
+        this._handleModeDessin = this._handleModeDessin.bind(this);
+    }
+
+    _handleModeDessin(event) {
+        event.preventDefault();
+        let boolean = this.props.opCanvas.draw;
+        let idGroup = this.props.opUsers.groupToDisplay;
+        if (!boolean && idGroup !== '') {
+            boolean = true;
+        }
+        else {
+            boolean = false;
+        }
+        this.props.draw(boolean);
     }
 
     render() {
@@ -25,6 +39,7 @@ class CanvasContainer extends Component {
                              groupToDisplay={groupToDisplay}
                              bounds={bounds}
                              zoom={zoom}
+                             handleModeDessin={this._handleModeDessin}
                              sendDrawing={this.props.sendDrawing}
                              changeDescription={this.props.changeDescription}
             />
@@ -55,7 +70,10 @@ const  mapDispatchToProps = (dispatch) => {
         sendDrawing:(drawing, idUser, idGroup, description, zoom, center) => {
             dispatch(sendDrawing(drawing, idUser, idGroup, description, zoom, center));
             dispatch(draw(false));
-        }
+        },
+        draw: (boolean) => {
+            dispatch(draw(boolean));
+        },
     }
 };
 

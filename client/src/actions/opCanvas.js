@@ -4,8 +4,9 @@ export const CHANGE_DESCRIPTION = 'CHANGE_DESCRIPTION';
 export const SEND_DRAWING = 'SEND_DRAWING';
 export const GET_DRAWINGS_GROUP = 'GET_DRAWINGS_GROUP';
 export const BIND_DRAWINGS_GROUP = 'BIND_DRAWINGS_GROUP';
-export const SHOW_DRAWING = 'SHOW_DRAWING';
 export const SET_DRAWING_TO_SHOW = 'SET_DRAWING_TO_SHOW';
+export const CHANGE_DELETE = 'CHANGE_DELETE';
+export const DELETE_DRAWING = 'DELETE_DRAWING';
 
 export function draw (boolean){
     return {type: DRAW, boolean}
@@ -31,8 +32,12 @@ export function bindDrawingsGroup(drawings) {
     return {type: BIND_DRAWINGS_GROUP, drawings}
 }
 
-export function showDrawing(boolean) {
-    return {type: SHOW_DRAWING, boolean}
+export function chandeDelete(id) {
+    return {type: CHANGE_DELETE, id}
+}
+
+export function deleteDrawing(id, idUser, idGroup) {
+    return {type: DELETE_DRAWING, id, idUser, idGroup}
 }
 
 export function setDrawingToShow(drawing) {

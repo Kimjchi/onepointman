@@ -2,15 +2,15 @@
   <library name="Generated files" type="javaScript">
     <properties>
       <sourceFilesUrls>
-        <item url="file://$PROJECT_DIR$/dist/facebookdata.js" />
-        <item url="file://$PROJECT_DIR$/dist/routes/groups.js" />
-        <item url="file://$PROJECT_DIR$/dist/sender.js" />
-        <item url="file://$PROJECT_DIR$/dist/connection/index.js" />
-        <item url="file://$PROJECT_DIR$/dist/routes/fblogin.js" />
-        <item url="file://$PROJECT_DIR$/dist/routes/users.js" />
         <item url="file://$PROJECT_DIR$/dist/app.js" />
+        <item url="file://$PROJECT_DIR$/dist/connection/index.js" />
+        <item url="file://$PROJECT_DIR$/dist/facebookdata.js" />
         <item url="file://$PROJECT_DIR$/dist/routes/drawing.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/fblogin.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/groups.js" />
         <item url="file://$PROJECT_DIR$/dist/routes/pinpoint.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/users.js" />
+        <item url="file://$PROJECT_DIR$/dist/sender.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>

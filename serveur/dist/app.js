@@ -60,5 +60,21 @@ app.use(function (err, req, res, next) {
   res.send('error' + err);
 });
 
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+
+server.listen(3002);
+
+io.on('connection', function (socket) {
+
+  //send to BD
+  console.log('Un client est connected!');
+  console.log('Le id du client est ' + socket.id);
+  socket.emit('Notification', 'ASTONISHING');
+  //socket.on('my other event', function (data) {
+  //   console.log(data);
+  //});
+});
+
 module.exports = app;
 //# sourceMappingURL=app.js.map

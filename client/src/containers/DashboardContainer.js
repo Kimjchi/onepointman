@@ -16,9 +16,7 @@ class DashboardContainer extends Component {
                 <OptionsContainer/>
                 <UsersContainer/>
                 <MapContainer/>
-                {
-                    !this.props.opCanvas.draw && <GroupsContainer/>
-                }
+                <GroupsContainer draw={this.props.opCanvas.draw}/>
                 {
                     this.props.opCanvas.draw && <CanvasContainer/>
                 }

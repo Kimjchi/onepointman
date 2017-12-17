@@ -23,9 +23,12 @@ import Datetime from "react-datetime";
 import dateFormat from "dateformat";
 import {hours} from "moment";
 import fbDefaultImage from "../pictures/SMART_BOY_FB.jpg"
-import {draw, getDrawingsGroup, setDrawingToShow, showDrawing} from "../actions/opCanvas";
+import {
+    bindDrawingsGroup, chandeDelete, deleteDrawing, draw, getDrawingsGroup, setDrawingToShow
+} from "../actions/opCanvas";
 import {push} from "react-router-redux";
 import {setMessage, updateMessage} from "../actions/opGroups";
+import {stayGroup} from "../actions/opUsers";
 
 var ATLANTIC_OCEAN = {
     latitude: 29.532804,
@@ -53,6 +56,8 @@ class OptionsContainer extends Component {
         this._handleConstantPositionSending = this._handleConstantPositionSending.bind(this);
         this._open = this._open.bind(this);
         this._close = this._close.bind(this);
+        this._close2 = this._close2.bind(this);
+        this._deleteDrawing = this._deleteDrawing.bind(this);
         this._openPp = this._openPp.bind(this);
         this._closePp = this._closePp.bind(this);
         this._displayMarker = this._displayMarker.bind(this);
@@ -69,6 +74,9 @@ class OptionsContainer extends Component {
         this._onChangeMessage = this._onChangeMessage.bind(this);
         this._handleUpdateMessage = this._handleUpdateMessage.bind(this);
         setInterval(this._checkLocation, INTERVAL);
+        this.state = {
+            showModal: false,
+        };
     }
 
     _open() {
@@ -290,10 +298,45 @@ class OptionsContainer extends Component {
 
     _showDessin(dessin, event) {
         event.preventDefault();
-        let centerLat = ((parseFloat(dessin.swlt) + parseFloat(dessin.nelt))/2);
-        let centerLng = ((parseFloat(dessin.swlg) + parseFloat(dessin.nelg))/2);
-        let mapCenter = { lat: centerLat, lng: centerLng };
-        this.props.showDrawing(dessin, mapCenter, dessin.zoom);
+
+        let {drawingsToShow, drawingsGroup} = this.props.opCanvas;
+        let contains = false;
+        drawingsToShow.forEach(drawing => {
+            if (drawing.iddrawing === dessin.iddrawing) {
+                contains = true;
+            }
+        });
+        if (contains) {
+            let newDrawings = drawingsToShow.filter(drawing => {
+                return drawing.iddrawing !== dessin.iddrawing;
+            });
+            this.props.hideDrawing(newDrawings);
+            let drawings = drawingsGroup.map(element => {
+                if (element.iddrawing === dessin.iddrawing) {
+                    return {...element, show: false};
+                }
+                else {
+                    return element;
+                }
+            });
+            this.props.bindDrawingsGroup(drawings);
+        }
+        else {
+            let centerLat = ((parseFloat(dessin.swlt) + parseFloat(dessin.nelt)) / 2);
+            let centerLng = ((parseFloat(dessin.swlg) + parseFloat(dessin.nelg)) / 2);
+            let mapCenter = {lat: centerLat, lng: centerLng};
+            drawingsToShow.push(dessin);
+            this.props.showDrawing(drawingsToShow, mapCenter, dessin.zoom);
+            let drawings = drawingsGroup.map(element => {
+                if (element.iddrawing === dessin.iddrawing) {
+                    return {...element, show: true};
+                }
+                else {
+                    return element;
+                }
+            });
+            this.props.bindDrawingsGroup(drawings);
+        }
     }
 
     _onChangeMessage(event) {
@@ -306,6 +349,28 @@ class OptionsContainer extends Component {
             let idUser = this.props.opLogin.idUser;
             this.props.updateMessage(idUser, message);
         }
+    }
+
+    _open2(drawing) {
+        this.props.changeDelete(drawing.iddrawing);
+        this.setState({showModal: true});
+    }
+
+    _close2() {
+        this.setState({showModal: false});
+    }
+
+    _deleteDrawing() {
+        let idDrawing = this.props.opCanvas.idDelete;
+        let idUser = this.props.opLogin.idUser;
+        let idGroup = this.props.opUsers.groupToDisplay;
+        let {drawingsToShow} = this.props.opCanvas;
+        let newDrawings = drawingsToShow.filter(drawing => {
+            return drawing.iddrawing !== idDrawing;
+        });
+        this.props.hideDrawing(newDrawings);
+        this.props.deleteDrawing(idDrawing, idUser, idGroup);
+        this._close2();
     }
 
     render() {
@@ -431,8 +496,10 @@ class OptionsContainer extends Component {
                         <ul>
                             {
                                 drawingsGroup.length !== 0 && drawingsGroup.map((drawing, index) => {
-                                    return <li key={index}  onClick={this._showDessin.bind(this, drawing)}>
-                                        <a>{drawing.description}</a>
+                                    return <li key={index} onClick={this._showDessin.bind(this, drawing)}
+                                               onContextMenu={this._open2.bind(this, drawing)}>
+                                        <a>{(drawing.show ? "- " : "+ ")}{drawing.description} made
+                                            by {drawing.prenomcreator} {drawing.nomcreator}</a>
                                     </li>
                                 })
                             }
@@ -486,6 +553,17 @@ class OptionsContainer extends Component {
                         <div className="text-center">
                             <Button bsStyle="primary" onClick={this._deletePinPoint}>Oui</Button>
                             <Button bsStyle="danger" onClick={this._closePp}>Annuler</Button>
+                        </div>
+                    </Modal.Body>
+                </Modal>
+                <Modal show={this.state.showModal} onHide={this._close2} className="moddal">
+                    <Modal.Header closeButton>
+                        <Modal.Title>Voulez-vous supprimer ce dessin du groupe ?</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="text-center">
+                            <Button bsStyle="primary" onClick={this._deleteDrawing}>Oui</Button>
+                            <Button bsStyle="danger" onClick={this._close2}>Annuler</Button>
                         </div>
                     </Modal.Body>
                 </Modal>
@@ -556,8 +634,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         showDrawing: (img, mapCenter, zoom) => {
             dispatch(recenterMap(mapCenter, zoom));
-            dispatch(showDrawing(false));
-            setTimeout(function(){ dispatch(showDrawing(true)); }, 500);
+            dispatch(setDrawingToShow(img));
+        },
+        hideDrawing: (img) => {
             dispatch(setDrawingToShow(img));
         },
         changeMarkerMemberDisplay: () => {
@@ -571,6 +650,15 @@ const mapDispatchToProps = (dispatch) => {
         },
         updateMessage: (id, message) => {
             dispatch(updateMessage(id, message))
+        },
+        bindDrawingsGroup: (newDrawings) => {
+            dispatch(bindDrawingsGroup(newDrawings));
+        },
+        deleteDrawing: (id, idUser, idGroup) => {
+            dispatch(deleteDrawing(id, idUser, idGroup));
+        },
+        changeDelete: (id) => {
+            dispatch(chandeDelete(id));
         }
     }
 };

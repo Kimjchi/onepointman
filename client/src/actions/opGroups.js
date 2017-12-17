@@ -19,8 +19,8 @@ export function addGroup (groupName, idUser){
     return {type: ADD_GROUP, groupName, idUser}
 }
 
-export function getGroups(idUser) {
-    return {type: GET_GROUPS, idUser}
+export function getGroups(idUser, idGroup) {
+    return {type: GET_GROUPS, idUser, idGroup}
 }
 
 export function changeGroups(groups) {

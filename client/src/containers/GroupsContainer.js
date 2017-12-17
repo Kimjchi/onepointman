@@ -6,7 +6,7 @@ import {
 } from "../actions/opGroups";
 import GroupsComponent from "../components/GroupsComponent";
 import {addUser} from "../actions/opUsers";
-import {getDrawingsGroup, showDrawing} from "../actions/opCanvas";
+import {getDrawingsGroup, setDrawingToShow} from "../actions/opCanvas";
 
 
 class GroupsContainer extends Component {
@@ -20,19 +20,24 @@ class GroupsContainer extends Component {
         let {groupsUsers} = this.props.opUsers;
         let {urlPhoto, idUser} = this.props.opLogin;
         return (
-            <GroupsComponent groups={groups}
-                             groupName={groupName}
-                             groupsUsers={groupsUsers}
-                             getInfosGroup={this.props.getInfosGroup}
-                             changeGroupName={this.props.changeGroupName}
-                             addGroup={this.props.addGroup}
-                             addUser={this.props.addUser}
-                             idUser={idUser}
-                             idGroup={idGroup}
-                             photoUser={urlPhoto}
-                             sendChangeName={this.props.sendChangeName}
-                             changeGroupId={this.props.changeGroupId}
-            />
+            <div>
+                {
+                    !this.props.draw && <GroupsComponent groups={groups}
+                                                        groupName={groupName}
+                                                        groupsUsers={groupsUsers}
+                                                        getInfosGroup={this.props.getInfosGroup}
+                                                        changeGroupName={this.props.changeGroupName}
+                                                        addGroup={this.props.addGroup}
+                                                        addUser={this.props.addUser}
+                                                        idUser={idUser}
+                                                        idGroup={idGroup}
+                                                        photoUser={urlPhoto}
+                                                        sendChangeName={this.props.sendChangeName}
+                                                        changeGroupId={this.props.changeGroupId}
+                    />
+                }
+            </div>
+
         )
     }
 }
@@ -56,7 +61,7 @@ const  mapDispatchToProps = (dispatch) => {
             dispatch(addGroup(groupName, idUser));
         },
         addUser: (arrayUsers, idGroup, idUser) => {
-            dispatch(showDrawing(false));
+            dispatch(setDrawingToShow([]));
             dispatch(addUser(arrayUsers, idGroup));
             dispatch(getInfosGroup(idUser, idGroup));
             dispatch(getDrawingsGroup(idUser, idGroup));

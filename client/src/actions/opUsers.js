@@ -1,3 +1,4 @@
+
 export const ADD_USER = 'ADD_USER';
 export const CHANGE_SEARCH = 'CHANGE_SEARCH';
 export const DELETE_USER = 'DELETE_USER';
@@ -11,6 +12,9 @@ export const GET_PHOTO_FRIENDS = 'GET_PHOTO_FRIENDS';
 export const SET_PHOTO_FRIENDS = 'SET_PHOTO_FRIENDS';
 export const FRIENDS_TO_ADD = 'FRIENDS_TO_ADD';
 export const ADD_USER_GROUP = 'ADD_USER_GROUP';
+export const STAY_GROUP = 'STAY_GROUP';
+export const PHOTO_GROUP = 'PHOTO_GROUP';
+export const SET_PHOTO_GROUP = 'SET_PHOTO_GROUP';
 
 export function addUser (arrayUsers, idGroup){
     return {type: ADD_USER, arrayUsers, idGroup}
@@ -62,4 +66,16 @@ export function addUserGroup (idUser, idGroup, idToAdd){
 
 export function changeIdGroup(idGroup) {
     return {type: CHANGE_ID_GROUP, idGroup}
+}
+
+export function stayGroup(idUser, idGroup) {
+    return {type: STAY_GROUP, idUser, idGroup}
+}
+
+export function photoGroup(idUser) {
+    return {type: PHOTO_GROUP, idUser}
+}
+
+export function setPhotoGroup(idUser, url) {
+    return {type: SET_PHOTO_GROUP, idUser, url}
 }

@@ -142,7 +142,7 @@ export function * requestPhoto() {
     }
 }
 
-export function * UsersFlow() {
+export function * UsersFlow(socket) {
     yield fork(requestUsersGroup);
     yield fork(requestAddUsers);
     yield fork(requestDeleteUser);

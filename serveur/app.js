@@ -12,7 +12,8 @@ var connection = require('./connection');
 var groups = require('./routes/groups');
 var pinpoint = require('./routes/pinpoint');
 var drawing = require('./routes/drawing');
-var tracking = require('./routes/tracking')
+var tracking = require('./routes/tracking');
+var server = require('./socket');
 
 var app = express();
 
@@ -60,20 +61,6 @@ app.use(function(err, req, res, next) {
   res.send('error' + err);
 });
 
-var server = require('http').Server(app);
-var io = require('socket.io')(server);
-
-server.listen(3002);
-
-io.on('connection', function (socket) {
-
-    //send to BD
-    console.log('Un client est connected!');
-    console.log('Le id du client est ' + socket.id);
-    socket.emit('Notification', 'ASTONISHING');
-    //socket.on('my other event', function (data) {
-    //   console.log(data);
-    //});
-});
+server.addGroup();
 
 module.exports = app;

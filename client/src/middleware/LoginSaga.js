@@ -4,7 +4,7 @@ import {store} from '../store';
 import {GET_PHOTO_USER, getPhotoUser, idUser, LOGIN_REQUEST, setPhotoUser} from "../actions/opLogin";
 import {push} from "react-router-redux";
 
-export function* requestLoginBack() {
+export function* requestLoginBack(socket) {
 
     while (true) {
 
@@ -28,7 +28,7 @@ export function* requestLoginBack() {
     }
 }
 
-export function * requestPhotoUser() {
+export function * requestPhotoUser(socket) {
     while (true) {
         let user = yield take(GET_PHOTO_USER);
         let id = user.idUser;
@@ -48,6 +48,6 @@ export function * requestPhotoUser() {
 }
 
 export function* LoginFlow(socket) {
-    yield fork(requestLoginBack);
-    yield fork(requestPhotoUser);
+    yield fork(requestLoginBack, socket);
+    yield fork(requestPhotoUser, socket);
 }

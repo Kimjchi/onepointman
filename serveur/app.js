@@ -12,7 +12,7 @@ var groups = require('./routes/groups');
 var pinpoint = require('./routes/pinpoint');
 var drawing = require('./routes/drawing');
 var tracking = require('./routes/tracking');
-var server = require('./socket');
+var socket = require('./socket');
 
 var app = express();
 
@@ -60,6 +60,6 @@ app.use(function(err, req, res, next) {
   res.send('error' + err);
 });
 
-server.addGroup();
+//socket.addGroup();
 
 module.exports = app;

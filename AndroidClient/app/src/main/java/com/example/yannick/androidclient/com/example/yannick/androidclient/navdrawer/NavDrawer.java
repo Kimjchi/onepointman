@@ -3,6 +3,7 @@ package com.example.yannick.androidclient.com.example.yannick.androidclient.navd
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -22,6 +23,9 @@ import android.widget.TextView;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.squareup.picasso.Picasso;
 
 public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -149,6 +153,9 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 settingsMenu.clear();
                 settingsMenu.add(Menu.NONE, ENVOYER_DESSIN, Menu.NONE, "Envoyer le dessin");
                 settingsMenu.add(Menu.NONE, STOP_DESSINER, Menu.NONE, "Annuler le dessin");
+                CameraPosition.Builder camPosition = new CameraPosition.Builder(mapFragment.mMap.getCameraPosition());
+                camPosition.bearing(0);
+                mapFragment.mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPosition.build()));
                 mapFragment.takeSnapshotAndLauchDrawFragment(getFragmentManager());
                 isDrawing = true;
                 break;

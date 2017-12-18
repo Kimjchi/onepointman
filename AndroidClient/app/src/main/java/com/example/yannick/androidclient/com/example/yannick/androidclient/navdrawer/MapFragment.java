@@ -47,6 +47,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONException;
@@ -78,10 +79,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private int currentTag = 0;
     public static MapFragment instance = null;
     public VolleyRequester restRequester = null;
-    private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>();
-    private Map<Integer, PolylineOptions> trace = new HashMap<Integer, PolylineOptions>();
+    private Map<String, Marker> markers = new HashMap<String, Marker>();
+    private Map<Integer, Polyline> trace = new HashMap<Integer, Polyline >();
     private HashMap<Drawing, GroundOverlay> drawings = new HashMap<>();
     private Bitmap cap;
+    private int displayedDrawings;
 
     public int getCurrentGroup(){return currentGroup;}
     public void setCurrentGroup(int group){currentGroup = group;}
@@ -366,15 +368,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void addMarker(String name, MarkerOptions marker){
         synchronized(markers) {
-            markers.put(name, marker);
+
+            if (name.length() > 8) {
+                if (name.substring(0, 8).equals("Pinpoint")) {
+                    markers.put(name, mMap.addMarker(marker));
+                    Marker pinpoint = markers.get(name);
+                    pinpoint.setTag(Integer.parseInt(name.substring(8)));
+                } else {
+                    markers.put(name, mMap.addMarker(marker));
+                    Marker classicMarker = markers.get(name);
+                    classicMarker.setTag(0);
+                }
+            } else {
+                markers.put(name, mMap.addMarker(marker));
+                Marker classicMarker = markers.get(name);
+                classicMarker.setTag(0);
+            }
         }
     }
 
-    public void updateDisplayMarkers(){
+/*    public void updateDisplayMarkers(){
         if (mMap != null) {
             mMap.clear();
+
             synchronized(markers) {
-                for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
+                for (Map.Entry<String, > marker : markers.entrySet()) {
                     if (marker.getKey().length() > 8) {
                         if (marker.getKey().substring(0, 8).equals("Pinpoint")) {
                             Marker pinpoint = mMap.addMarker(marker.getValue());
@@ -389,14 +407,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 }
             }
-            for (Map.Entry<Integer, PolylineOptions> traceToDisplay : trace.entrySet()) {
+            for (Map.Entry<Integer, Polyline> traceToDisplay : trace.entrySet()) {
                 mMap.addPolyline(traceToDisplay.getValue());
             }
-            displayDrawings();
         }
-    }
+    }*/
     public void clearMarkers(){
         synchronized(markers) {
+            mMap.clear();
             markers.clear();
             trace.clear();
             clearDrawings();
@@ -447,7 +465,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         else
         {
-            rdvOkButton.setEnabled(false);
+                rdvOkButton.setEnabled(false);
         }
     }
 
@@ -510,7 +528,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
              }
              line.startCap(new CustomCap(BitmapDescriptorFactory.fromBitmap(cap),30));
 
-             trace.put(traceJson.getInt("iduser"), line);
+             trace.put(traceJson.getInt("iduser"), mMap.addPolyline(line));
          } catch (JSONException e) {
              e.printStackTrace();
          }
@@ -537,15 +555,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Log.v("DISPLAY_DRAWING", "Dessins a afficher :" + this.drawings.size());
         for(Drawing drawing : this.drawings.keySet())
         {
-            /*if(this.drawings.get(drawing) == null)
-            {*/
+            if(this.drawings.get(drawing) == null)
+            {
                 GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
                         .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
                         .positionFromBounds(drawing.getBounds());
                 drawingOverlayOptions.clickable(true);
                 GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
                 this.drawings.put(drawing, drawingOverlay);
-            //}
+            }
         }
     }
 
@@ -577,6 +595,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     prenomCreator, bounds, stringImage);
 
             this.drawings.put(drawing, null);
+            displayDrawings();
         }
         catch(Exception ex)
         {

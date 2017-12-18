@@ -252,7 +252,7 @@ public class VolleyRequester
                                         activity.setCurrentGroup(id);
                                         activity.clearMarkers();
                                         VolleyRequester.getInstance(context).groupPositionUpdate(activity.getCurrentGroup());
-                                        activity.updateDisplayMarkers();
+                                        //activity.updateDisplayMarkers();
                                         return false;
                                     }
                                 });

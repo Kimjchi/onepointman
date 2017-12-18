@@ -370,6 +370,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void addMarker(String name, MarkerOptions marker){
         synchronized(markers) {
+            if (markers.get(name)!= null){
+                markers.get(name).remove();
+            }
 
             if (name.length() > 8) {
                 if (name.substring(0, 8).equals("Pinpoint")) {

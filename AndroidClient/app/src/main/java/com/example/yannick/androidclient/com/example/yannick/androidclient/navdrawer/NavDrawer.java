@@ -193,7 +193,8 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                         updateSettingsMenuOptions(false);
                         getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
                         isDrawing = false;
-                        VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
+                        if(MapFragment.instance.isShowDrawings())
+                            VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
                     }
                 });
                 builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {
@@ -213,6 +214,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             case SHOW_DRAWINGS:
                 item.setChecked(!item.isChecked());
                 MapFragment.instance.setShowDrawings(item.isChecked());
+                MapFragment.instance.clearDrawings();
                 VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
                 break;
             case SHOW_TRACES:

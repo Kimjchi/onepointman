@@ -633,7 +633,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     prenomCreator, bounds, stringImage);
 
             this.drawings.put(drawing, null);
-            displayDrawings();
+            if(isShowDrawings())
+                displayDrawings();
         }
         catch(Exception ex)
         {

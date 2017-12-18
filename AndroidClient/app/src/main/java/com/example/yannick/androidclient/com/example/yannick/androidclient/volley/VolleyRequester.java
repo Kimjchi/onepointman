@@ -505,13 +505,15 @@ public class VolleyRequester
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        try {
-            for(int i=0; i< json.getJSONArray("trackings").length(); i++) {
-                MapFragment.instance.updateTraceFromJson(json.getJSONArray("trackings").getJSONObject(i), i);
+        if(MapFragment.instance.isShowTraces())
+        {
+            try {
+                for(int i=0; i< json.getJSONArray("trackings").length(); i++) {
+                    MapFragment.instance.updateTraceFromJson(json.getJSONArray("trackings").getJSONObject(i), i);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
 

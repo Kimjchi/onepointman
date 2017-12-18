@@ -141,7 +141,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener() {
             @Override
             public void onGroundOverlayClick(GroundOverlay groundOverlay) {
-                //TODO Check which overylay is clicked
+                //TODO: créer popup
+                int idDrawing = (int)groundOverlay.getTag();
+                popupDeleteDrawing(idDrawing).show();
             }
         });
 
@@ -421,6 +423,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    public AlertDialog popupDeleteDrawing(final int drawId){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setMessage("Voulez-vous vraiment supprimer ce dessin?")
+                .setTitle("Suppression du dessin");
+
+        builder.setPositiveButton("Annuler", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNeutralButton("Supprimer", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                VolleyRequester.getInstance(getActivity().getApplicationContext()).deleteDrawing(drawId);
+            }
+        });
+        return builder.create();
+    }
+
     public AlertDialog popupBuilderInfoMarker(final Marker marker){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -559,9 +582,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             {
                 GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
                         .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
-                        .positionFromBounds(drawing.getBounds());
-                drawingOverlayOptions.clickable(true);
+                        .positionFromBounds(drawing.getBounds())
+                        .clickable(true);
+
                 GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
+                drawingOverlay.setTag(drawing.getIdDrawing());
                 this.drawings.put(drawing, drawingOverlay);
             }
         }
@@ -601,5 +626,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         {
             Log.v("MAP_FRAG_DRAW", "Error poto: "+ex.getMessage());
         }
+
+
     }
 }

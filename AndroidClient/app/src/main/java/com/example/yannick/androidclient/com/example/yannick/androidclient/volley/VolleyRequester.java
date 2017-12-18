@@ -851,7 +851,7 @@ public class VolleyRequester
 
     public void deleteDrawing(int iddrawing)
     {
-        String json = "{\"iddrawing:\""+iddrawing+"}";
+        String json = "{\"iddrawing\":"+iddrawing+"}";
         try
         {
             JSONObject bodyJson = new JSONObject(json);
@@ -861,6 +861,8 @@ public class VolleyRequester
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.v("DELETE_DRAWING", "Delete drawing success");
+                            MapFragment.instance.mMap.clear();
+                            getDrawings(MapFragment.instance.getCurrentGroup());
                         }
                     }, new Response.ErrorListener() {
                 @Override

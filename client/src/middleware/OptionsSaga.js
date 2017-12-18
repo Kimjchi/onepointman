@@ -121,7 +121,7 @@ export function* deletePinPoint() {
 }
 
 
-export function* OptionsFlow() {
+export function* OptionsFlow(socket) {
     yield fork(transmitPosition);
     yield fork(createPinPoint);
     yield fork(deletePinPoint);

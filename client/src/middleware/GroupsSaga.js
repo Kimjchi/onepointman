@@ -259,7 +259,7 @@ export function * requestUpdateMessage() {
     }
 }
 
-export function * GroupsFlow() {
+export function * GroupsFlow(socket) {
     yield fork(requestGroups);
     yield fork(requestAddGroup);
     yield fork(requestPhoto);

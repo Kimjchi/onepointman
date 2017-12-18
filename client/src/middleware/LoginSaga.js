@@ -47,7 +47,7 @@ export function * requestPhotoUser() {
     }
 }
 
-export function* LoginFlow() {
+export function* LoginFlow(socket) {
     yield fork(requestLoginBack);
     yield fork(requestPhotoUser);
 }

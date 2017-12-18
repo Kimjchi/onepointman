@@ -85,7 +85,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Bitmap cap;
     private LatLng positionBeforeDrawing;
     private float zoomBeforeDrawing;
-    private int displayedDrawings;
+    private boolean showDrawings;
+    private boolean showTraces;
 
     public int getCurrentGroup(){return currentGroup;}
     public void setCurrentGroup(int group){currentGroup = group;}
@@ -640,5 +641,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
 
+    }
+
+    public boolean isShowDrawings() {
+        return showDrawings;
+    }
+
+    public void setShowDrawings(boolean showDrawings) {
+        this.showDrawings = showDrawings;
+    }
+
+    public boolean isShowTraces() {
+        return showTraces;
+    }
+
+    public void setShowTraces(boolean showTraces) {
+        this.showTraces = showTraces;
     }
 }

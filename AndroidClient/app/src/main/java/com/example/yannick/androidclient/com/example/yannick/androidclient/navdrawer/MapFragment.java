@@ -83,6 +83,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Map<Integer, Polyline> trace = new HashMap<Integer, Polyline >();
     private HashMap<Drawing, GroundOverlay> drawings = new HashMap<>();
     private Bitmap cap;
+    private LatLng positionBeforeDrawing;
+    private float zoomBeforeDrawing;
     private int displayedDrawings;
 
     public int getCurrentGroup(){return currentGroup;}
@@ -103,7 +105,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         LatLng ltLg = markers.get("_MY_SELF_").getPosition();
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ltLg, 15));
                     } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "Impossible de trouver votre position...:", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Impossible de trouver votre position.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -274,6 +276,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 rdvDialog.show();
             }
         });
+        if(positionBeforeDrawing != null)
+        {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(positionBeforeDrawing,
+                    zoomBeforeDrawing));
+        }
     }
 
     @Override
@@ -503,6 +510,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 drawFragment.setZoom(getCurrentZoom());
                 drawFragment.setBounds(bounds);
                 drawFragment.setIdgroup(currentGroup);
+                zoomBeforeDrawing = getCurrentZoom();
+                positionBeforeDrawing = mMap.getCameraPosition().target;
                 fm.beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
             }
         };

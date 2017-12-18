@@ -110,7 +110,7 @@ export function* requestDeleteDrawing() {
     }
 }
 
-export function* CanvasFlow() {
+export function* CanvasFlow(socket) {
     yield fork(requestSendDrawing);
     yield fork(requestGetDrawings);
     yield fork(requestDeleteDrawing);

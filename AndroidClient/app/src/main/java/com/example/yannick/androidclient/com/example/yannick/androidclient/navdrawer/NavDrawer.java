@@ -26,6 +26,7 @@ import com.example.yannick.androidclient.com.example.yannick.androidclient.volle
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -34,6 +35,8 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
     private Menu settingsMenu;
     private boolean isDrawing;
     private MapFragment mapFragment;
+    private LatLng positionBeforeDrawing;
+    private float zoomBeforeDrawing;
 
     private static final int DESSINER = 1;
     private static final int STOP_DESSINER = 2;
@@ -193,6 +196,7 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                         settingsMenu.add(Menu.NONE, 7, Menu.NONE, "Afficher dessins");
                         getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
                         isDrawing = false;
+                        VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
                     }
                 });
                 builder.setNegativeButton("Retour", new DialogInterface.OnClickListener() {

@@ -887,6 +887,7 @@ public class VolleyRequester
                     @Override
                     public void onResponse(JSONObject response)
                     {
+                        MapFragment.instance.clearDrawings();
                         try
                         {
                             JSONObject msg = (JSONObject) response.get("message");

@@ -73,8 +73,9 @@ public class VolleyRequester
     private RequestQueue requestQueue;
     private static Context context;
     //private final String URL_SERVEUR = "http://192.168.0.108:3001";
-    private final String URL_SERVEUR = "http://192.168.137.1:3001";
+    //private final String URL_SERVEUR = "http://192.168.137.1:3001";
     //private final String URL_SERVEUR = "http://192.168.43.202:3001";
+    public final String URL_SERVEUR = "https://onepointman.herokuapp.com";
 
     private VolleyRequester(Context context)
     {
@@ -144,7 +145,6 @@ public class VolleyRequester
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                // TODO Auto-generated method stub
                 //MDR LÉ EREUR C POUR LÉ FèBLe
 
                 System.out.println("Erreur lors de la demande des groupes: " + error.toString());
@@ -201,7 +201,6 @@ public class VolleyRequester
                                 });
 
                                 Switch trackerSwitch = new Switch(context);
-                                //TODO Color!
                                 if (isTracking){
                                     trackerSwitch.setChecked(true);
                                 }
@@ -251,8 +250,9 @@ public class VolleyRequester
                                         MapFragment activity = MapFragment.instance;
                                         activity.setCurrentGroup(id);
                                         activity.clearMarkers();
-                                        VolleyRequester.getInstance(context).groupPositionUpdate(activity.getCurrentGroup());
-                                        activity.updateDisplayMarkers();
+                                        groupPositionUpdate(activity.getCurrentGroup());
+                                        if(MapFragment.instance.isShowDrawings())
+                                            getDrawings(activity.getCurrentGroup());
                                         return false;
                                     }
                                 });
@@ -292,7 +292,6 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // TODO Auto-generated method stub
                     //MDR LÉ EREUR C POUR LÉ FèBLe
                     Toast.makeText(context,"Serveur indisponible, partage de position non mis à jour!", Toast.LENGTH_SHORT);
                 }
@@ -319,7 +318,6 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // TODO Auto-generated method stub
                     //MDR LÉ EREUR C POUR LÉ FèBLe
                     Toast.makeText(context,"Serveur indisponible, tracking non supprimé!", Toast.LENGTH_SHORT);
                 }
@@ -347,7 +345,6 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // TODO Auto-generated method stub
                     //MDR LÉ EREUR C POUR LÉ FèBLe
                     Toast.makeText(context,"Serveur indisponible, tracking non mis à jour!", Toast.LENGTH_SHORT);
                 }
@@ -386,7 +383,6 @@ public class VolleyRequester
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // TODO Auto-generated method stub
                 //MDR LÉ EREUR C POUR LÉ FèBLe
                 System.out.println("Erreur lors de la demande des groupes: " + error.toString());
             }
@@ -418,7 +414,6 @@ public class VolleyRequester
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // TODO Auto-generated method stub
                 //MDR LÉ EREUR C POUR LÉ FèBLe
                 System.out.println("Erreur lors de la demande des positions d'un groupe: " + error.toString());
             }
@@ -505,13 +500,15 @@ public class VolleyRequester
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        try {
-            for(int i=0; i< json.getJSONArray("trackings").length(); i++) {
-                MapFragment.instance.updateTraceFromJson(json.getJSONArray("trackings").getJSONObject(i), i);
+        if(MapFragment.instance.isShowTraces())
+        {
+            try {
+                for(int i=0; i< json.getJSONArray("trackings").length(); i++) {
+                    MapFragment.instance.updateTraceFromJson(json.getJSONArray("trackings").getJSONObject(i), i);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
 
@@ -851,7 +848,7 @@ public class VolleyRequester
 
     public void deleteDrawing(int iddrawing)
     {
-        String json = "{\"iddrawing:\""+iddrawing+"}";
+        String json = "{\"iddrawing\":"+iddrawing+"}";
         try
         {
             JSONObject bodyJson = new JSONObject(json);
@@ -861,6 +858,9 @@ public class VolleyRequester
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.v("DELETE_DRAWING", "Delete drawing success");
+                            MapFragment.instance.mMap.clear();
+                            groupPositionUpdate(MapFragment.instance.getCurrentGroup());
+                            getDrawings(MapFragment.instance.getCurrentGroup());
                         }
                     }, new Response.ErrorListener() {
                 @Override

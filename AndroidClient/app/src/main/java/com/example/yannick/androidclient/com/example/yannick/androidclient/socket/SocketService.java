@@ -15,6 +15,9 @@ import com.example.yannick.androidclient.com.example.yannick.androidclient.volle
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.URISyntaxException;
 
 public class SocketService extends Service {
@@ -37,7 +40,8 @@ public class SocketService extends Service {
         try {
             socket = IO.socket("http://192.168.137.1:3002");
             socket.connect();
-            socket.emit("mapUserID", "{\"userId\":\""+ FacebookInfosRetrieval.user_id+"\"}");
+            JSONObject jsonObject = new JSONObject("{\"userId\":\""+ FacebookInfosRetrieval.user_id+"\"}");
+            socket.emit("mapUserID", jsonObject);
             socket.on("Notification", onNotif);
             socket.on("userAdded Notification", onAddToGroup);
             socket.on("userDeleted Notification", onRemoveFromGroup);
@@ -45,6 +49,8 @@ public class SocketService extends Service {
         } catch (URISyntaxException e) {
             e.printStackTrace();
             Log.v("SOCKET", "FAIL");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 

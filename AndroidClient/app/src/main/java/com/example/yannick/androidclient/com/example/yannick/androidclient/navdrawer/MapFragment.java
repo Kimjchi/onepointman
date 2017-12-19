@@ -10,6 +10,7 @@ import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -87,14 +88,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private float zoomBeforeDrawing;
     private boolean showDrawings;
     private boolean showTraces;
+    private SharedPreferences sharedPreferences;
 
     public int getCurrentGroup(){return currentGroup;}
-    public void setCurrentGroup(int group){currentGroup = group;}
+    public void setCurrentGroup(int group)
+    {
+        currentGroup = group;
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putInt("groupId", group);
+        edit.commit();
+    }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        sharedPreferences = getActivity().getApplicationContext()
+                .getSharedPreferences("OnePointMan", Context.MODE_PRIVATE);
+        showDrawings = sharedPreferences.getBoolean("showDrawing", false);
+        showTraces = sharedPreferences.getBoolean("showTraces", false);
+        currentGroup = sharedPreferences.getInt("groupId", 0);
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ImageButton upButton = (ImageButton) view.findViewById(R.id.center_position);
         upButton.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +123,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
+        Log.v("CREATE VIEW MAP FRAGMEN", "Create view "+currentGroup);
         return view;
     }
 
@@ -122,12 +135,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         restRequester.groupsRequest();
         instance = this;
         startGpsService();
+        Log.v("ON START MAP FRAGMEN", "On start "+currentGroup);
     }
 
     @Override
     public void onStop(){
         super.onStop();
         stopDisplayThread();
+        Log.v("ON STOP MAP FRAGMEN", "On stop "+currentGroup);
     }
 
     @Override
@@ -364,7 +379,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
     
     public void startDisplayThread() {
-        updateMyPosition = new DisplayThread();
+        updateMyPosition = new DisplayThread(currentGroup);
         updateMyPosition.run();
         Log.v("GPS Service", "Display thread started");
     }
@@ -591,8 +606,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Log.v("DISPLAY_DRAWING", "Dessins a afficher :" + this.drawings.size());
         for(Drawing drawing : this.drawings.keySet())
         {
-            if(this.drawings.get(drawing) == null)
-            {
+
                 GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
                         .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
                         .positionFromBounds(drawing.getBounds())
@@ -601,7 +615,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
                 drawingOverlay.setTag(drawing.getIdDrawing());
                 this.drawings.put(drawing, drawingOverlay);
-            }
+
         }
     }
 
@@ -648,8 +662,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return showDrawings;
     }
 
-    public void setShowDrawings(boolean showDrawings) {
+    public void setShowDrawings(boolean showDrawings)
+    {
         this.showDrawings = showDrawings;
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putBoolean("showDrawing", showDrawings);
+        edit.commit();
     }
 
     public boolean isShowTraces() {
@@ -658,5 +676,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void setShowTraces(boolean showTraces) {
         this.showTraces = showTraces;
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putBoolean("showTraces", showTraces);
+        edit.commit();
     }
 }

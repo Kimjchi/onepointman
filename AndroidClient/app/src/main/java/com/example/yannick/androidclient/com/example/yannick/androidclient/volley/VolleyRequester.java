@@ -251,8 +251,9 @@ public class VolleyRequester
                                         MapFragment activity = MapFragment.instance;
                                         activity.setCurrentGroup(id);
                                         activity.clearMarkers();
-                                        VolleyRequester.getInstance(context).groupPositionUpdate(activity.getCurrentGroup());
-                                        //activity.updateDisplayMarkers();
+                                        groupPositionUpdate(activity.getCurrentGroup());
+                                        if(MapFragment.instance.isShowDrawings())
+                                            getDrawings(activity.getCurrentGroup());
                                         return false;
                                     }
                                 });

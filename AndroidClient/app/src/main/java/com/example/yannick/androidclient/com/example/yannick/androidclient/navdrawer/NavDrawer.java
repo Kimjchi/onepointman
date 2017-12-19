@@ -136,8 +136,12 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         }
         else {
             settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
-            settingsMenu.add(Menu.NONE, SHOW_DRAWINGS, Menu.NONE, "Afficher dessins").setCheckable(true);
-            settingsMenu.add(Menu.NONE, SHOW_TRACES, Menu.NONE, "Afficher tracés").setCheckable(true);
+            settingsMenu.add(Menu.NONE, SHOW_DRAWINGS, Menu.NONE, "Afficher dessins")
+                    .setCheckable(true)
+                    .setChecked(MapFragment.instance.isShowDrawings());
+            settingsMenu.add(Menu.NONE, SHOW_TRACES, Menu.NONE, "Afficher tracés")
+                    .setCheckable(true)
+                    .setChecked(MapFragment.instance.isShowTraces());
             settingsMenu.add(Menu.NONE, DELETE_TRACE, Menu.NONE, "Supprimer ma trace");
         }
     }
@@ -214,8 +218,17 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             case SHOW_DRAWINGS:
                 item.setChecked(!item.isChecked());
                 MapFragment.instance.setShowDrawings(item.isChecked());
-                MapFragment.instance.clearDrawings();
-                VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
+                if(item.isChecked() == false)
+                {
+                    MapFragment.instance.clearDrawings();
+                    MapFragment.instance.mMap.clear();
+                    VolleyRequester.getInstance(getApplicationContext())
+                            .groupPositionUpdate(MapFragment.instance.getCurrentGroup());
+                }
+                else
+                {
+                    VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
+                }
                 break;
             case SHOW_TRACES:
                 item.setChecked(!item.isChecked());

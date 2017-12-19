@@ -29,6 +29,18 @@ public class DisplayThread implements Runnable {
     private Location myLocation;
     private MapFragment activity;
 
+    public DisplayThread(int group)
+    {
+        if(group == 0)
+        {
+            firstGroup = true;
+        }
+        else
+        {
+            firstGroup = false;
+        }
+    }
+
     @Override
     public void run() {
         if (displayThreadRunning) {
@@ -62,6 +74,7 @@ public class DisplayThread implements Runnable {
                 Log.v("LOCATION", "Update displayed!");
                 requester.displayGroupForNavDrawer(((NavDrawer)activity.getActivity()).getMenu(), firstGroup);
                 if(firstGroup){
+
                     firstGroup = false;
                 }
 
@@ -79,4 +92,6 @@ public class DisplayThread implements Runnable {
     public boolean getdisplayThreadRunning(){
         return displayThreadRunning;
     }
+
+
 }

@@ -8,6 +8,7 @@ const squel = squelb.useFlavour('postgres');
 
 const sender = require('../sender');
 const facebookdata = require("../facebookdata");
+var socket = require('../socket');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
@@ -30,19 +31,19 @@ router.post(('/updateposition'), function (req, res) {
         .where('ugr.iduser = ?', parseInt(toUpdate.iduser, 10))
         .toString();
     db.any(getGroups)
-        .then((groups) =>{
+        .then((groups) => {
             let currentTime = new Date();
             let updateUserTable = squel.update()
                 .table('public."USER"')
                 .set('lg', toUpdate.userlg)
-                .set('lt',toUpdate.userlt)
+                .set('lt', toUpdate.userlt)
                 .set('dateposition', currentTime.toISOString())
                 .where('iduser = ?', toUpdate.iduser)
                 .toString();
             db.none(updateUserTable)
                 .then(() => {
-                    console.log('Updated position of user in USER ');
-                    console.log(groups);
+                    //console.log('Updated position of user in USER ');
+                    //console.log(groups);
                     groups.forEach(element => {
                         console.log(element.sharesposition);
                         //pour chaque groupe, s'il décide de partager sa position avec, on update sa position
@@ -57,7 +58,7 @@ router.post(('/updateposition'), function (req, res) {
                                 .toString();
                             db.none(query)
                                 .then(() => {
-                                    console.log('Updated position of user in group ' + element.idgroup);
+                                    //console.log('Updated position of user in group ' + element.idgroup);
                                 })
                                 .catch(e => {
 
@@ -83,8 +84,8 @@ router.post(('/updateposition'), function (req, res) {
                                 })
                         }
 
-                })
-            });
+                    })
+                });
 
             res.send({
                 status: 'success',
@@ -100,12 +101,12 @@ router.post(('/updateposition'), function (req, res) {
         });
 });
 
-router.post(('/updatepositionsharing/'), function(req, res){
+router.post(('/updatepositionsharing/'), function (req, res) {
 
     let toUpdate = {
-        iduser : req.body.iduser,
-        idgroup : req.body.idgroup,
-        positionSharing : req.body.positionSharing,
+        iduser: req.body.iduser,
+        idgroup: req.body.idgroup,
+        positionSharing: req.body.positionSharing,
     };
 
     let query = squel.update()
@@ -116,42 +117,51 @@ router.post(('/updatepositionsharing/'), function(req, res){
         .toString();
 
     db.query(query)
-        .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'Position sharing updated successfully'}, res)
+        .then(() => {
+            sender.sendResponse(sender.SUCCESS_STATUS, {
+                status: 'success',
+                message: 'Position sharing updated successfully'
+            }, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.BAD_REQUEST, {status:'fail', message:'Error while updating position sharing'}, res);
+            sender.sendResponse(sender.BAD_REQUEST, {
+                status: 'fail',
+                message: 'Error while updating position sharing'
+            }, res);
             console.log(e);
         })
 });
 
-router.post('/updatemsg', function(req,res){
-   let toUpdate = {
-       iduser : req.body.iduser,
-       msg: req.body.msg
-   };
-   console.log(toUpdate);
-   let query = squel.update({replaceSingleQuotes: true, singleQuoteReplacement: `''`})
-       .table('public."USER"')
-       .set('msg', toUpdate.msg)
-       .where('iduser = ?', toUpdate.iduser)
-       .toString();
-console.log(query);
-   db.none(query)
-       .then(()=>{
-           sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'message updated successfully successfully'}, res)
-       })
-       .catch(e=>{
-           sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Error while updating message'}, res);
-           console.log(e);
-       })
-   //UPDATE MESSAGE
+router.post('/updatemsg', function (req, res) {
+    let toUpdate = {
+        iduser: req.body.iduser,
+        msg: req.body.msg
+    };
+    //console.log(toUpdate);
+    let query = squel.update({replaceSingleQuotes: true, singleQuoteReplacement: `''`})
+        .table('public."USER"')
+        .set('msg', toUpdate.msg)
+        .where('iduser = ?', toUpdate.iduser)
+        .toString();
+    //console.log(query);
+    db.none(query)
+        .then(() => {
+            sender.sendResponse(sender.SUCCESS_STATUS, {
+                status: 'success',
+                message: 'message updated successfully successfully'
+            }, res)
+        })
+        .catch(e => {
+            sender.sendResponse(sender.BAD_REQUEST, {status: 'fail', message: 'Error while updating message'}, res);
+            console.log(e);
+        })
+    //UPDATE MESSAGE
 
 });
 
-router.get('/getmsg/:iduser', function(req,res){
+router.get('/getmsg/:iduser', function (req, res) {
     let iduser = req.params.iduser;
-    let query= squel.select()
+    let query = squel.select()
         .from('public."USER"')
         .field('msg')
         .where('iduser = ?', iduser)
@@ -159,10 +169,10 @@ router.get('/getmsg/:iduser', function(req,res){
 
     db.one(query)
         .then((msg) => {
-            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:msg}, res)
+            sender.sendResponse(sender.SUCCESS_STATUS, {status: 'success', message: msg}, res)
         })
-        .catch(e=>{
-            sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Error while getting message'}, res);
+        .catch(e => {
+            sender.sendResponse(sender.BAD_REQUEST, {status: 'fail', message: 'Error while getting message'}, res);
             console.log(e);
         })
 });
@@ -180,68 +190,95 @@ router.post('/createuser/', function (req, res) {
         .toString();
 
     db.none(query)
-        .then(()=>{
-            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully'}, res)
+        .then(() => {
+            _getGroupNameByID(toCreate.idgroup)
+                .then((row) => {
+                    socket.sendNotification(socket.ADD_GROUP_NOTIFICATION_TYPE, toCreate.iduser, row[0].nom);
+                })
+                .catch(e => {
+                    console.log('Failed at deleting group' + e)
+                });
+            sender.sendResponse(sender.SUCCESS_STATUS, {
+                status: 'success',
+                message: 'User ' + toCreate.iduser + ' added to group ' + toCreate.idgroup + ' successfully'
+            }, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.BAD_REQUEST, {status:'fail',message:'Error while adding user ' + toCreate.iduser + ' to group'}, res);
+            sender.sendResponse(sender.BAD_REQUEST, {
+                status: 'fail',
+                message: 'Error while adding user ' + toCreate.iduser + ' to group'
+            }, res);
             console.log(e);
         })
 });
 
-router.post('/deleteuser/', function(req, res){
+router.post('/deleteuser/', function (req, res) {
     console.log(req.body);
     let toUpdate = {
-        iduser : req.body.iduser,
-        idgroup : req.body.idgroup,
+        iduser: req.body.iduser,
+        idgroup: req.body.idgroup,
     };
-// check si ya 1 personne dans le groupe
+
     let query = squel.delete()
         .from('public."USER_GROUP"')
         .where('iduser = ?', parseInt(toUpdate.iduser))
         .where('idgroup = ?', parseInt(toUpdate.idgroup))
         .toString();
     db.query(query)
-        .then(()=>{
-        let query2 = squel.select()
-            .from('public."USER_GROUP"')
-            .where('idgroup = ? ', parseInt(toUpdate.idgroup))
-            .toString();
-        db.any(query2)
-            .then((result)=>{
-                if(result.length === 1){
-                    //supprimer la derniere personne du groupe
-                    let deleteLastUser = squel.delete()
-                        .from('public."USER_GROUP"')
-                        .where('idgroup = ?', parseInt(toUpdate.idgroup))
-                        .toString();
-                    db.query(deleteLastUser)
-                        .then(()=>{
-                            console.log('deleted last user from group successfully')
-                            let deleteGroup=squel.delete()
-                                .from('public."GROUP"')
-                                .where('idgroup = ?', toUpdate.idgroup)
-                                .toString();
-                            db.query(deleteGroup)
-                                .then(()=>{
-                                    console.log("group deleted bc no more users");
-                                })
-                                .catch(err=>{
-                                    console.log("failed at deleting empty group" + err);
-                                })
-                        })
-                        .catch(error=>{
-                            console.log('failed at deleting last user' + error)
-                        });
-                }
-            })
-            .catch(e=>{
-                console.log('Failed at deleting group' + e)
-            });
-            sender.sendResponse(sender.SUCCESS_STATUS, {status:'success',message:'User deleted from group successfully'}, res)
+        .then(() => {
+            _getGroupNameByID(toUpdate.idgroup)
+                .then((row) => {
+                    socket.sendNotification(socket.REMOVE_GROUP_NOTIFICATION_TYPE, toUpdate.iduser, row[0].nom);
+                })
+                .catch(e => {
+                    console.log('Failed at deleting group' + e)
+                });
+            // check si ya 1 personne dans le groupe
+            let query2 = squel.select()
+                .from('public."USER_GROUP"')
+                .where('idgroup = ? ', parseInt(toUpdate.idgroup))
+                .toString();
+            db.any(query2)
+                .then((result) => {
+                    if (result.length === 1) {
+                        //supprimer la derniere personne du groupe
+                        let deleteLastUser = squel.delete()
+                            .from('public."USER_GROUP"')
+                            .where('idgroup = ?', parseInt(toUpdate.idgroup))
+                            .toString();
+                        db.query(deleteLastUser)
+                            .then(() => {
+                                console.log('deleted last user from group successfully')
+                                let deleteGroup = squel.delete()
+                                    .from('public."GROUP"')
+                                    .where('idgroup = ?', toUpdate.idgroup)
+                                    .toString();
+                                db.query(deleteGroup)
+                                    .then(() => {
+                                        console.log("group deleted bc no more users");
+                                    })
+                                    .catch(err => {
+                                        console.log("failed at deleting empty group" + err);
+                                    })
+                            })
+                            .catch(error => {
+                                console.log('failed at deleting last user' + error)
+                            });
+                    }
+                })
+                .catch(e => {
+                    console.log('Failed at deleting group' + e)
+                });
+            sender.sendResponse(sender.SUCCESS_STATUS, {
+                status: 'success',
+                message: 'User deleted from group successfully'
+            }, res)
         })
         .catch(e => {
-            sender.sendResponse(sender.BAD_REQUEST, {status:'success',message:'Error while deleting user from group'}, res);
+            sender.sendResponse(sender.BAD_REQUEST, {
+                status: 'success',
+                message: 'Error while deleting user from group'
+            }, res);
             console.log(e);
         })
 });
@@ -251,7 +288,7 @@ router.get('/userFriends/:user_id/', function (req, res) {
 
     let user_id = req.params.user_id;
     let userFriendList = {
-        friendlist : []
+        friendlist: []
     };
 
     _getUserFriendList(user_id)
@@ -259,15 +296,22 @@ router.get('/userFriends/:user_id/', function (req, res) {
             userFriendList.friendlist = response.data.data;
 
             console.log('userAccessToken : ' + facebookdata.userAccessToken);
-            
+
             console.log('userFriendList : ' + JSON.stringify(userFriendList.friendlist));
 
             sender.sendResponse(sender.SUCCESS_STATUS, userFriendList, res)
         })
         .catch(error => {
-        console.log(error)
-    });
+            console.log(error)
+        });
 });
+
+const _getGroupNameByID = (groupId) => {
+    return db.query(squel.select('nom')
+        .from('"GROUP"')
+        .where('idgroup = ?', groupId)
+        .toString())
+};
 
 const _getUserFriendList = (user_id) => {
     let userFriendListRequest = {

@@ -161,11 +161,11 @@ export function * requestInfosGroup() {
                     let isSharing = response.data.message.issharing;
                     store.dispatch(changeSharing(isSharing));
 
-                    let trackings = response.data.message.trackings;
+                   let trackings = response.data.message.trackings;
 
                     let trackingsFormat = [];
                     trackings.map((tracking => {
-                        if(!!trackings.iduser) {
+                        if(!!tracking.iduser) {
                             let newTracking = {
                                 iduser: tracking.iduser,
                                 path: tracking.tracking
@@ -173,7 +173,8 @@ export function * requestInfosGroup() {
                             trackingsFormat.push(newTracking);
                         }
                     }));
-                    store.dispatch(changeTrackings(trackings));
+                    console.log("Wow" + trackingsFormat);
+                    store.dispatch(changeTrackings(trackingsFormat));
                 }
             })
             .catch(function (error) {

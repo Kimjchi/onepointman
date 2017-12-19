@@ -81,9 +81,6 @@ public class DisplayThread implements Runnable {
                 if(activity.getCurrentGroup() != 0)
                 {
                     requester.groupPositionUpdate(activity.getCurrentGroup());
-                    if(activity.isShowDrawings()){
-                        requester.getDrawings(activity.getCurrentGroup());
-                    }
                 }
                 handler.postDelayed(this, MY_POSITION_UPDATE_TIME);
             }

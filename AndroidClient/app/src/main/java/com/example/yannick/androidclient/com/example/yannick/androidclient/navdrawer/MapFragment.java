@@ -417,31 +417,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-/*    public void updateDisplayMarkers(){
-        if (mMap != null) {
-            mMap.clear();
-
-            synchronized(markers) {
-                for (Map.Entry<String, > marker : markers.entrySet()) {
-                    if (marker.getKey().length() > 8) {
-                        if (marker.getKey().substring(0, 8).equals("Pinpoint")) {
-                            Marker pinpoint = mMap.addMarker(marker.getValue());
-                            pinpoint.setTag(Integer.parseInt(marker.getKey().substring(8)));
-                        } else {
-                            Marker classicMarker = mMap.addMarker(marker.getValue());
-                            classicMarker.setTag(0);
-                        }
-                    } else {
-                        Marker classicMarker = mMap.addMarker(marker.getValue());
-                        classicMarker.setTag(0);
-                    }
-                }
-            }
-            for (Map.Entry<Integer, Polyline> traceToDisplay : trace.entrySet()) {
-                mMap.addPolyline(traceToDisplay.getValue());
-            }
-        }
-    }*/
     public void clearMarkers(){
         synchronized(markers) {
             mMap.clear();
@@ -577,7 +552,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
              //Pour chaque position
              for(int i=0; i< traceJson.getJSONArray("tracking").length(); i++) {
                  position = traceJson.getJSONArray("tracking").getJSONObject(i);
-                 line.add(new LatLng(position.getDouble("lt"),position.getDouble("lg")));
+                 line.add(new LatLng(position.getDouble("lat"),position.getDouble("lng")));
              }
              line.startCap(new CustomCap(BitmapDescriptorFactory.fromBitmap(cap),30));
 
@@ -609,7 +584,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
                 .positionFromBounds(drawing.getBounds())
                 .clickable(true);
-
+        
         GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
         drawingOverlay.setTag(drawing.getIdDrawing());
         this.drawings.put(drawing, drawingOverlay);
@@ -620,28 +595,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         try
         {
             int idDrawing = draw.getInt("iddrawing");
-
+            boolean alreadyExist = false;
+            Drawing drawing = null;
             for(Drawing d : this.drawings.keySet())
             {
                 if(d.getIdDrawing() == idDrawing)
                 {
-                    return;
+                    drawing = d;
+                    alreadyExist = true;
                 }
             }
+            if (!alreadyExist) {
+                String idCreator = draw.getString("idcreator");
+                String nomCreator = draw.getString("nomcreator");
+                String prenomCreator = draw.getString("prenomcreator");
+                LatLng sw = new LatLng(Double.parseDouble(draw.getString("swlt")),
+                        Double.parseDouble(draw.getString("swlg")));
+                LatLng ne = new LatLng(Double.parseDouble(draw.getString("nelt")),
+                        Double.parseDouble(draw.getString("nelg")));
+                LatLngBounds bounds = new LatLngBounds(sw, ne);
+                String stringImage = draw.getString("img");
 
-            String idCreator = draw.getString("idcreator");
-            String nomCreator = draw.getString("nomcreator");
-            String prenomCreator = draw.getString("prenomcreator");
-            LatLng sw = new LatLng(Double.parseDouble(draw.getString("swlt")),
-                    Double.parseDouble(draw.getString("swlg")));
-            LatLng ne = new LatLng(Double.parseDouble(draw.getString("nelt")),
-                    Double.parseDouble(draw.getString("nelg")));
-            LatLngBounds bounds = new LatLngBounds(sw, ne);
-            String stringImage = draw.getString("img");
-
-            Drawing drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
-                    prenomCreator, bounds, stringImage);
-
+                drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
+                        prenomCreator, bounds, stringImage);
+            }
             if(isShowDrawings())
                 displayDrawing(drawing);
         }

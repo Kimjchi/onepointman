@@ -45,7 +45,7 @@ public class SocketService extends Service {
         super.onCreate();
         instance = this;
         try {
-            socket = IO.socket("http://192.168.137.1:3002");
+            socket = IO.socket(VolleyRequester.getInstance(getApplicationContext()).URL_SERVEUR+":3002");
             socket.connect();
             JSONObject jsonObject = new JSONObject("{\"userId\":\""+ FacebookInfosRetrieval.user_id+"\"}");
             Log.v("SOCKET", jsonObject.toString());

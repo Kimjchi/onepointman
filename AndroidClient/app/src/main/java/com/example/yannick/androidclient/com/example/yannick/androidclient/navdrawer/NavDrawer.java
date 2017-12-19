@@ -211,7 +211,6 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 });
 
                 builder.show();
-                //TODO REQUETE ENVOI DU DESSIN
                 break;
             case DELETE_TRACE:
                 VolleyRequester.getInstance(getApplicationContext()).updateTracking(false, MapFragment.instance.getCurrentGroup());

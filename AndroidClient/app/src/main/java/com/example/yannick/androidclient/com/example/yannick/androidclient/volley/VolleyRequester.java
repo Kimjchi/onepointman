@@ -145,7 +145,6 @@ public class VolleyRequester
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                // TODO Auto-generated method stub
                 //MDR LÉ EREUR C POUR LÉ FèBLe
 
                 System.out.println("Erreur lors de la demande des groupes: " + error.toString());
@@ -202,7 +201,6 @@ public class VolleyRequester
                                 });
 
                                 Switch trackerSwitch = new Switch(context);
-                                //TODO Color!
                                 if (isTracking){
                                     trackerSwitch.setChecked(true);
                                 }
@@ -294,7 +292,6 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // TODO Auto-generated method stub
                     //MDR LÉ EREUR C POUR LÉ FèBLe
                     Toast.makeText(context,"Serveur indisponible, partage de position non mis à jour!", Toast.LENGTH_SHORT);
                 }
@@ -321,7 +318,6 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // TODO Auto-generated method stub
                     //MDR LÉ EREUR C POUR LÉ FèBLe
                     Toast.makeText(context,"Serveur indisponible, tracking non supprimé!", Toast.LENGTH_SHORT);
                 }
@@ -349,7 +345,6 @@ public class VolleyRequester
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // TODO Auto-generated method stub
                     //MDR LÉ EREUR C POUR LÉ FèBLe
                     Toast.makeText(context,"Serveur indisponible, tracking non mis à jour!", Toast.LENGTH_SHORT);
                 }
@@ -388,7 +383,6 @@ public class VolleyRequester
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // TODO Auto-generated method stub
                 //MDR LÉ EREUR C POUR LÉ FèBLe
                 System.out.println("Erreur lors de la demande des groupes: " + error.toString());
             }
@@ -420,7 +414,6 @@ public class VolleyRequester
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // TODO Auto-generated method stub
                 //MDR LÉ EREUR C POUR LÉ FèBLe
                 System.out.println("Erreur lors de la demande des positions d'un groupe: " + error.toString());
             }

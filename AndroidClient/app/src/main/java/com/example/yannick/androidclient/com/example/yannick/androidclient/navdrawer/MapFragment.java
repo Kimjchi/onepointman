@@ -163,7 +163,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener() {
             @Override
             public void onGroundOverlayClick(GroundOverlay groundOverlay) {
-                //TODO: créer popup
                 int idDrawing = (int)groundOverlay.getTag();
                 popupDeleteDrawing(idDrawing).show();
             }
@@ -276,9 +275,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 rdvOkButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        //TODO Placer le point de RDV sur la carte + envoyer au backend
-
-
                         String dateString = datePickerText.getText().toString() + " " + hourPickerText.getText().toString();
                         restRequester.sendNewPinPoint(currentGroup, latLng, descriptionRdv.getText().toString(), dateString);
                         rdvDialog.dismiss();

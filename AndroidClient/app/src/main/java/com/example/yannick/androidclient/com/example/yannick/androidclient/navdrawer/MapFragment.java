@@ -136,6 +136,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         instance = this;
         startGpsService();
         Log.v("ON START MAP FRAGMEN", "On start "+currentGroup);
+        if(showDrawings)
+        {
+            VolleyRequester.getInstance(getActivity().getApplicationContext()).getDrawings(currentGroup);
+        }
     }
 
     @Override

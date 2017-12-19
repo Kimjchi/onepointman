@@ -17,7 +17,7 @@ export function* transmitPosition() {
             userlg: position.lng,
             userlt: position.lat
         };
-        let server = "http://localhost:3001/users/updateposition";
+        let server = "https://onepointman.herokuapp.com/users/updateposition";
         axios.post(server, data, {
             headers: {
                 'Content-Type': 'application/json'
@@ -43,7 +43,7 @@ export function* transmitSharingMode() {
 	        idgroup: idGroup,
 	        positionSharing : isSharing
         };
-        let server = "http://localhost:3001/users/updatepositionsharing";
+        let server = "https://onepointman.herokuapp.com/users/updatepositionsharing";
         axios.post(server, data, {
             headers: {
                 'Content-Type': 'application/json'
@@ -67,7 +67,7 @@ export function* createPinPoint() {
         console.log(pinPoint);
         console.log(userId);
         console.log(groupId);
-        let server = "http://localhost:3001/pinpoint/createpinpoint";
+        let server = "https://onepointman.herokuapp.com/pinpoint/createpinpoint";
         axios.post(server, pinPoint, {
             headers: {
                 'Content-Type': 'application/json'
@@ -101,7 +101,7 @@ export function* deletePinPoint() {
         console.log(idPinPoint);
         console.log(userId);
         console.log(groupId);
-        let server = "http://localhost:3001/pinpoint/deletepinpoint";
+        let server = "https://onepointman.herokuapp.com/pinpoint/deletepinpoint";
         axios.post(server, data, {
             headers: {
                 'Content-Type': 'application/json'

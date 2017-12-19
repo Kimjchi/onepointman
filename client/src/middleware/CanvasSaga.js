@@ -23,7 +23,7 @@ export function* requestSendDrawing() {
         let zoom = drawing.zoom;
         let bounds = drawing.bounds;
 
-        let server = "http://localhost:3001/drawing/createdrawing";
+        let server = "https://onepointman.herokuapp.com/drawing/createdrawing";
 
         axios.post(server, {
             iduser: idUser,
@@ -57,7 +57,7 @@ export function* requestGetDrawings() {
 
         let idUser = drawing.idUser;
         let idGroup = drawing.idGroup;
-        let server = "http://localhost:3001/groups/drawings/" + idUser + "/" + idGroup;
+        let server = "https://onepointman.herokuapp.com/groups/drawings/" + idUser + "/" + idGroup;
 
         axios.get(server)
             .then(function (response) {
@@ -90,7 +90,7 @@ export function* requestDeleteDrawing() {
         let idDrawing = drawing.id;
         let idUser = drawing.idUser;
         let idGroup = drawing.idGroup;
-        let server = "http://localhost:3001/drawing/deletedrawing";
+        let server = "https://onepointman.herokuapp.com/drawing/deletedrawing";
 
         axios.post(server, {
             iddrawing: idDrawing

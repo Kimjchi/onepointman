@@ -17,7 +17,7 @@ export function * requestUsersGroup() {
         let id = user.idUser;
         let idGroup = user.idGroup;
 
-        let server = "http://localhost:3001/"+idGroup+"/"+id;
+        let server = "https://onepointman.herokuapp.com/"+idGroup+"/"+id;
 
         axios.get(server)
             .then(function (response) {
@@ -44,7 +44,7 @@ export function * requestAddUsers() {
         let id = user.idToAdd;
         let idGroup = user.idGroup;
 
-        let server = "http://localhost:3001/users/createuser";
+        let server = "https://onepointman.herokuapp.com/users/createuser";
 
         axios.post(server, {
             iduser: id,
@@ -74,7 +74,7 @@ export function * requestDeleteUser() {
         let id = user.user.iduser;
         let idGroup = user.idGroup;
 
-        let server = "http://localhost:3001/users/deleteuser";
+        let server = "https://onepointman.herokuapp.com/users/deleteuser";
 
         axios.post(server, {
             iduser: id,
@@ -102,7 +102,7 @@ export function * requestFriends() {
         let user = yield take(GET_FRIENDS);
         let id = user.idUser;
 
-        let server = "http://localhost:3001/users/userFriends/"+id;
+        let server = "https://onepointman.herokuapp.com/users/userFriends/"+id;
         axios.get(server)
             .then(function (response) {
                 if (!!response.status && response.status === 200) {
@@ -150,7 +150,7 @@ export function * requestGroupInfo() {
         let idUser = user.idUser;
         let idGroup = user.idGroup;
 
-        let server = "http://localhost:3001/groups/getGroupInfo/"+idGroup;
+        let server = "https://onepointman.herokuapp.com/groups/getGroupInfo/"+idGroup;
 
         axios.get(server)
             .then(function (response) {

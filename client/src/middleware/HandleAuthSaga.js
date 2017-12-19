@@ -11,7 +11,7 @@ export function* HandleAuth() {
 
         yield take(HANDLE_AUTH_REQ);
 
-        let server = "http://localhost:3001/fblogin/handleauth?";
+        let server = "https://onepointman.herokuapp.com/fblogin/handleauth?";
 
         //console.log('Trying to reach URL : ' + server + window.location.href.substring(window.location.href.indexOf("?") + 1, window.location.href.length));
 

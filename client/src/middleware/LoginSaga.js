@@ -10,7 +10,7 @@ export function* requestLoginBack() {
 
         yield take(LOGIN_REQUEST);
 
-        let server = "http://localhost:3001/fblogin";
+        let server = "https://onepointman.herokuapp.com/fblogin";
 
         axios.get(server)
             .then(function (response) {

@@ -17,7 +17,7 @@ export function * requestGroups() {
         let user = yield take(GET_GROUPS);
         let id = user.idUser;
         let idGroup = user.idGroup;
-        let server = "http://localhost:3001/groups/"+id;
+        let server = "https://onepointman.herokuapp.com/groups/"+id;
         axios.get(server)
             .then(function (response) {
                 if (!!response.data.status && response.data.status === 'success') {
@@ -69,7 +69,7 @@ export function * requestAddGroup() {
         let id = user.idUser;
         let groupName = user.groupName;
 
-        let server = "http://localhost:3001/groups/creategroup/";
+        let server = "https://onepointman.herokuapp.com/groups/creategroup/";
 
         axios.post(server, {
             groupname: groupName,
@@ -116,7 +116,7 @@ export function * requestInfosGroup() {
         let user = yield take(GET_INFOS_GROUP);
         let idUser = user.idUser;
         let idGroup = user.idGroup;
-        let server = "http://localhost:3001/groups/positions/"+idUser+"/"+idGroup;
+        let server = "https://onepointman.herokuapp.com/groups/positions/"+idUser+"/"+idGroup;
 
         axios.get(server)
             .then(function (response) {
@@ -189,7 +189,7 @@ export function * requestChangeNameGroup() {
         let groupName = user.groupName;
         let idGroup = user.idGroup;
 
-        let server = "http://localhost:3001/groups/changegroupname";
+        let server = "https://onepointman.herokuapp.com/groups/changegroupname";
 
         axios.post(server, {
             newgroupname: groupName,
@@ -217,7 +217,7 @@ export function * requestMessage() {
         let user = yield take(GET_MESSAGE);
         let id = user.id;
         console.log(id);
-        let server = "http://localhost:3001/users/getmsg/"+id;
+        let server = "https://onepointman.herokuapp.com/users/getmsg/"+id;
 
         axios.get(server)
             .then(function (response) {
@@ -239,7 +239,7 @@ export function * requestUpdateMessage() {
         let user = yield take(UPDATE_MESSAGE);
         let id = user.id;
         let message = user.message;
-        let server = "http://localhost:3001/users/updatemsg";
+        let server = "https://onepointman.herokuapp.com/users/updatemsg";
 
         axios.post(server, {
             iduser: id,

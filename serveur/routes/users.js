@@ -44,6 +44,7 @@ router.post(('/updateposition'), function (req, res) {
                     console.log('Updated position of user in USER ');
                     console.log(groups);
                     groups.forEach(element => {
+                        console.log(element.sharesposition);
                         //pour chaque groupe, s'il décide de partager sa position avec, on update sa position
                         if (element.sharesposition === true) {
                             let query = squel.update()
@@ -52,6 +53,7 @@ router.post(('/updateposition'), function (req, res) {
                                 .set('userglg', toUpdate.userlg)
                                 .set('dateposition', currentTime.toISOString())
                                 .where('iduser = ?', toUpdate.iduser)
+                                .where('idgroup = ?', element.idgroup)
                                 .toString();
                             db.none(query)
                                 .then(() => {

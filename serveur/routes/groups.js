@@ -303,7 +303,7 @@ function buildTrackingArray(array) {
             }
         });
         if (containsIdUser) {
-            toReturn[indexInReturn].tracking.push({lt: element.lt, lg: element.lg});
+            toReturn[indexInReturn].tracking.push({latt: element.lat, lng: element.lng});
         }
         else {
             toReturn.push({iduser: parseInt(element.iduser), tracking: [{lt: element.lt, lg: element.lg}]})

@@ -52,7 +52,7 @@ router.post('/createdrawing', function (req, res) {
 });
 
 //Ce serait peut etre mieux de le supprimer carrément? plutôt que de le set inactif
-router.post('deletedrawing', function (req, res) {
+router.post('/deletedrawing', function (req, res) {
     var toDelete = {
         iddrawing: req.body.iddrawing
     };

@@ -123,7 +123,6 @@ public class SettingsGroup extends AppCompatActivity {
                         .setPositiveButton(R.string.oui, new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                //TODO Envoyer la requete de delete
                                 Toast.makeText(getApplicationContext(), "Groupe delete", Toast.LENGTH_SHORT).show();
                                 onBackPressed();
                             }})

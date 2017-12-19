@@ -116,11 +116,14 @@ export function * requestInfosGroup() {
         let user = yield take(GET_INFOS_GROUP);
         let idUser = user.idUser;
         let idGroup = user.idGroup;
+
         let server = "https://onepointman.herokuapp.com/groups/positions/"+idUser+"/"+idGroup;
+
 
         axios.get(server)
             .then(function (response) {
                 if(!!response.data.status && response.data.status === 'success') {
+                    console.log(response.data);
                     let pinpoints = response.data.message.pinpoints;
                     let newPinpoints = [];
                     pinpoints.map((pinPoint => {
@@ -161,11 +164,11 @@ export function * requestInfosGroup() {
                     let isSharing = response.data.message.issharing;
                     store.dispatch(changeSharing(isSharing));
 
-                    let trackings = response.data.message.trackings;
+                   let trackings = response.data.message.trackings;
 
                     let trackingsFormat = [];
                     trackings.map((tracking => {
-                        if(!!trackings.iduser) {
+                        if(!!tracking.iduser) {
                             let newTracking = {
                                 iduser: tracking.iduser,
                                 path: tracking.tracking
@@ -173,7 +176,8 @@ export function * requestInfosGroup() {
                             trackingsFormat.push(newTracking);
                         }
                     }));
-                    store.dispatch(changeTrackings(trackings));
+                    console.log("Wow" + trackingsFormat);
+                    store.dispatch(changeTrackings(trackingsFormat));
                 }
             })
             .catch(function (error) {
@@ -259,7 +263,7 @@ export function * requestUpdateMessage() {
     }
 }
 
-export function * GroupsFlow() {
+export function * GroupsFlow(socket) {
     yield fork(requestGroups);
     yield fork(requestAddGroup);
     yield fork(requestPhoto);

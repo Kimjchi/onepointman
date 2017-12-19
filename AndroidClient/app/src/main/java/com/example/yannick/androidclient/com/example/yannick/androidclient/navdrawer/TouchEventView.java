@@ -29,6 +29,7 @@ public class TouchEventView extends View
     private float mX, mY;
 
     public static int MAX_VALUE_STROKE = 70;
+    public static int MIN_TOLERANCE = 1;
 
     private HashMap<Path, Paint> donepathsMap;
     private HashMap<Path, Paint> undonePathsMap;
@@ -98,7 +99,7 @@ public class TouchEventView extends View
             case MotionEvent.ACTION_MOVE:
                 float dx = Math.abs(xPos - mX);
                 float dy = Math.abs(yPos - mY);
-                if (dx >= 4 || dy >= 4) {
+                if (dx >= MIN_TOLERANCE || dy >= MIN_TOLERANCE) {
                     path.quadTo(mX, mY, (xPos+ mX)/2, (yPos + mY)/2);
                     mX = xPos;
                     mY = yPos;

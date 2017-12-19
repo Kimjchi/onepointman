@@ -3,6 +3,7 @@ package com.example.yannick.androidclient.com.example.yannick.androidclient.navd
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -21,7 +22,11 @@ import android.widget.TextView;
 
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
 import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.socket.SocketService;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 public class NavDrawer extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -34,7 +39,9 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
     private static final int DESSINER = 1;
     private static final int STOP_DESSINER = 2;
     private static final int ENVOYER_DESSIN = 3;
-    private static final int DELETE_TRACKING = 4;
+    private static final int DELETE_TRACE = 4;
+    private static final int SHOW_DRAWINGS = 5;
+    private static final int SHOW_TRACES = 6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,11 +80,6 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
 
         isDrawing = false;
 
-        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu, false);
-
-        final Handler updateGroupInfos = new Handler();
-        final String url = "http://api.geonames.org/citiesJSON?north=44.1&south=-9.9&east=-22.4&west=55.2&lang=de&username=demo";
-
         drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -106,6 +108,9 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             }
         });
 
+        Intent socket = new Intent(getBaseContext(), SocketService.class);
+        startService(socket);
+
     }
     public Menu getMenu() {
         return navigationMenu;
@@ -114,7 +119,6 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
     @Override
     protected void onResume() {
         super.onResume();
-        VolleyRequester.getInstance(getApplicationContext()).displayGroupForNavDrawer(navigationMenu, true);
     }
 
     @Override
@@ -127,15 +131,32 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         }
     }
 
+    public void updateSettingsMenuOptions(boolean draw)
+    {
+        settingsMenu.clear();
+        if(draw)
+        {
+            settingsMenu.add(Menu.NONE, ENVOYER_DESSIN, Menu.NONE, "Envoyer le dessin");
+            settingsMenu.add(Menu.NONE, STOP_DESSINER, Menu.NONE, "Annuler le dessin");
+        }
+        else {
+            settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
+            settingsMenu.add(Menu.NONE, SHOW_DRAWINGS, Menu.NONE, "Afficher dessins")
+                    .setCheckable(true)
+                    .setChecked(MapFragment.instance.isShowDrawings());
+            settingsMenu.add(Menu.NONE, SHOW_TRACES, Menu.NONE, "Afficher tracés")
+                    .setCheckable(true)
+                    .setChecked(MapFragment.instance.isShowTraces());
+            settingsMenu.add(Menu.NONE, DELETE_TRACE, Menu.NONE, "Supprimer ma trace");
+        }
+    }
+
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         settingsMenu = menu;
-        settingsMenu.clear();
-        settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
-        settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
-        settingsMenu.add(Menu.NONE, 7, Menu.NONE, "Afficher dessins");
+        updateSettingsMenuOptions(isDrawing);
         return true;
     }
 
@@ -146,17 +167,15 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         switch (id)
         {
             case DESSINER:
-                settingsMenu.clear();
-                settingsMenu.add(Menu.NONE, ENVOYER_DESSIN, Menu.NONE, "Envoyer le dessin");
-                settingsMenu.add(Menu.NONE, STOP_DESSINER, Menu.NONE, "Annuler le dessin");
+                updateSettingsMenuOptions(true);
+                CameraPosition.Builder camPosition = new CameraPosition.Builder(mapFragment.mMap.getCameraPosition());
+                camPosition.bearing(0);
+                mapFragment.mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPosition.build()));
                 mapFragment.takeSnapshotAndLauchDrawFragment(getFragmentManager());
                 isDrawing = true;
                 break;
             case STOP_DESSINER:
-                settingsMenu.clear();
-                settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
-                settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
-                settingsMenu.add(Menu.NONE, 7, Menu.NONE, "Afficher dessins");
+                updateSettingsMenuOptions(false);
                 getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
                 isDrawing = false;
                 break;
@@ -179,11 +198,8 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                         VolleyRequester.getInstance(getApplicationContext())
                                 .sendDrawing(drawFragment.getIdgroup(), description,
                                         drawFragment.getZoom(), drawFragment.getBounds(), image);
-                        
-                        settingsMenu.clear();
-                        settingsMenu.add(Menu.NONE, DESSINER, Menu.NONE, "Dessiner");
-                        settingsMenu.add(Menu.NONE, DELETE_TRACKING, Menu.NONE, "Supprimer le tracking");
-                        settingsMenu.add(Menu.NONE, 7, Menu.NONE, "Afficher dessins");
+
+                        updateSettingsMenuOptions(false);
                         getFragmentManager().beginTransaction().replace(R.id.content_frame, mapFragment, "MAP_FRAGMENT").commit();
                         isDrawing = false;
                     }
@@ -196,14 +212,29 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
                 });
 
                 builder.show();
-                //TODO REQUETE ENVOI DU DESSIN
                 break;
-            case DELETE_TRACKING:
+            case DELETE_TRACE:
                 VolleyRequester.getInstance(getApplicationContext()).updateTracking(false, MapFragment.instance.getCurrentGroup());
                 VolleyRequester.getInstance(getApplicationContext()).deleteTracking(MapFragment.instance.getCurrentGroup());
                 break;
-            case 7:
-                VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
+            case SHOW_DRAWINGS:
+                item.setChecked(!item.isChecked());
+                MapFragment.instance.setShowDrawings(item.isChecked());
+                if(item.isChecked() == false)
+                {
+                    MapFragment.instance.clearDrawings();
+                    MapFragment.instance.mMap.clear();
+                    VolleyRequester.getInstance(getApplicationContext())
+                            .groupPositionUpdate(MapFragment.instance.getCurrentGroup());
+                }
+                else
+                {
+                    VolleyRequester.getInstance(getApplicationContext()).getDrawings(mapFragment.getCurrentGroup());
+                }
+                break;
+            case SHOW_TRACES:
+                item.setChecked(!item.isChecked());
+                MapFragment.instance.setShowTraces(item.isChecked());
                 break;
         }
 
@@ -260,7 +291,15 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         return true;
     }
 
-    public Menu getNavigationMenu(){
-        return navigationMenu;
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SocketService.getInstance().stopSelf();
     }
 }

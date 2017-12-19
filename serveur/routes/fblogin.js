@@ -83,11 +83,16 @@ const _bindLoggedUserData = (responseFromfb) => {
     loggedUser.nom = responseFromfb.last_name;
     loggedUser.photo = responseFromfb.picture;
     loggedUser.iduser = facebookdata.userFbId
-}
+};
 
-const _updateDataAfterAuth = () => {
-    //TODO: update last connection
+const _updateDataAfterAuth = (user_id) => {
     //TODO: set is logged = true
+    return db.query(squel
+        .update()
+        .table('"USER"')
+        .set('lastconnexion', 'now()')
+        .where('iduser = ?', user_id)
+        .toString())
 };
 
 let loggedUser = {
@@ -148,13 +153,18 @@ router.get('/handleauth', function (req, res, next) {
                                         console.log('User does not exist. Creating user with facebook ID : ' + facebookdata.userFbId);
 
                                         _insertNewUser(facebookdata.userFbId, loggedUser.nom, loggedUser.prenom);
-
-                                        _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
                                     } else {
                                         console.log('User with ID : ' + facebookdata.userFbId + 'already exists in database');
-
-                                        _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
                                     }
+
+                                    _updateDataAfterAuth(facebookdata.userFbId)
+                                        .then(() => {})
+                                        .catch(error => {
+                                            console.log(error);
+                                        });
+                                    ;
+
+                                    _sendResponse(sender.SUCCESS_STATUS, loggedUser, res);
                                 })
                                 .catch(error => {
                                     console.log(error);

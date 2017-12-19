@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {withGoogleMap, GoogleMap, Marker, InfoWindow, OverlayView, GroundOverlay} from "react-google-maps"
+import {withGoogleMap, GoogleMap, Marker, InfoWindow, OverlayView, GroundOverlay, Polyline} from "react-google-maps"
 import GoogleMapsWrapper from "../util/GoogleMapsWrapper";
 import '../style/Map.css';
 import dateFormat from "dateformat";
@@ -125,6 +125,21 @@ class Map extends Component {
                                     new window.google.maps.LatLng(parseFloat(drawing.nelt), parseFloat(drawing.nelg))
                                 )}
                                 defaultOpacity={1}
+                            />
+                        })
+                    }
+
+                    {this.props.isMarkerShown &&
+                        this.props.trackings.map((tracking, index) => {
+                            return <Polyline
+                                key={index}
+                                path={tracking.path}
+                                geodesic={true}
+                                options={{
+                                    strokeColor: '#ff2527',
+                                    strokeOpacity: 1.0,
+                                    strokeWeight: 2
+                                }}
                             />
                         })
                     }

@@ -10,6 +10,8 @@ import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +37,7 @@ import android.widget.Toast;
 
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.draw.Drawing;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.socket.SocketService;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -47,6 +50,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONException;
@@ -78,18 +82,33 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private int currentTag = 0;
     public static MapFragment instance = null;
     public VolleyRequester restRequester = null;
-    private Map<String, MarkerOptions> markers = new HashMap<String, MarkerOptions>();
-    private Map<Integer, PolylineOptions> trace = new HashMap<Integer, PolylineOptions>();
+    private Map<String, Marker> markers = new HashMap<String, Marker>();
+    private Map<Integer, Polyline> trace = new HashMap<Integer, Polyline >();
     private HashMap<Drawing, GroundOverlay> drawings = new HashMap<>();
     private Bitmap cap;
+    private LatLng positionBeforeDrawing;
+    private float zoomBeforeDrawing;
+    private boolean showDrawings;
+    private boolean showTraces;
+    private SharedPreferences sharedPreferences;
 
     public int getCurrentGroup(){return currentGroup;}
-    public void setCurrentGroup(int group){currentGroup = group;}
+    public void setCurrentGroup(int group)
+    {
+        currentGroup = group;
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putInt("groupId", group);
+        edit.commit();
+    }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        sharedPreferences = getActivity().getApplicationContext()
+                .getSharedPreferences("OnePointMan", Context.MODE_PRIVATE);
+        showDrawings = sharedPreferences.getBoolean("showDrawing", false);
+        showTraces = sharedPreferences.getBoolean("showTraces", false);
+        currentGroup = sharedPreferences.getInt("groupId", 0);
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         ImageButton upButton = (ImageButton) view.findViewById(R.id.center_position);
         upButton.setOnClickListener(new View.OnClickListener() {
@@ -101,11 +120,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         LatLng ltLg = markers.get("_MY_SELF_").getPosition();
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ltLg, 15));
                     } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "Impossible de trouver votre position...:", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "Impossible de trouver votre position.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         });
+        Log.v("CREATE VIEW MAP FRAGMEN", "Create view "+currentGroup);
         return view;
     }
 
@@ -117,12 +137,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         restRequester.groupsRequest();
         instance = this;
         startGpsService();
+        Log.v("ON START MAP FRAGMEN", "On start "+currentGroup);
+        if(showDrawings)
+        {
+            VolleyRequester.getInstance(getActivity().getApplicationContext()).getDrawings(currentGroup);
+        }
     }
 
     @Override
     public void onStop(){
         super.onStop();
         stopDisplayThread();
+        Log.v("ON STOP MAP FRAGMEN", "On stop "+currentGroup);
     }
 
     @Override
@@ -139,7 +165,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener() {
             @Override
             public void onGroundOverlayClick(GroundOverlay groundOverlay) {
-                //TODO Check which overylay is clicked
+                int idDrawing = (int)groundOverlay.getTag();
+                popupDeleteDrawing(idDrawing).show();
             }
         });
 
@@ -250,9 +277,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 rdvOkButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        //TODO Placer le point de RDV sur la carte + envoyer au backend
-
-
                         String dateString = datePickerText.getText().toString() + " " + hourPickerText.getText().toString();
                         restRequester.sendNewPinPoint(currentGroup, latLng, descriptionRdv.getText().toString(), dateString);
                         rdvDialog.dismiss();
@@ -270,6 +294,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 rdvDialog.show();
             }
         });
+        if(positionBeforeDrawing != null)
+        {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(positionBeforeDrawing,
+                    zoomBeforeDrawing));
+        }
     }
 
     @Override
@@ -352,7 +381,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
     
     public void startDisplayThread() {
-        updateMyPosition = new DisplayThread();
+        updateMyPosition = new DisplayThread(currentGroup);
         updateMyPosition.run();
         Log.v("GPS Service", "Display thread started");
     }
@@ -366,41 +395,56 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void addMarker(String name, MarkerOptions marker){
         synchronized(markers) {
-            markers.put(name, marker);
+            if (markers.get(name)!= null){
+                markers.get(name).remove();
+            }
+
+            if (name.length() > 8) {
+                if (name.substring(0, 8).equals("Pinpoint")) {
+                    markers.put(name, mMap.addMarker(marker));
+                    Marker pinpoint = markers.get(name);
+                    pinpoint.setTag(Integer.parseInt(name.substring(8)));
+                } else {
+                    markers.put(name, mMap.addMarker(marker));
+                    Marker classicMarker = markers.get(name);
+                    classicMarker.setTag(0);
+                }
+            } else {
+                markers.put(name, mMap.addMarker(marker));
+                Marker classicMarker = markers.get(name);
+                classicMarker.setTag(0);
+            }
         }
     }
 
-    public void updateDisplayMarkers(){
-        if (mMap != null) {
-            mMap.clear();
-            synchronized(markers) {
-                for (Map.Entry<String, MarkerOptions> marker : markers.entrySet()) {
-                    if (marker.getKey().length() > 8) {
-                        if (marker.getKey().substring(0, 8).equals("Pinpoint")) {
-                            Marker pinpoint = mMap.addMarker(marker.getValue());
-                            pinpoint.setTag(Integer.parseInt(marker.getKey().substring(8)));
-                        } else {
-                            Marker classicMarker = mMap.addMarker(marker.getValue());
-                            classicMarker.setTag(0);
-                        }
-                    } else {
-                        Marker classicMarker = mMap.addMarker(marker.getValue());
-                        classicMarker.setTag(0);
-                    }
-                }
-            }
-            for (Map.Entry<Integer, PolylineOptions> traceToDisplay : trace.entrySet()) {
-                mMap.addPolyline(traceToDisplay.getValue());
-            }
-            displayDrawings();
-        }
-    }
     public void clearMarkers(){
         synchronized(markers) {
+            mMap.clear();
             markers.clear();
             trace.clear();
             clearDrawings();
         }
+    }
+
+    public AlertDialog popupDeleteDrawing(final int drawId){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setMessage("Voulez-vous vraiment supprimer ce dessin?")
+                .setTitle("Suppression du dessin");
+
+        builder.setPositiveButton("Annuler", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNeutralButton("Supprimer", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                VolleyRequester.getInstance(getActivity().getApplicationContext()).deleteDrawing(drawId);
+            }
+        });
+        return builder.create();
     }
 
     public AlertDialog popupBuilderInfoMarker(final Marker marker){
@@ -447,7 +491,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         else
         {
-            rdvOkButton.setEnabled(false);
+                rdvOkButton.setEnabled(false);
         }
     }
 
@@ -462,6 +506,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 drawFragment.setZoom(getCurrentZoom());
                 drawFragment.setBounds(bounds);
                 drawFragment.setIdgroup(currentGroup);
+                zoomBeforeDrawing = getCurrentZoom();
+                positionBeforeDrawing = mMap.getCameraPosition().target;
                 fm.beginTransaction().replace(R.id.content_frame, drawFragment, "DRAW_FRAGMENT").commit();
             }
         };
@@ -506,11 +552,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
              //Pour chaque position
              for(int i=0; i< traceJson.getJSONArray("tracking").length(); i++) {
                  position = traceJson.getJSONArray("tracking").getJSONObject(i);
-                 line.add(new LatLng(position.getDouble("lt"),position.getDouble("lg")));
+                 line.add(new LatLng(position.getDouble("lat"),position.getDouble("lng")));
              }
              line.startCap(new CustomCap(BitmapDescriptorFactory.fromBitmap(cap),30));
 
-             trace.put(traceJson.getInt("iduser"), line);
+             trace.put(traceJson.getInt("iduser"), mMap.addPolyline(line));
          } catch (JSONException e) {
              e.printStackTrace();
          }
@@ -532,21 +578,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         drawings.clear();
     }
 
-    public void displayDrawings()
+    public void displayDrawing(Drawing drawing)
     {
-        Log.v("DISPLAY_DRAWING", "Dessins a afficher :" + this.drawings.size());
-        for(Drawing drawing : this.drawings.keySet())
-        {
-            /*if(this.drawings.get(drawing) == null)
-            {*/
-                GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
-                        .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
-                        .positionFromBounds(drawing.getBounds());
-                drawingOverlayOptions.clickable(true);
-                GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
-                this.drawings.put(drawing, drawingOverlay);
-            //}
-        }
+        GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
+                .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
+                .positionFromBounds(drawing.getBounds())
+                .clickable(true);
+        
+        GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
+        drawingOverlay.setTag(drawing.getIdDrawing());
+        this.drawings.put(drawing, drawingOverlay);
     }
 
     public void addDrawingToList(JSONObject draw)
@@ -554,33 +595,61 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         try
         {
             int idDrawing = draw.getInt("iddrawing");
-
+            boolean alreadyExist = false;
+            Drawing drawing = null;
             for(Drawing d : this.drawings.keySet())
             {
                 if(d.getIdDrawing() == idDrawing)
                 {
-                    return;
+                    drawing = d;
+                    alreadyExist = true;
                 }
             }
+            if (!alreadyExist) {
+                String idCreator = draw.getString("idcreator");
+                String nomCreator = draw.getString("nomcreator");
+                String prenomCreator = draw.getString("prenomcreator");
+                LatLng sw = new LatLng(Double.parseDouble(draw.getString("swlt")),
+                        Double.parseDouble(draw.getString("swlg")));
+                LatLng ne = new LatLng(Double.parseDouble(draw.getString("nelt")),
+                        Double.parseDouble(draw.getString("nelg")));
+                LatLngBounds bounds = new LatLngBounds(sw, ne);
+                String stringImage = draw.getString("img");
 
-            String idCreator = draw.getString("idcreator");
-            String nomCreator = draw.getString("nomcreator");
-            String prenomCreator = draw.getString("prenomcreator");
-            LatLng sw = new LatLng(Double.parseDouble(draw.getString("swlt")),
-                    Double.parseDouble(draw.getString("swlg")));
-            LatLng ne = new LatLng(Double.parseDouble(draw.getString("nelt")),
-                    Double.parseDouble(draw.getString("nelg")));
-            LatLngBounds bounds = new LatLngBounds(sw, ne);
-            String stringImage = draw.getString("img");
-
-            Drawing drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
-                    prenomCreator, bounds, stringImage);
-
-            this.drawings.put(drawing, null);
+                drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
+                        prenomCreator, bounds, stringImage);
+            }
+            if(isShowDrawings())
+                displayDrawing(drawing);
         }
         catch(Exception ex)
         {
             Log.v("MAP_FRAG_DRAW", "Error poto: "+ex.getMessage());
         }
+
+
+    }
+
+    public boolean isShowDrawings() {
+        return showDrawings;
+    }
+
+    public void setShowDrawings(boolean showDrawings)
+    {
+        this.showDrawings = showDrawings;
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putBoolean("showDrawing", showDrawings);
+        edit.commit();
+    }
+
+    public boolean isShowTraces() {
+        return showTraces;
+    }
+
+    public void setShowTraces(boolean showTraces) {
+        this.showTraces = showTraces;
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putBoolean("showTraces", showTraces);
+        edit.commit();
     }
 }

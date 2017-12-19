@@ -31,9 +31,6 @@ var database = "d71i59h5089d3k"; // database name
 var database_port = '5432';
 var conString = "postgres://" + username + ":" + password + "@" + host + ':' + database_port + "/" + database + "?ssl=true"; // Your Database Connection
 
-// Set up your database query to display GeoJSON
-var query = 'SELECT now()';
-
 var client = new pg.Client(conString);
 client.connect();
 
@@ -46,10 +43,6 @@ DB.query(squel.select().field('NOW()').toString()).then(function (res) {
 }).catch(function (err) {
     console.error('Unable to connect to the database', err);
 });
-
-/*client.query(query, function (row, result) {
-    console.log(result.rows[0].now);
-});*/
 
 module.exports = DB;
 //# sourceMappingURL=index.js.map

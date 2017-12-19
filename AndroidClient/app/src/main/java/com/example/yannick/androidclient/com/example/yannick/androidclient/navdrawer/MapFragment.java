@@ -601,22 +601,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         drawings.clear();
     }
 
-    public void displayDrawings()
+    public void displayDrawing(Drawing drawing)
     {
-        Log.v("DISPLAY_DRAWING", "Dessins a afficher :" + this.drawings.size());
-        for(Drawing drawing : this.drawings.keySet())
-        {
+        GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
+                .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
+                .positionFromBounds(drawing.getBounds())
+                .clickable(true);
 
-                GroundOverlayOptions drawingOverlayOptions = new GroundOverlayOptions()
-                        .image(BitmapDescriptorFactory.fromBitmap(drawing.getImage()))
-                        .positionFromBounds(drawing.getBounds())
-                        .clickable(true);
-
-                GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
-                drawingOverlay.setTag(drawing.getIdDrawing());
-                this.drawings.put(drawing, drawingOverlay);
-
-        }
+        GroundOverlay drawingOverlay =  mMap.addGroundOverlay(drawingOverlayOptions);
+        drawingOverlay.setTag(drawing.getIdDrawing());
+        this.drawings.put(drawing, drawingOverlay);
     }
 
     public void addDrawingToList(JSONObject draw)
@@ -646,9 +640,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Drawing drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
                     prenomCreator, bounds, stringImage);
 
-            this.drawings.put(drawing, null);
             if(isShowDrawings())
-                displayDrawings();
+                displayDrawing(drawing);
         }
         catch(Exception ex)
         {

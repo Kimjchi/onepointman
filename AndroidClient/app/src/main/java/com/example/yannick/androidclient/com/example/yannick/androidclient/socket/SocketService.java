@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.MapFragment;
@@ -26,20 +27,23 @@ public class SocketService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return null;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         try {
-            socket = IO.socket(VolleyRequester.getInstance(getApplicationContext()).URL_SERVEUR);
+            socket = IO.socket(VolleyRequester.getInstance(getApplicationContext()).URL_SERVEUR+":3002");
+            socket.connect();
+            socket.on("Notification", onNotif);
+            socket.on("userAdded Notification", onAddToGroup);
+            socket.on("userDeleted Notification", onRemoveFromGroup);
+            Log.v("SOCKET", "CREATED");
         } catch (URISyntaxException e) {
             e.printStackTrace();
+            Log.v("SOCKET", "FAIL");
         }
-        socket.connect();
-        socket.on("userAdded Notification", onAddToGroup);
-        socket.on("userDeleted Notification", onRemoveFromGroup);
     }
 
     @Override
@@ -51,10 +55,18 @@ public class SocketService extends Service {
         socket.off("userDeleted Notification", onRemoveFromGroup);
     }
 
+    private Emitter.Listener onNotif = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            Log.v("ON_NOTIF", args[0].toString());
+        }
+    };
+
     private Emitter.Listener onAddToGroup = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
             sendNotification("Vous avez été retiré du groupe", "");
+            Log.v("PUSH", "Remove");
         }
     };
 
@@ -62,6 +74,7 @@ public class SocketService extends Service {
         @Override
         public void call(final Object... args) {
             sendNotification("Vous avez été ajouté au groupe", "");
+            Log.v("PUSH", "Add");
         }
     };
 

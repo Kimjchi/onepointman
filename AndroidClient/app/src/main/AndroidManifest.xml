@@ -56,6 +56,8 @@
             android:name=".com.example.yannick.androidclient.friendlist.AddUserToGroup"
             android:label="@string/title_activity_add_user_to_group"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <service android:name=".com.example.yannick.androidclient.socket.SocketService"></service>
     </application>
 
 </manifest>

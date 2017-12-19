@@ -13,8 +13,6 @@ export function* HandleAuth(socket) {
 
         let server = "http://localhost:3001/fblogin/handleauth?";
 
-        //console.log('Trying to reach URL : ' + server + window.location.href.substring(window.location.href.indexOf("?") + 1, window.location.href.length));
-
         axios.get(server + window.location.href.substring(window.location.href.indexOf("?") + 1, window.location.href.length))
             .then(function (response) {
                 if (!!response.status && response.status === 200) {

@@ -8,14 +8,18 @@ import {OptionsFlow} from "./OptionsSaga";
 import {CanvasFlow} from "./CanvasSaga";
 import openSocket from 'socket.io-client';
 
-
-//TODO: establish websocket connection
 const socket = openSocket('http://localhost:3002');
 
 socket.on('Notification', (data) => {
-    //alert(data);
     notify(data);
-    //nm.info(data, 'Success');
+});
+
+socket.on('userAdded Notification', (data) => {
+    notify(data.message);
+});
+
+socket.on('userDeleted Notification', (data) => {
+    notify(data.message);
 });
 
 function notify(message) {

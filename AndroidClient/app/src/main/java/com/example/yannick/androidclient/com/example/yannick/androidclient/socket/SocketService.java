@@ -45,7 +45,7 @@ public class SocketService extends Service {
         super.onCreate();
         instance = this;
         try {
-            socket = IO.socket(VolleyRequester.getInstance(getApplicationContext()).URL_SERVEUR+":3002");
+            socket = IO.socket(VolleyRequester.getInstance(getApplicationContext()).URL_SERVEUR+":3001");
             socket.connect();
             JSONObject jsonObject = new JSONObject("{\"userId\":\""+ FacebookInfosRetrieval.user_id+"\"}");
             Log.v("SOCKET", jsonObject.toString());
@@ -81,7 +81,14 @@ public class SocketService extends Service {
     private Emitter.Listener onRemoveFromGroup = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            sendNotification("Vous avez été retiré du groupe", "");
+            String title = null;
+            try {
+                JSONObject obj = new JSONObject(args[0].toString());
+                title = obj.getString("message");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            sendNotification(title, "");
             Log.v("SOCKET", "Remove");
         }
     };
@@ -89,7 +96,14 @@ public class SocketService extends Service {
     private Emitter.Listener onAddToGroup = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            sendNotification("Vous avez été ajouté au groupe", "");
+            String title = null;
+            try {
+                JSONObject obj = new JSONObject(args[0].toString());
+                title = obj.getString("message");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            sendNotification(title, "");
             Log.v("SOCKET", "Add");
         }
     };

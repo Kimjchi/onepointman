@@ -3,6 +3,7 @@ package com.example.yannick.androidclient.com.example.yannick.androidclient.navd
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 
 import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
 import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.socket.SocketService;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -106,6 +108,8 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             }
         });
 
+        Intent socket = new Intent(this, SocketService.class);
+        startService(socket);
     }
     public Menu getMenu() {
         return navigationMenu;

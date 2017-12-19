@@ -620,28 +620,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         try
         {
             int idDrawing = draw.getInt("iddrawing");
-
+            boolean alreadyExist = false;
+            Drawing drawing = null;
             for(Drawing d : this.drawings.keySet())
             {
                 if(d.getIdDrawing() == idDrawing)
                 {
-                    return;
+                    drawing = d;
+                    alreadyExist = true;
                 }
             }
+            if (!alreadyExist) {
+                String idCreator = draw.getString("idcreator");
+                String nomCreator = draw.getString("nomcreator");
+                String prenomCreator = draw.getString("prenomcreator");
+                LatLng sw = new LatLng(Double.parseDouble(draw.getString("swlt")),
+                        Double.parseDouble(draw.getString("swlg")));
+                LatLng ne = new LatLng(Double.parseDouble(draw.getString("nelt")),
+                        Double.parseDouble(draw.getString("nelg")));
+                LatLngBounds bounds = new LatLngBounds(sw, ne);
+                String stringImage = draw.getString("img");
 
-            String idCreator = draw.getString("idcreator");
-            String nomCreator = draw.getString("nomcreator");
-            String prenomCreator = draw.getString("prenomcreator");
-            LatLng sw = new LatLng(Double.parseDouble(draw.getString("swlt")),
-                    Double.parseDouble(draw.getString("swlg")));
-            LatLng ne = new LatLng(Double.parseDouble(draw.getString("nelt")),
-                    Double.parseDouble(draw.getString("nelg")));
-            LatLngBounds bounds = new LatLngBounds(sw, ne);
-            String stringImage = draw.getString("img");
-
-            Drawing drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
-                    prenomCreator, bounds, stringImage);
-
+                drawing = new Drawing(idDrawing, getCurrentGroup(), idCreator, nomCreator,
+                        prenomCreator, bounds, stringImage);
+            }
             if(isShowDrawings())
                 displayDrawing(drawing);
         }

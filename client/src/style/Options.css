@@ -690,3 +690,7 @@ body .wrapper .menu-icon {
     height: 100vh;
 }*/
 
+body .wrapper li a.drawings {
+    text-indent: 10px;
+    text-align:center;
+}

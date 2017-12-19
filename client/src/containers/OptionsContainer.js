@@ -503,7 +503,8 @@ class OptionsContainer extends Component {
                                 drawingsGroup.length !== 0 && drawingsGroup.map((drawing, index) => {
                                     return <li key={index} onClick={this._showDessin.bind(this, drawing)}
                                                onContextMenu={this._open2.bind(this, drawing)}>
-                                        <a>{(drawing.show ? "- " : "+ ")}{drawing.description} made
+                                        <a className = 'drawings' style={{'color' : (drawing.show ? '#ffffff' : '#a1a1a1')}} >
+                                        {drawing.description} made
                                             by {drawing.prenomcreator} {drawing.nomcreator}</a>
                                     </li>
                                 })

@@ -132,11 +132,12 @@ class Map extends Component {
                     {this.props.isMarkerShown &&
                         this.props.trackings.map((tracking, index) => {
                             return <Polyline
+                                key={index}
                                 path={tracking.path}
                                 geodesic={true}
                                 options={{
                                     strokeColor: '#ff2527',
-                                    strokeOpacity: 0.0,
+                                    strokeOpacity: 1.0,
                                     strokeWeight: 2
                                 }}
                             />

@@ -168,10 +168,15 @@ export function * requestInfosGroup() {
 
                     let trackingsFormat = [];
                     trackings.map((tracking => {
+                        console.log(tracking);
                         if(!!tracking.iduser) {
+                            let tracks = tracking.tracking.map(track => {
+                                return {lat: parseFloat(track.lat), lng: parseFloat(track.lng)};
+                            });
+                            console.log(tracks);
                             let newTracking = {
                                 iduser: tracking.iduser,
-                                path: tracking.tracking
+                                path: tracks
                             };
                             trackingsFormat.push(newTracking);
                         }

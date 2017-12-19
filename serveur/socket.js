@@ -43,6 +43,8 @@ const sendNotification = (notificationType, userIdToNotif, ...data) => {
     let clientSocket = mapSocketUser.get(userIdToNotif);
 
     //For group notifType => data[0] = groupName
+	console.log('clientSocket : ' + clientSocket);
+	console.log('userIdToNotif : ' + userIdToNotif);
     switch (notificationType) {
         case ADD_GROUP_NOTIFICATION_TYPE :
             clientSocket.emit('userAdded Notification', {message: 'Ajouté au groupe ' + data[0] + ' !'});

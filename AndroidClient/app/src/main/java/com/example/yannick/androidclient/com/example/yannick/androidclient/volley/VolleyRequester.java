@@ -73,7 +73,7 @@ public class VolleyRequester
     private RequestQueue requestQueue;
     private static Context context;
     //private final String URL_SERVEUR = "http://192.168.0.108:3001";
-    public final String URL_SERVEUR = "http://192.168.137.1:3001";
+    private final String URL_SERVEUR = "http://192.168.137.1:3001";
     //private final String URL_SERVEUR = "http://192.168.43.202:3001";
     //public final String URL_SERVEUR = "https://onepointman.herokuapp.com";
 

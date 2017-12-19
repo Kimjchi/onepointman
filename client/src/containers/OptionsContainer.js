@@ -489,6 +489,14 @@ class OptionsContainer extends Component {
                                     </div>
                                 </a>
                             </li>
+                            <li>
+                                <a href='#'
+                                   onClick={this._handleModeDessin}>
+                                    <div>
+                                        Mode dessin
+                                    </div>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <span/>

@@ -9,6 +9,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.example.yannick.androidclient.R;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.login.FacebookInfosRetrieval;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.navdrawer.MapFragment;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.github.nkzawa.emitter.Emitter;
@@ -34,8 +35,9 @@ public class SocketService extends Service {
     public void onCreate() {
         super.onCreate();
         try {
-            socket = IO.socket(VolleyRequester.getInstance(getApplicationContext()).URL_SERVEUR+":3002");
+            socket = IO.socket("http://192.168.137.1:3002");
             socket.connect();
+            socket.emit("mapUserID", "{\"userId\":\""+ FacebookInfosRetrieval.user_id+"\"}");
             socket.on("Notification", onNotif);
             socket.on("userAdded Notification", onAddToGroup);
             socket.on("userDeleted Notification", onRemoveFromGroup);

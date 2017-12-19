@@ -108,8 +108,9 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
             }
         });
 
-        Intent socket = new Intent(this, SocketService.class);
+        Intent socket = new Intent(getBaseContext(), SocketService.class);
         startService(socket);
+
     }
     public Menu getMenu() {
         return navigationMenu;
@@ -288,5 +289,17 @@ public class NavDrawer extends AppCompatActivity implements NavigationView.OnNav
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SocketService.getInstance().stopSelf();
     }
 }

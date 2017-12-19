@@ -23,10 +23,16 @@ import java.net.URISyntaxException;
 public class SocketService extends Service {
 
     private com.github.nkzawa.socketio.client.Socket socket;
+    private static SocketService instance;
 
     public SocketService()
     {
 
+    }
+
+    public static SocketService getInstance()
+    {
+        return instance;
     }
 
     @Override
@@ -37,10 +43,12 @@ public class SocketService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         try {
             socket = IO.socket("http://192.168.137.1:3002");
             socket.connect();
             JSONObject jsonObject = new JSONObject("{\"userId\":\""+ FacebookInfosRetrieval.user_id+"\"}");
+            Log.v("SOCKET", jsonObject.toString());
             socket.emit("mapUserID", jsonObject);
             socket.on("Notification", onNotif);
             socket.on("userAdded Notification", onAddToGroup);
@@ -66,23 +74,23 @@ public class SocketService extends Service {
     private Emitter.Listener onNotif = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            Log.v("ON_NOTIF", args[0].toString());
-        }
-    };
-
-    private Emitter.Listener onAddToGroup = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            sendNotification("Vous avez été retiré du groupe", "");
-            Log.v("PUSH", "Remove");
+            Log.v("SOCKET", args[0].toString());
         }
     };
 
     private Emitter.Listener onRemoveFromGroup = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
+            sendNotification("Vous avez été retiré du groupe", "");
+            Log.v("SOCKET", "Remove");
+        }
+    };
+
+    private Emitter.Listener onAddToGroup = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
             sendNotification("Vous avez été ajouté au groupe", "");
-            Log.v("PUSH", "Add");
+            Log.v("SOCKET", "Add");
         }
     };
 
@@ -90,7 +98,7 @@ public class SocketService extends Service {
     {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(MapFragment.instance.getActivity().getApplicationContext())
-                        .setSmallIcon(R.drawable.cap)
+                        .setSmallIcon(R.mipmap.onepointman)
                         .setContentTitle(title)
                         .setContentText(description);
 

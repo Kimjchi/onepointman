@@ -10,6 +10,7 @@ import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 
 import com.example.yannick.androidclient.R;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.draw.Drawing;
+import com.example.yannick.androidclient.com.example.yannick.androidclient.socket.SocketService;
 import com.example.yannick.androidclient.com.example.yannick.androidclient.volley.VolleyRequester;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;

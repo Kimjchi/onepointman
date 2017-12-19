@@ -5,9 +5,7 @@ import {store} from '../store';
 import {getPhotoUser, idUser, setAuthState} from "../actions/opLogin";
 import {push} from "react-router-redux";
 
-var sockett;
-
-export function* HandleAuth() {
+export function* HandleAuth(socket) {
 
     while (true) {
 
@@ -21,7 +19,10 @@ export function* HandleAuth() {
             .then(function (response) {
                 if (!!response.status && response.status === 200) {
                     alert('Welcome ' + JSON.stringify(response.data.prenom).replace(/\"/g, ""));
-                    sockett.emit('mapUserID', {"userId": response.data.iduser});
+
+                    //send user id to build datastructure
+                    socket.emit('mapUserID', {"userId": response.data.iduser});
+
                     store.dispatch(setAuthState(true));
                     store.dispatch(idUser(response.data.iduser));
                     store.dispatch(getPhotoUser(response.data.iduser));
@@ -37,7 +38,5 @@ export function* HandleAuth() {
 }
 
 export function* HandleAuthFlow(socket) {
-    sockett = socket;
-
-    yield fork(HandleAuth);
+    yield fork(HandleAuth, socket);
 }
